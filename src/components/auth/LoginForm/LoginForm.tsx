@@ -10,8 +10,7 @@ import { Link, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import firebase from 'firebase/app';
 
-//core components
-// import Error from '@/myComponents/ui/Error';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import GridItem from '@/components/ui/Grid/GridItem';
 import Button from '@/components/ui/Button';
 import GridContainer from '@/components/ui/Grid/GridContainer';
@@ -51,46 +50,44 @@ const LoginForm: FC = () => {
   };
 
   // Submit function (Login user)
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     clearErrors();
     setLoading(true);
     await setPersistence();
-    await firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password)
-      .then(userCredential => userCredential.user)
-      .then(user => {
-        const docRef = firebase.firestore().collection('users').doc(user!.uid);
-        return docRef.get();
-      })
-      .then(doc => {
-        if (doc.exists) {
-          const { role } = doc.data() as any;
-          return role;
-        }
-      })
-      .then(role => {
-        router.push(`/${role}`);
-      })
-      .catch(error => {
-        if (error.code == 'auth/invalid-email') {
-          setError('Formato de correo electrónico inválido');
-        } else if (
-          error.code == 'auth/wrong-password' ||
-          error.code == 'auth/user-not-found'
-        ) {
-          setError('Usuario y/o contraseña inválido');
-        } else if (error.code == 'auth/too-many-request') {
-          setError(
-            'Demasiados intentos. Intente más tarde o solicite el restablecimiento de su contraseña.'
-          );
-        } else if (error) {
-          setError(error.message);
-        }
-      });
+    try {
+      const { user } = await firebase
+        .auth()
+        .signInWithEmailAndPassword(email, password);
+
+      const userDoc = await firebase
+        .firestore()
+        .collection('users')
+        .doc(user!.uid)
+        .get();
+
+      if (!userDoc.exists) return;
+      const userData = userDoc.data() as any;
+      router.push(`/${userData.role}/dashboard`);
+    } catch (err) {
+      if (err.code == 'auth/invalid-email') {
+        setError('Formato de correo electrónico inválido');
+      } else if (
+        err.code == 'auth/wrong-password' ||
+        err.code == 'auth/user-not-found'
+      ) {
+        setError('Usuario y/o contraseña inválido');
+      } else if (err.code == 'auth/too-many-request') {
+        setError(
+          'Demasiados intentos. Intente más tarde o solicite el restablecimiento de su contraseña.'
+        );
+      } else if (err) {
+        setError(err.message);
+      }
+    }
+
     setLoading(false);
-  }
+  };
 
   return (
     <div className={classes.paper}>
@@ -102,7 +99,10 @@ const LoginForm: FC = () => {
       {error && (
         <GridItem>
           <br />
-          {/* <Error msg={error} /> */}
+          <Alert severity="error">
+            <AlertTitle>Error</AlertTitle>
+            {error}
+          </Alert>
         </GridItem>
       )}
       <form className={classes.form} onSubmit={handleSubmit}>

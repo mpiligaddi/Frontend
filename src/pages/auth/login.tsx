@@ -1,14 +1,11 @@
-import { FC } from 'react';
+import { AuthLayout } from '@/components/common';
+import { LoginForm } from '@/components/auth';
+import type { Page } from '@/typings/page';
 
-import AuthLayout from '@/components/common/layouts/auth/AuthLayout';
-import LoginForm from '@/components/auth/LoginForm';
-
-const Login: FC = () => {
-  return (
-    <AuthLayout>
-      <LoginForm />
-    </AuthLayout>
-  );
+const Login: Page = () => {
+  return <LoginForm />;
 };
+
+Login.Layout = AuthLayout;
 
 export default Login;

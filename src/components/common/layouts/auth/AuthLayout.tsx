@@ -1,12 +1,12 @@
 import { useEffect, FC } from 'react';
 import Image from 'next/image';
+
+import logo from '@/assets/img/chek-blanca.png';
+
+import { useStyles } from './styles';
 import Carousel from './Carousel';
 
-//assets
-import logo from '@/assets/img/chek-blanca.png';
-import { useStyles } from './styles';
-
-const AuthLayout: FC = ({ children, ...rest }) => {
+const AuthLayout: FC = ({ children }) => {
   const classes = useStyles();
 
   useEffect(() => {

@@ -53,13 +53,11 @@ const Contact: FC<ContactProps> = ({ close, isOpen = false }) => {
   });
 
   const onSubmit: SubmitHandler<FormValues> = async values => {
-    console.log(values);
     setDisabled(true);
-    // await firebase.firestore().collection('contact').add(values);
+    await firebase.firestore().collection('contact').add(values);
     reset();
     setDisabled(false);
   };
-  console.log(getValues());
 
   return (
     <Dialog open={isOpen} aria-labelledby="form-dialog-title">

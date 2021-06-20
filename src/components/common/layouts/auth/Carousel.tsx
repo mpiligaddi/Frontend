@@ -1,4 +1,5 @@
 import MaterialCarousel from 'react-material-ui-carousel';
+import Image from 'next/image';
 
 import { makeStyles } from '@material-ui/core/styles';
 
@@ -33,19 +34,26 @@ const useStyles = makeStyles(theme => ({
       top: '60vh',
       padding: '20px'
     }
+  },
+  bgWrap: {
+    position: 'relative',
+    height: '100vh',
+    width: '100%',
+    overflow: 'hidden',
+    zIndex: -1
   }
 }));
 
 const items = [
   {
-    src: image1.src,
+    image: image1,
     content: 'Chekeá cómo están tus marcas'
   },
   {
-    src: image2.src,
+    image: image2,
     content: 'Chekeá cómo están tus tiendas'
   },
-  { src: image3.src, content: 'Chekeá cómo trabaja tu equipo' }
+  { image: image3, content: 'Chekeá cómo trabaja tu equipo' }
 ];
 
 export default function Carousel() {
@@ -63,11 +71,15 @@ export default function Carousel() {
       navButtonsAlwaysInvisible
     >
       {items.map((item, i) => (
-        <div
-          key={i}
-          className={classes.item}
-          style={{ backgroundImage: `url(${item.src})` }}
-        >
+        <div key={i} className={classes.item}>
+          <div className={classes.bgWrap}>
+            <Image
+              src={item.image}
+              layout="fill"
+              objectFit="cover"
+              alt={item.content}
+            />
+          </div>
           {/* <img src={item.src} /> */}
           <p className={classes.content}>{item.content}</p>
         </div>

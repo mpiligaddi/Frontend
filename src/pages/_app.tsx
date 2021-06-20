@@ -1,12 +1,23 @@
-import { useEffect, FC } from 'react';
-import type { AppProps } from 'next/app';
-
 import '@/assets/scss/trade-app.scss';
-import { ThemeProvider } from '@material-ui/core';
-import theme from '@/config/theme';
 import '@/lib/firebase';
 
-const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
+import { useEffect, FC } from 'react';
+import type { AppProps } from 'next/app';
+import type { Page } from '@/typings/page';
+import Head from 'next/head';
+
+import { ThemeProvider } from '@material-ui/core';
+import theme from '@/config/theme';
+
+type MyAppProps = AppProps & {
+  Component: Page;
+};
+
+const Noop: FC = ({ children }) => <>{children}</>;
+
+const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
+  const Layout = Component.Layout ?? Noop;
+
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector('#jss-server-side');
@@ -16,11 +27,15 @@ const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
   }, []);
 
   return (
-    <>
-      <ThemeProvider theme={theme}>
+    <ThemeProvider theme={theme}>
+      <Head>
+        <title>Chek</title>
+      </Head>
+      <Layout>
         <Component {...pageProps} />
-      </ThemeProvider>
-    </>
+      </Layout>
+    </ThemeProvider>
   );
 };
+
 export default MyApp;
