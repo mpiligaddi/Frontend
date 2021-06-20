@@ -8,13 +8,13 @@ import illustration from '@/assets/img/LANDINGILUSTRACION.png';
 // @material-ui/core components
 import { Link, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
 import { useRouter } from 'next/router';
-import firebase from 'firebase/app';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import { Alert, AlertTitle } from '@material-ui/lab';
 import GridItem from '@/components/ui/Grid/GridItem';
 import Button from '@/components/ui/Button';
 import GridContainer from '@/components/ui/Grid/GridContainer';
+import { useLogin } from '@/api/auth';
 
 import { useStyles } from './styles';
 
@@ -36,6 +36,7 @@ const LoginForm: FC = () => {
     handleSubmit,
     control
   } = useForm<FormValues>();
+  const login = useLogin();
 
   const handleClose = () => {
     setForgotOpen(false);
@@ -46,33 +47,14 @@ const LoginForm: FC = () => {
   };
 
   // Submit function (Login user)
-  const onSubmit: SubmitHandler<FormValues> = async ({
-    email,
-    password,
-    remember
-  }) => {
+  const onSubmit: SubmitHandler<FormValues> = async values => {
     setError('');
 
-    const persistence = remember
-      ? firebase.auth.Auth.Persistence.LOCAL
-      : firebase.auth.Auth.Persistence.SESSION;
-
-    await firebase.auth().setPersistence(persistence);
-
     try {
-      const { user } = await firebase
-        .auth()
-        .signInWithEmailAndPassword(email, password);
+      const role = await login.mutateAsync(values);
+      if (!role) return;
 
-      const userDoc = await firebase
-        .firestore()
-        .collection('users')
-        .doc(user!.uid)
-        .get();
-
-      if (!userDoc.exists) return;
-      const userData = userDoc.data() as any;
-      await router.push(`/${userData.role}/dashboard`);
+      await router.push(`/${role}/dashboard`);
     } catch (err) {
       if (err.code == 'auth/invalid-email') {
         setError('Formato de correo electrónico inválido');

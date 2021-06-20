@@ -5,6 +5,8 @@ import { useEffect, FC } from 'react';
 import type { AppProps } from 'next/app';
 import type { Page } from '@/typings/page';
 import Head from 'next/head';
+import { QueryClientProvider, QueryClient } from 'react-query';
+import { ReactQueryDevtools } from 'react-query/devtools';
 
 import { ThemeProvider } from '@material-ui/core';
 import theme from '@/config/theme';
@@ -14,6 +16,8 @@ type MyAppProps = AppProps & {
 };
 
 const Noop: FC = ({ children }) => <>{children}</>;
+
+const queryClient = new QueryClient();
 
 const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
   const Layout = Component.Layout ?? Noop;
@@ -27,14 +31,17 @@ const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
   }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Head>
-        <title>Chek</title>
-      </Head>
-      <Layout>
-        <Component {...pageProps} />
-      </Layout>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <Head>
+          <title>Chek</title>
+        </Head>
+        <Layout>
+          <Component {...pageProps} />
+          <ReactQueryDevtools />
+        </Layout>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 

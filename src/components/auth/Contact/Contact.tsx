@@ -3,7 +3,7 @@ import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import 'yup-phone';
-import firebase from 'firebase/app';
+import { useContact } from '@/api/auth';
 
 import {
   Dialog,
@@ -19,7 +19,7 @@ type FormValues = {
   email: string;
   name: string;
   phone: string;
-  message: string;
+  message?: string;
 };
 
 type ContactProps = {
@@ -30,12 +30,12 @@ type ContactProps = {
 const Contact: FC<ContactProps> = ({ close, isOpen = false }) => {
   const [disabled, setDisabled] = useState(false);
   const classes = useStyles();
+  const contact = useContact();
 
   const {
     register,
     handleSubmit,
     reset,
-    getValues,
     formState: { errors }
   } = useForm<FormValues>({
     resolver: yupResolver(
@@ -45,7 +45,10 @@ const Contact: FC<ContactProps> = ({ close, isOpen = false }) => {
           .email('Formato de correo electrónico inválido')
           .required('Campo obligatorio'),
         name: yup.string().required('Campo obligatorio'),
-        phone: yup.string().required('Campo obligatorio'),
+        phone: yup
+          .string()
+          .required('Campo obligatorio')
+          .phone('Numero invalido.'),
         message: yup.string()
       })
     ),
@@ -54,7 +57,7 @@ const Contact: FC<ContactProps> = ({ close, isOpen = false }) => {
 
   const onSubmit: SubmitHandler<FormValues> = async values => {
     setDisabled(true);
-    await firebase.firestore().collection('contact').add(values);
+    await contact.mutateAsync(values);
     reset();
     setDisabled(false);
   };
