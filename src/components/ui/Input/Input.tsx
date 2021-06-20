@@ -116,7 +116,6 @@ const Input = React.forwardRef<any, InputProps>((props, ref) => {
         id={name}
         name={name}
         inputProps={{
-          inputRef: ref,
           name: name,
           placeholder,
           ...newInputProps,

@@ -68,62 +68,57 @@ const Contact: FC<ContactProps> = ({ close, isOpen = false }) => {
         <DialogTitle id="form-dialog-title">Formulario de contacto</DialogTitle>
       </div>
       <DialogContent>
-        <DialogContentText>
-          <GridContainer justify="center">
+        <GridContainer justify="center">
+          <GridItem xs={12} sm={12} md={10}>
             <GridItem xs={12} sm={12} md={10}>
-              <GridItem xs={12} sm={12} md={10}>
-                <form
-                  onSubmit={handleSubmit(onSubmit)}
-                  className={classes.form}
-                >
-                  <Input
-                    fullWidth
-                    className={classes.customFormControlClasses}
-                    errors={errors}
-                    {...register('name')}
-                    placeholder="Nombre"
-                  />
-                  <Input
-                    fullWidth
-                    errors={errors}
-                    className={classes.customFormControlClasses}
-                    {...register('email')}
-                    placeholder="Correo Electronico"
-                  />
-                  <Input
-                    fullWidth
-                    className={classes.customFormControlClasses}
-                    errors={errors}
-                    {...register('phone')}
-                    placeholder="Teléfono"
-                  />
-                  <Input
-                    labelText="Mensaje (opcional)"
-                    errors={errors}
-                    fullWidth
-                    className={classes.customFormControlClasses}
-                    {...register('message')}
-                    multiline
-                    rows={3}
-                  />
-                  <div className={classes.center}>
-                    <br />
-                    <Button
-                      disabled={disabled}
-                      onClick={close}
-                      color="transparent"
-                    >
-                      Cerrar
-                    </Button>
-                    <Button disabled={disabled} type="submit" color="primary">
-                      Enviar
-                    </Button>
-                  </div>
-                </form>
-              </GridItem>
+              <form onSubmit={handleSubmit(onSubmit)} className={classes.form}>
+                <Input
+                  fullWidth
+                  className={classes.customFormControlClasses}
+                  errors={errors}
+                  {...register('name')}
+                  placeholder="Nombre"
+                />
+                <Input
+                  fullWidth
+                  errors={errors}
+                  className={classes.customFormControlClasses}
+                  {...register('email')}
+                  placeholder="Correo Electronico"
+                />
+                <Input
+                  fullWidth
+                  className={classes.customFormControlClasses}
+                  errors={errors}
+                  {...register('phone')}
+                  placeholder="Teléfono"
+                />
+                <Input
+                  labelText="Mensaje (opcional)"
+                  errors={errors}
+                  fullWidth
+                  className={classes.customFormControlClasses}
+                  {...register('message')}
+                  multiline
+                  rows={3}
+                />
+                <div className={classes.center}>
+                  <br />
+                  <Button
+                    disabled={disabled}
+                    onClick={close}
+                    color="transparent"
+                  >
+                    Cerrar
+                  </Button>
+                  <Button disabled={disabled} type="submit" color="primary">
+                    Enviar
+                  </Button>
+                </div>
+              </form>
             </GridItem>
-          </GridContainer>
-        </DialogContentText>
+          </GridItem>
+        </GridContainer>
       </DialogContent>
     </Dialog>
   );
