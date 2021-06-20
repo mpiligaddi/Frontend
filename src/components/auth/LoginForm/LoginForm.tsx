@@ -9,6 +9,7 @@ import illustration from '@/assets/img/LANDINGILUSTRACION.png';
 import { Link, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
 import { useRouter } from 'next/router';
 import firebase from 'firebase/app';
+import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import { Alert, AlertTitle } from '@material-ui/lab';
 import GridItem from '@/components/ui/Grid/GridItem';
@@ -17,17 +18,24 @@ import GridContainer from '@/components/ui/Grid/GridContainer';
 
 import { useStyles } from './styles';
 
+type FormValues = {
+  email: string;
+  password: string;
+  remember: boolean;
+};
+
 const LoginForm: FC = () => {
   const classes = useStyles();
   const [error, setError] = useState('');
-  const [checked, setChecked] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const router = useRouter();
+  const {
+    register,
+    formState: { errors },
+    handleSubmit,
+    control
+  } = useForm<FormValues>();
 
   const handleClose = () => {
     setForgotOpen(false);
@@ -37,24 +45,20 @@ const LoginForm: FC = () => {
     setContactOpen(false);
   };
 
-  const setPersistence = async () => {
-    const persistence = rememberMe
+  // Submit function (Login user)
+  const onSubmit: SubmitHandler<FormValues> = async ({
+    email,
+    password,
+    remember
+  }) => {
+    setError('');
+
+    const persistence = remember
       ? firebase.auth.Auth.Persistence.LOCAL
       : firebase.auth.Auth.Persistence.SESSION;
 
-    return firebase.auth().setPersistence(persistence);
-  };
+    await firebase.auth().setPersistence(persistence);
 
-  const clearErrors = () => {
-    setError('');
-  };
-
-  // Submit function (Login user)
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    clearErrors();
-    setLoading(true);
-    await setPersistence();
     try {
       const { user } = await firebase
         .auth()
@@ -68,7 +72,7 @@ const LoginForm: FC = () => {
 
       if (!userDoc.exists) return;
       const userData = userDoc.data() as any;
-      router.push(`/${userData.role}/dashboard`);
+      await router.push(`/${userData.role}/dashboard`);
     } catch (err) {
       if (err.code == 'auth/invalid-email') {
         setError('Formato de correo electrónico inválido');
@@ -85,8 +89,6 @@ const LoginForm: FC = () => {
         setError(err.message);
       }
     }
-
-    setLoading(false);
   };
 
   return (
@@ -105,17 +107,15 @@ const LoginForm: FC = () => {
           </Alert>
         </GridItem>
       )}
-      <form className={classes.form} onSubmit={handleSubmit}>
+      <form className={classes.form} onSubmit={handleSubmit(onSubmit)}>
         <TextField
           variant="outlined"
           margin="normal"
           required
+          {...register('email')}
           fullWidth
           type="email"
-          id="email"
           label="Correo electrónico"
-          name="email"
-          onChange={e => setEmail(e.target.value)}
           autoComplete="email"
           autoFocus
         />
@@ -124,19 +124,24 @@ const LoginForm: FC = () => {
           margin="normal"
           required
           fullWidth
-          name="password"
+          {...register('password')}
           label="Contraseña"
           type="password"
-          id="password"
-          onChange={e => setPassword(e.target.value)}
           autoComplete="current-password"
         />
         <FormControlLabel
           control={
-            <Checkbox
-              onChange={() => setRememberMe(!rememberMe)}
-              value={rememberMe}
-              color="primary"
+            <Controller
+              control={control}
+              name="remember"
+              render={({ field: { onChange, value } }) => (
+                <Checkbox
+                  color="primary"
+                  onChange={e => onChange(e.target.checked)}
+                  checked={value}
+                />
+              )}
+              defaultValue={false}
             />
           }
           label="Recordar usuario"
