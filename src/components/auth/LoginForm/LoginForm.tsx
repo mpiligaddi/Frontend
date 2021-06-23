@@ -1,19 +1,17 @@
-import React, { useState, FC } from 'react';
+import { useState, FC } from 'react';
 import Image from 'next/image';
-// import ForgotPassword from './ForgotPassword';
+
+import ForgotPassword from '../ForgotPassword';
 import Contact from '../Contact';
 
 import illustration from '@/assets/img/LANDINGILUSTRACION.png';
 
-// @material-ui/core components
 import { Link, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
+import { Alert, AlertTitle } from '@material-ui/lab';
 import { useRouter } from 'next/router';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
-import { Alert, AlertTitle } from '@material-ui/lab';
-import GridItem from '@/components/ui/Grid/GridItem';
-import Button from '@/components/ui/Button';
-import GridContainer from '@/components/ui/Grid/GridContainer';
+import { GridItem, Button, GridContainer } from '@/components/ui';
 import { useLogin } from '@/api/auth';
 
 import { useStyles } from './styles';
@@ -30,12 +28,7 @@ const LoginForm: FC = () => {
   const [forgotOpen, setForgotOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const router = useRouter();
-  const {
-    register,
-    formState: { errors },
-    handleSubmit,
-    control
-  } = useForm<FormValues>();
+  const { register, handleSubmit, control } = useForm<FormValues>();
   const login = useLogin();
 
   const handleClose = () => {
@@ -51,10 +44,10 @@ const LoginForm: FC = () => {
     setError('');
 
     try {
-      const role = await login.mutateAsync(values);
-      if (!role) return;
+      const user = await login.mutateAsync(values);
+      if (!user?.role) return;
 
-      await router.push(`/${role}/dashboard`);
+      await router.push(`/${user.role}/dashboard`);
     } catch (err) {
       if (err.code == 'auth/invalid-email') {
         setError('Formato de correo electrónico inválido');
@@ -166,7 +159,7 @@ const LoginForm: FC = () => {
           </GridItem>
         </GridContainer>
       </form>
-      {/* <ForgotPassword isOpen={forgotOpen} handleClose={handleClose} /> */}
+      <ForgotPassword isOpen={forgotOpen} close={handleClose} />
       <Contact isOpen={contactOpen} close={handleCloseContact} />
     </div>
   );

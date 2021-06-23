@@ -1,5 +1,7 @@
 import { useMutation } from 'react-query';
 import firebase from 'firebase/app';
+import { User } from '@/lib/types';
+import { useQueryClient } from 'react-query';
 
 type Data = {
   email: string;
@@ -8,11 +10,13 @@ type Data = {
 };
 
 export const useLogin = () => {
+  const queryClient = useQueryClient();
+
   const login = async ({
     email,
     remember,
     password
-  }: Data): Promise<string | null> => {
+  }: Data): Promise<User | null> => {
     const persistence = remember
       ? firebase.auth.Auth.Persistence.LOCAL
       : firebase.auth.Auth.Persistence.SESSION;
@@ -30,10 +34,14 @@ export const useLogin = () => {
       .get();
 
     if (!userDoc.exists) return null;
-    const userData = userDoc.data() as any;
+    const userData = userDoc.data() as User;
 
-    return userData.role;
+    return userData;
   };
 
-  return useMutation(login);
+  return useMutation(login, {
+    onSuccess(user) {
+      queryClient.setQueryData('me', user);
+    }
+  });
 };

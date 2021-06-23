@@ -1,4 +1,5 @@
 import '@/assets/scss/trade-app.scss';
+import 'react-perfect-scrollbar/dist/css/styles.css';
 import '@/lib/firebase';
 
 import { useEffect, FC } from 'react';
@@ -38,8 +39,8 @@ const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
         </Head>
         <Layout>
           <Component {...pageProps} />
-          <ReactQueryDevtools />
         </Layout>
+        {/* <ReactQueryDevtools /> */}
       </ThemeProvider>
     </QueryClientProvider>
   );

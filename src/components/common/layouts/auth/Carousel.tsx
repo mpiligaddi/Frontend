@@ -1,9 +1,9 @@
+import { FC } from 'react';
 import MaterialCarousel from 'react-material-ui-carousel';
 import Image from 'next/image';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-//assets
 import image1 from '@/assets/img/LANDING-01.webp';
 import image2 from '@/assets/img/LANDING-02.webp';
 import image3 from '@/assets/img/LANDING-03.webp';
@@ -56,12 +56,8 @@ const items = [
   { image: image3, content: 'Chekeá cómo trabaja tu equipo' }
 ];
 
-export default function Carousel() {
-  const props = {
-    backgroundImage: 'url(../../../assets/img/LANDING-01.webp)'
-  };
-
-  const classes = useStyles(props);
+const Carousel: FC = () => {
+  const classes = useStyles();
 
   return (
     <MaterialCarousel
@@ -80,10 +76,11 @@ export default function Carousel() {
               alt={item.content}
             />
           </div>
-          {/* <img src={item.src} /> */}
           <p className={classes.content}>{item.content}</p>
         </div>
       ))}
     </MaterialCarousel>
   );
-}
+};
+
+export default Carousel;

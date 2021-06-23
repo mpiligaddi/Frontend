@@ -1,16 +1,11 @@
-import React, { useState, FC } from 'react';
+import { useState, FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import 'yup-phone';
 import { useContact } from '@/api/auth';
 
-import {
-  Dialog,
-  DialogContent,
-  DialogContentText,
-  DialogTitle
-} from '@material-ui/core';
+import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
 import { Button, GridContainer, GridItem, Input } from '@/components/ui';
 
 import { useStyles } from './styles';

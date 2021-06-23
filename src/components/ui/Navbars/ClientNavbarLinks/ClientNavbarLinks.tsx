@@ -1,63 +1,59 @@
-import React from 'react';
-import classNames from 'classnames';
-import PropTypes from 'prop-types';
-// import { Manager, Target, Popper } from "react-popper";
+import React, { FC, useState } from 'react';
+import cn from 'classnames';
 
-// @material-ui/core components
-import { makeStyles } from '@material-ui/core/styles';
-import MenuItem from '@material-ui/core/MenuItem';
-import MenuList from '@material-ui/core/MenuList';
-import ClickAwayListener from '@material-ui/core/ClickAwayListener';
-import Paper from '@material-ui/core/Paper';
-import Grow from '@material-ui/core/Grow';
-import Hidden from '@material-ui/core/Hidden';
-import Popper from '@material-ui/core/Popper';
-import Divider from '@material-ui/core/Divider';
+import {
+  MenuItem,
+  MenuList,
+  Paper,
+  Grow,
+  Hidden,
+  Popper,
+  ClickAwayListener
+} from '@material-ui/core';
 
-// @material-ui/icons
-import ExitToApp from '@material-ui/icons/ExitToApp';
-import Notifications from '@material-ui/icons/Notifications';
-import Dashboard from '@material-ui/icons/Dashboard';
-import Search from '@material-ui/icons/Search';
+import { ExitToApp, Notifications } from '@material-ui/icons';
 
-// core components
-import CustomInput from '../CustomInput/CustomInput.js';
-import Button from '../CustomButtons/Button.js';
-import SignOutButton from '../../myComponents/SignOutButton';
+import { SignOutButton, Button } from '@/components/ui';
 
-import styles from '../../assets/jss/trade-app/components/adminNavbarLinksStyle.js';
+import { useStyles } from './styles';
+import { useDropdownStyles } from '@/styles/dropdown';
 
-const useStyles = makeStyles(styles);
+const ClientNavBarLinks: FC = () => {
+  const [openNotification, setOpenNotification] = useState(null);
+  const [openProfile, setOpenProfile] = useState(null);
+  const classes = useStyles();
+  const dropDownClasses = useDropdownStyles();
 
-export default function HeaderLinks(props) {
-  const [openNotification, setOpenNotification] = React.useState(null);
-  const handleClickNotification = event => {
-    if (openNotification && openNotification.contains(event.target)) {
+  const handleClickNotification = (event: React.MouseEvent) => {
+    if (openNotification && (openNotification as any).contains(event.target)) {
       setOpenNotification(null);
     } else {
-      setOpenNotification(event.currentTarget);
+      setOpenNotification(event.currentTarget as any);
     }
   };
+
   const handleCloseNotification = () => {
     setOpenNotification(null);
   };
-  const [openProfile, setOpenProfile] = React.useState(null);
-  const handleClickProfile = event => {
-    if (openProfile && openProfile.contains(event.target)) {
+
+  const handleClickProfile = (event: React.MouseEvent) => {
+    if (openProfile && (openProfile as any).contains(event.target)) {
       setOpenProfile(null);
     } else {
-      setOpenProfile(event.currentTarget);
+      setOpenProfile(event.currentTarget as any);
     }
   };
+
   const handleCloseProfile = () => {
     setOpenProfile(null);
   };
-  const classes = useStyles();
-  const searchButton =
-    classes.top + ' ' + classes.searchButton + ' ' + classNames({});
-  const dropdownItem = classNames(classes.dropdownItem, classes.primaryHover);
-  const wrapper = classNames({});
-  const managerClasses = classNames({
+  const searchButton = classes.top + ' ' + classes.searchButton + ' ' + cn({});
+  const dropdownItem = cn(
+    dropDownClasses.dropdownItem,
+    dropDownClasses.primaryHover
+  );
+  const wrapper = cn({});
+  const managerClasses = cn({
     [classes.managerClasses]: true
   });
   return (
@@ -95,20 +91,20 @@ export default function HeaderLinks(props) {
           <span className={classes.linkText}>{'Dashboard'}</span>
         </Hidden>
       </Button> */}
-     <div className={managerClasses}>
+      <div className={managerClasses}>
         <Button
           color="transparent"
           justIcon
           aria-label="Notificationes"
-          aria-owns={openNotification ? 'notification-menu-list' : null}
+          aria-owns={openNotification ? 'notification-menu-list' : undefined}
           aria-haspopup="true"
           onClick={handleClickNotification}
           className={classes.buttonLink}
         >
           <Notifications
             className={classes.headerLinksSvg + ' ' + classes.links}
-          /> 
-            </Button>
+          />
+        </Button>
         <Popper
           open={Boolean(openNotification)}
           anchorEl={openNotification}
@@ -116,38 +112,34 @@ export default function HeaderLinks(props) {
           disablePortal
           placement="bottom"
           color="primary"
-          className={classNames({
-            [classes.popperClose]: !openNotification,
-            [classes.popperResponsive]: true,
-            [classes.popperNav]: true
+          className={cn({
+            [dropDownClasses.popperClose]: !openNotification,
+            [dropDownClasses.popperResponsive]: true,
+            [dropDownClasses.popperNav]: true
           })}
         >
           {({ TransitionProps }) => (
-            <Grow
-              {...TransitionProps}
-              id="notification-menu-list"
-              style={{ transformOrigin: '0 0 0' }}
-            >
-              <Paper className={classes.dropdown}>
+            <Grow {...TransitionProps} style={{ transformOrigin: '0 0 0' }}>
+              <Paper className={dropDownClasses.dropdown}>
                 <ClickAwayListener onClickAway={handleCloseNotification}>
                   <MenuList role="menu">
-                  <MenuItem
+                    <MenuItem
                       onClick={handleCloseNotification}
                       className={dropdownItem}
                     >
-                       {'Permanecé atento'}
+                      {'Permanecé atento'}
                     </MenuItem>
                     <MenuItem
                       onClick={handleCloseNotification}
                       className={dropdownItem}
                     >
-                     {'Próximamente verás aquí'}
+                      {'Próximamente verás aquí'}
                     </MenuItem>
                     <MenuItem
                       onClick={handleCloseNotification}
                       className={dropdownItem}
                     >
-                     {'Tus notificaciones'}
+                      {'Tus notificaciones'}
                     </MenuItem>
                   </MenuList>
                 </ClickAwayListener>
@@ -155,14 +147,14 @@ export default function HeaderLinks(props) {
             </Grow>
           )}
         </Popper>
-      </div> 
-  
+      </div>
+
       <div className={managerClasses}>
         <Button
           color="transparent"
           aria-label="ExitToApp"
           justIcon
-          aria-owns={openProfile ? 'profile-menu-list' : null}
+          aria-owns={openProfile ? 'profile-menu-list' : undefined}
           aria-haspopup="true"
           onClick={handleClickProfile}
           className={classes.buttonLink}
@@ -180,19 +172,15 @@ export default function HeaderLinks(props) {
           transition
           disablePortal
           placement="bottom"
-          className={classNames({
-            [classes.popperClose]: !openProfile,
-            [classes.popperResponsive]: true,
-            [classes.popperNav]: true
+          className={cn({
+            [dropDownClasses.popperClose]: !openProfile,
+            [dropDownClasses.popperResponsive]: true,
+            [dropDownClasses.popperNav]: true
           })}
         >
           {({ TransitionProps }) => (
-            <Grow
-              {...TransitionProps}
-              id="profile-menu-list"
-              style={{ transformOrigin: '0 0 0' }}
-            >
-              <Paper className={classes.dropdown}>
+            <Grow {...TransitionProps} style={{ transformOrigin: '0 0 0' }}>
+              <Paper className={dropDownClasses.dropdown}>
                 <ClickAwayListener onClickAway={handleCloseProfile}>
                   <MenuList role="menu">
                     {/* <MenuItem
@@ -221,6 +209,6 @@ export default function HeaderLinks(props) {
       </div>
     </div>
   );
-}
+};
 
-HeaderLinks.propTypes = {};
+export default ClientNavBarLinks;
