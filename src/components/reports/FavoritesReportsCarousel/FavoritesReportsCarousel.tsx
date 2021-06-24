@@ -4,7 +4,8 @@ import { format } from 'date-fns';
 
 import { Branch, Chain } from '@/lib/types';
 import { getImages, FilteredImage } from '@/utils/images';
-import { useClientsFilters } from '@/api/reports/filters';
+import { useClientsFilters } from '@/api/reports/filters/query';
+import branches from '@/data/branches';
 
 import { Card, CardBody, CardFooter } from '@/components/ui';
 import { useStyles } from './styles';
@@ -20,17 +21,17 @@ const FavoritesReportsCarousel: FC = () => {
   const classes = useStyles();
   const [images, setImages] = useState<FilteredImage[]>([]);
   const [activeImage, setActiveImage] = useState<ActiveImage>();
-  const { reportsXClient, branchesXClient, chains } = useClientsFilters();
+  const { reports, chains } = useClientsFilters();
 
   useEffect(() => {
-    if (!reportsXClient) return;
+    if (!reports.data) return;
 
-    const images = getImages(reportsXClient);
+    const images = getImages(reports.data);
 
     const favoritesImages = images.filter(image => image.favorite).slice(0, 6);
 
     setImages(favoritesImages);
-  }, [reportsXClient]);
+  }, [reports.data]);
 
   const onChangeImage = useCallback(
     (index: number) => {
@@ -41,20 +42,18 @@ const FavoritesReportsCarousel: FC = () => {
       setActiveImage({
         date: format(image.report.createdAt.toDate(), 'dd/mm/yy'),
         category: image.categoryName,
-        branch: branchesXClient.find(
-          branch => branch.ID === image.report.branchId
-        ),
-        chain: chains.find(chain => chain.ID === image.report.chainId)
+        branch: branches.find(branch => branch.ID === image.report.branchId),
+        chain: chains.data?.find(chain => chain.ID === image.report.chainId)
       });
     },
-    [images, branchesXClient, chains]
+    [images, chains.data]
   );
 
   useEffect(() => {
-    if (images.length > 0 && branchesXClient.length > 0 && chains.length > 0) {
+    if (images.length > 0 && branches.length > 0 && chains.data?.length! > 0) {
       onChangeImage(0);
     }
-  }, [branchesXClient, chains, images, onChangeImage]);
+  }, [chains.data, images, onChangeImage]);
 
   return (
     <Card className={classes.card}>

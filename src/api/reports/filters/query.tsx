@@ -1,0 +1,108 @@
+import { useState, useEffect, FC, createContext, SetStateAction } from 'react';
+import { useReports, useCategories, useChains, useBranches } from '@/api/data';
+import { useClient } from '@/api/user';
+import { UseQueryResult } from 'react-query';
+import { Branch, Category, Chain, Report } from '@/lib/types';
+import { Dispatch } from 'react';
+import { useContext } from 'react';
+
+interface Filters {
+  branch?: Branch;
+  chain?: Chain;
+  category?: Category;
+}
+
+interface ClientsFiltersState {
+  reports: UseQueryResult<Report[]>;
+  chains: UseQueryResult<Chain[]>;
+  branches: UseQueryResult<Branch[]>;
+  categories: UseQueryResult<Category[]>;
+  filteredReports: Report[];
+  filters?: Filters;
+  setFilters: Dispatch<SetStateAction<Filters | undefined>>;
+}
+
+const ClientsFiltersContext = createContext({} as ClientsFiltersState);
+
+const ClientsFiltersProvider: FC = ({ children }) => {
+  const { client } = useClient();
+  const [filters, setFilters] = useState<Filters>();
+  const [filteredReports, setFilteredReports] = useState<Report[]>([]);
+
+  const categories = useCategories(+client);
+  const reports = useReports(+client);
+  const chains = useChains({
+    clientId: client,
+    reported: true,
+    reports: reports.data
+  });
+  const branches = useBranches({
+    chain: filters?.chain?.ID,
+    reported: true,
+    reports: reports.data
+  });
+
+  useEffect(() => {
+    const getReports = async () => {
+      if (!reports.data) return;
+
+      if (!filters) return;
+
+      if (!filters.chain?.ID || !filters.branch?.ID) return;
+
+      let filteredReports = reports.data.filter(report => {
+        if (
+          filters.chain?.ID &&
+          !filters.branch?.ID &&
+          report.chainId === filters.chain.ID
+        )
+          return true;
+        else if (
+          filters.chain?.ID &&
+          filters.branch?.ID &&
+          report.chainId === filters.chain?.ID &&
+          report.branchId === filters.branch?.ID
+        )
+          return true;
+        else return false;
+      });
+
+      if (filters?.category?.ID) {
+        filteredReports = filteredReports?.map(report => {
+          const categories = report.categories.filter(
+            c => c.ID === filters?.category?.ID
+          );
+
+          return {
+            ...report,
+            categories
+          };
+        });
+      }
+
+      setFilteredReports(filteredReports);
+    };
+
+    getReports();
+  }, [filters, reports.data]);
+
+  return (
+    <ClientsFiltersContext.Provider
+      value={{
+        reports,
+        chains,
+        categories,
+        filters,
+        setFilters,
+        filteredReports,
+        branches
+      }}
+    >
+      {children}
+    </ClientsFiltersContext.Provider>
+  );
+};
+
+export const useClientsFilters = () => useContext(ClientsFiltersContext);
+
+export default ClientsFiltersProvider;

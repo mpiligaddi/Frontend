@@ -1,48 +1,46 @@
 import { FC } from 'react';
-import { useClientsFilters } from '@/api/reports/filters';
-
-import { GridItem, GridContainer } from '@/components/ui';
 import { Select, MenuItem, FormControl, InputLabel } from '@material-ui/core';
+import { GridItem, GridContainer } from '@/components/ui';
+import { useClientsFilters } from '@/api/reports/filters/query';
+
 import { useStyles } from './styles';
 import { useSelectStyles } from '@/styles/select';
 
 const FilterBar: FC = () => {
   const classes = useStyles();
   const selectClasses = useSelectStyles();
-  const {
-    setBranch,
-    setChain,
-    setCategory,
-    branchesXClient,
-    branch,
-    chain,
-    category,
-    chainsWithReports,
-    branchesWithReports,
-    categories
-  } = useClientsFilters();
+  const { chains, categories, setFilters, filters, branches } =
+    useClientsFilters();
 
   const handleSelectChain = (event: any) => {
-    setBranch({});
-    const c = chainsWithReports.find(
-      (chain: any) => chain.ID === event.target.value
-    );
-    setChain(c);
+    setFilters(filters => ({
+      ...filters,
+      branch: undefined
+    }));
+    const chain = chains.data?.find(chain => chain.ID === event.target.value);
+    setFilters(filters => ({
+      ...filters,
+      chain
+    }));
   };
 
   const handleSelectBranch = (event: any) => {
     const { value } = event.target;
-    const branch = chain
-      ? branchesWithReports.find(b => b.ID === value)
-      : branchesXClient.find(b => b.ID === value);
-    setBranch(branch);
+    const branch = branches.data?.find(b => b.ID === value);
+
+    setFilters(filters => ({
+      ...filters,
+      branch
+    }));
   };
 
   const handleSelectCategory = (event: any) => {
     const { value } = event.target;
-    const category = categories.find(category => category.ID === value);
-    if (!category) setCategory({ name: 'Todas' });
-    else setCategory(category) as any;
+    const category = categories.data?.find(category => category.ID === value);
+    setFilters(filters => ({
+      ...filters,
+      category
+    }));
   };
 
   return (
@@ -70,7 +68,7 @@ const FilterBar: FC = () => {
                   classes={{
                     select: selectClasses.select
                   }}
-                  value={chain.ID ?? ''}
+                  value={filters?.chain?.ID || ''}
                   onChange={handleSelectChain}
                   inputProps={{
                     name: 'selectChain',
@@ -81,7 +79,7 @@ const FilterBar: FC = () => {
                     Seleccione cadena
                   </MenuItem>
 
-                  {chainsWithReports.map((chain: any) => (
+                  {chains.data?.map((chain: any) => (
                     <MenuItem
                       key={chain.ID}
                       classes={{
@@ -109,7 +107,7 @@ const FilterBar: FC = () => {
                   Sucursal
                 </InputLabel>
                 <Select
-                  disabled={chain ? false : true}
+                  disabled={filters?.chain?.name ? false : true}
                   displayEmpty
                   MenuProps={{
                     className: selectClasses.selectMenu
@@ -117,7 +115,7 @@ const FilterBar: FC = () => {
                   classes={{
                     select: selectClasses.select
                   }}
-                  value={branch.ID ?? ''}
+                  value={filters?.branch?.ID || ''}
                   onChange={handleSelectBranch}
                   inputProps={{
                     name: 'selectBranch',
@@ -127,7 +125,7 @@ const FilterBar: FC = () => {
                   <MenuItem value={''} disabled>
                     Seleccione sucursal
                   </MenuItem>
-                  {branchesWithReports.map((branch: any) => (
+                  {branches.data?.map((branch: any) => (
                     <MenuItem
                       key={branch.ID}
                       classes={{
@@ -162,7 +160,7 @@ const FilterBar: FC = () => {
                   classes={{
                     select: selectClasses.select
                   }}
-                  value={category.ID ?? ''}
+                  value={filters?.category?.ID || ''}
                   onChange={handleSelectCategory}
                   inputProps={{
                     name: 'selectCategory',
@@ -170,7 +168,6 @@ const FilterBar: FC = () => {
                   }}
                 >
                   <MenuItem
-                    key={branch.ID}
                     classes={{
                       root: selectClasses.selectMenuItem,
                       selected: selectClasses.selectMenuItemSelected
@@ -179,7 +176,7 @@ const FilterBar: FC = () => {
                   >
                     Todas las categorías
                   </MenuItem>
-                  {categories.map((category: any, i: number) => (
+                  {categories.data?.map(category => (
                     <MenuItem
                       key={category.ID}
                       classes={{

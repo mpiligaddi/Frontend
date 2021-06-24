@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { ClientsFiltersProvider } from '@/api/reports/filters';
+import ClientsFiltersProvider from '@/api/reports/filters/query';
 
 import { ClientNavbar } from '@/components/ui';
 import logo from '@/assets/img/CHEK-NEGRO (1).png';

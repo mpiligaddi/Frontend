@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useClient } from '@/api/user';
 import { Page } from '@/typings/page';
-import { useClientsFilters } from '@/api/reports/filters';
+import { useClientsFilters } from '@/api/reports/filters/query';
 import { ClientLayout } from '@/components/common/';
 import { makeStyles } from '@material-ui/core/styles';
 import { FavoritesReports } from '@/components/reports';
@@ -95,12 +95,7 @@ const useStyles = makeStyles({
 const Dashboard: Page = () => {
   const classes = useStyles();
   const { name, client } = useClient();
-  const { chain, branchesXClient, chains, getReportsxClient, branch } =
-    useClientsFilters();
-
-  useEffect(() => {
-    getReportsxClient();
-  }, [client]);
+  const { chains, filters } = useClientsFilters();
 
   return (
     <GridContainer>
@@ -128,16 +123,10 @@ const Dashboard: Page = () => {
           {client && <FilterBar />}
         </GridItem>
         <GridItem xs={12} sm={8} md={8} lg={8}>
-          {chain && branch.name ? (
+          {filters?.chain && filters?.branch?.name ? (
             <Accordion type="revised" />
           ) : (
-            <>
-              {branchesXClient.length === 0 || chains.length === 0 ? (
-                <LinearProgress />
-              ) : (
-                <FavoritesReports />
-              )}
-            </>
+            <>{chains.isLoading ? <LinearProgress /> : <FavoritesReports />}</>
           )}
         </GridItem>
       </GridContainer>

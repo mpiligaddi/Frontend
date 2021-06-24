@@ -2,20 +2,20 @@ import { useState, useEffect, FC } from 'react';
 import { LinearProgress } from '@/components/ui';
 
 import Report from '../Report';
-import { useClientsFilters } from '@/api/reports/filters';
+import { useClientsFilters } from '@/api/reports/filters/query';
 import CarouselProvider from '../Carousel/CarouselProvider';
 import { ReportCategory, Report as IReport } from '@/lib/types';
 
 const FilterImages: FC<{ type: string }> = ({ type }) => {
   const [loading, setLoading] = useState(true);
-  const [filteredReports, setFilteredReports] = useState<IReport[]>([]);
-  const { reports, category } = useClientsFilters();
+  const [reports, setReports] = useState<IReport[]>([]);
+  const { filteredReports, filters } = useClientsFilters();
 
   useEffect(() => {
-    if (!reports) return;
+    if (!filteredReports) return;
 
     setLoading(true);
-    const newReports = reports.reduce((reports: IReport[], report) => {
+    const newReports = filteredReports.reduce((reports: IReport[], report) => {
       if (!report.revised) return reports;
 
       const categories = report.categories.reduce(
@@ -57,19 +57,19 @@ const FilterImages: FC<{ type: string }> = ({ type }) => {
       ];
     }, []);
 
-    setFilteredReports(newReports);
+    setReports(newReports);
     setLoading(false);
-  }, [reports, type]);
+  }, [filteredReports, type]);
 
   if (loading) return <LinearProgress />;
 
   return (
     <CarouselProvider disableAction>
-      {filteredReports.map(report => (
+      {reports.map(report => (
         <Report
           key={report.id}
           report={report}
-          category={category}
+          category={filters?.category}
           disableAction
           revisable={false}
         />

@@ -39,8 +39,8 @@ const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
         </Head>
         <Layout>
           <Component {...pageProps} />
+          <ReactQueryDevtools />
         </Layout>
-        {/* <ReactQueryDevtools /> */}
       </ThemeProvider>
     </QueryClientProvider>
   );

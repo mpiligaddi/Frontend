@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import firebase from 'firebase/app';
+import { User } from '@/lib/types';
 
 export const useClient = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const [client, setClient] = useState();
+  const [client, setClient] = useState('');
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(async user => {
@@ -17,14 +18,14 @@ export const useClient = () => {
 
         if (!user.exists) return;
 
-        const { displayName, email } = user.data() as any;
+        const { displayName, email } = user.data() as User;
         setName(displayName);
         setEmail(email);
 
         const client = await firebase
           .firestore()
           .collection('clients')
-          .where('email', '==', `${email}`)
+          .where('email', '==', email)
           .get();
 
         const clientId = client.docs.map(doc => doc.data())[0].ID;

@@ -15,7 +15,7 @@ import { useStyles } from './styles';
 
 type ReportProps = {
   report: IReport;
-  category: Category;
+  category?: Category;
   disableAction?: boolean;
   revisable?: boolean;
 };
@@ -69,7 +69,7 @@ const Report: FC<ReportProps> = ({
       </div>
       {report.categories.map((cat, catIndex: number) => (
         <GridContainer key={catIndex} className={classes.report}>
-          {!category.ID && (
+          {!category && (
             <div className={classes.reportDate}>
               <p>{cat.name}</p>
             </div>
