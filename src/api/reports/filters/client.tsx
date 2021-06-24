@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { createContext, useState, useContext, useEffect, FC } from 'react';
 import { useClient } from '@/api/user/client';
 import firebase from 'firebase/app';

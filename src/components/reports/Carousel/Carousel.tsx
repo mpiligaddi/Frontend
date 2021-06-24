@@ -110,7 +110,7 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
     }
   };
 
-  const scrollBehaviour = e => {
+  const scrollBehaviour = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
     e.target.scrollTop = lastScroll;
@@ -147,24 +147,26 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
   };
 
   const nextSlide = () => {
-    if (carouselRef.current?.children.length > 1) {
-      const firtsElement = carouselRef.current.firstElementChild;
+    if (carouselRef?.current?.children?.length! > 1) {
+      const firtsElement = carouselRef.current!.firstElementChild;
 
-      carouselRef.current.style.transition = `500ms ease-out all`;
+      carouselRef.current!.style.transition = `500ms ease-out all`;
 
-      carouselRef.current.style.transform = `translateX(-${firtsElement.offsetWidth}px)`;
+      carouselRef.current!.style.transform = `translateX(-${
+        (firtsElement as any).offsetWidth
+      }px)`;
 
       const nextTransition = () => {
-        carouselRef.current.style.transition = 'none';
-        carouselRef.current.style.transform = `translateX(0)`;
-        carouselRef.current.appendChild(firtsElement);
-        carouselRef.current.removeEventListener(
+        carouselRef.current!.style.transition = 'none';
+        carouselRef.current!.style.transform = `translateX(0)`;
+        carouselRef.current?.appendChild(firtsElement as Node);
+        carouselRef.current?.removeEventListener(
           'transitionend',
           nextTransition
         );
       };
 
-      carouselRef.current.addEventListener('transitionend', nextTransition);
+      carouselRef.current!.addEventListener('transitionend', nextTransition);
     }
   };
 
@@ -173,7 +175,7 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
       const lastChild = carouselRef.current.lastElementChild;
 
       carouselRef.current.insertBefore(
-        lastChild,
+        lastChild!,
         carouselRef.current.firstChild
       );
 
@@ -181,8 +183,8 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
       carouselRef.current.style.transform = `translateX(-${lastChild.offsetWidth}px)`;
 
       setTimeout(() => {
-        carouselRef.current.style.transition = `500ms ease-out all`;
-        carouselRef.current.style.transform = `translateX(0)`;
+        carouselRef.current!.style.transition = `500ms ease-out all`;
+        carouselRef.current!.style.transform = `translateX(0)`;
       }, 30);
     }
   };

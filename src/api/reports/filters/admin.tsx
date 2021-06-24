@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import {
   createContext,
   useState,
@@ -16,14 +18,25 @@ import zonesJSON from '@/data/zones';
 import supervisorsJSON from '@/data/supervisors';
 import adminsJSON from '@/data/admins';
 import comercialsJSON from '@/data/comercials';
-import { Report, Branch } from '@/lib/types';
+import {
+  Report,
+  Branch,
+  Client,
+  Chain,
+  Zone,
+  Supervisor,
+  Admin,
+  Comercial,
+  Coverage
+} from '@/lib/types';
+import firebase from 'firebase/app';
 
 const noop = () => {};
 
 const AdminFiltersContext = createContext({
   loading: true,
   isLoading: false,
-  chain: {},
+  chain: {} as Chain,
   client: '',
   reports: [] as Report[],
   branch: {} as Branch,
@@ -57,23 +70,23 @@ const AdminFiltersContext = createContext({
 
 const AdminFiltersProvider: FC = ({ children }) => {
   const { clientsData, loading } = useAdminClients();
-  const [chain, setChain] = useState({});
+  const [chain, setChain] = useState<Chain>();
   const [client, setClient] = useState('');
   const [branch, setBranch] = useState({});
   const [category, setCategory] = useState({});
   const [isLoading, setIsLoading] = useState(false);
   const [chains, setChains] = useState([]);
-  const [allBranches, setAllBranches] = useState([]);
-  const [allChains, setAllChains] = useState([]);
-  const [coverages, setCoverages] = useState([]);
-  const [zones, setZones] = useState([]);
-  const [supervisors, setSupervisors] = useState([]);
-  const [admins, setAdmins] = useState([]);
-  const [comercials, setComercials] = useState([]);
+  const [allBranches, setAllBranches] = useState<Branch[]>([]);
+  const [allChains, setAllChains] = useState<Chain[]>([]);
+  const [coverages, setCoverages] = useState<Coverage[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [supervisors, setSupervisors] = useState<Supervisor[]>([]);
+  const [admins, setAdmins] = useState<Admin[]>([]);
+  const [comercials, setComercials] = useState<Comercial[]>([]);
   const [chainsWithReports, setChainsWithReports] = useState([]);
   const [coveragesXAdmin, setCoveragesXAdmin] = useState([]);
   const [coverageXClient, setCoverageXClient] = useState([]);
-  const [allClients, setAllClients] = useState([]);
+  const [allClients, setAllClients] = useState<Client[]>([]);
   const [reports, setReports] = useState([]);
   const [categories, setCategories] = useState([]);
   const [reportsXChain, setReportsXChain] = useState([]);
@@ -132,7 +145,8 @@ const AdminFiltersProvider: FC = ({ children }) => {
   ///*** CADENAS, SUCURSALES Y COBERTURAS ***///
 
   const getCoveragesFirebase = async () => {
-    const result = await firebase.db
+    const result = await firebase
+      .firestore()
       .collection('coverages')
       .orderBy('clientId', 'asc')
       .get();
@@ -140,7 +154,7 @@ const AdminFiltersProvider: FC = ({ children }) => {
     const coverages = result.docs.map(br => ({
       ...br.data(),
       id: br.id
-    }));
+    })) as Coverage[];
     //console.log(coverages)
     setCoverages(coverages);
 
@@ -154,7 +168,8 @@ const AdminFiltersProvider: FC = ({ children }) => {
     //setAllBranches([]);
     setIsLoading(true);
     try {
-      const result = await firebase.db
+      const result = await firebase
+        .firestore()
         .collection('chainsxclient')
         .where('clientId', '==', client)
         .get();
@@ -164,18 +179,19 @@ const AdminFiltersProvider: FC = ({ children }) => {
         id: chain.id
       }));
 
-      setChainsXClient(chainsXClient);
+      setChainsXClient(chainsXClient as any);
 
-      const chainsId = chainsXClient.map(obj => obj.chainId);
+      const chainsId = chainsXClient.map((obj: any) => obj.chainId);
 
-      const { docs: chainDocs } = await firebase.db
+      const { docs: chainDocs } = await firebase
+        .firestore()
         .collection('chains')
         .orderBy('name', 'asc')
         .get();
 
       const chains = chainDocs.map(doc => doc.data());
 
-      const chainsData = [];
+      const chainsData: any[] = [];
 
       chains.forEach(chain => {
         if (chainsId.includes(chain.ID)) {
@@ -183,14 +199,14 @@ const AdminFiltersProvider: FC = ({ children }) => {
         }
       });
 
-      const reportsChainIds = reportsXClient.map(report => report.chainId);
+      const reportsChainIds = reportsXClient.map((report: any) => report.chainId);
 
       const onlyWithReports = chainsData.filter(chain =>
         reportsChainIds.includes(chain.ID)
       );
 
-      setChains(chainsData);
-      setChainsWithReports(onlyWithReports);
+      setChains(chainsData as any);
+      setChainsWithReports(onlyWithReports as any);
       setIsLoading(false);
     } catch (error) {
       console.error(`getChains. Ocurrió el error: ${error}`);
@@ -202,12 +218,12 @@ const AdminFiltersProvider: FC = ({ children }) => {
   const getBranchesxClient = () => {
     setIsLoading(true);
     try {
-      const result = coverages.filter(c => c.clientId == client);
+      const result = coverages.filter(c => c.clientId == +client);
       const ids = result.map(bxc => bxc.branchId);
 
       const totalbranches = getAllBranches();
 
-      let branchesxclient = [];
+      const branchesxclient: any[] = [];
 
       totalbranches.forEach(b => {
         if (ids.includes(b.ID)) {
@@ -215,7 +231,7 @@ const AdminFiltersProvider: FC = ({ children }) => {
         }
       });
       //console.log('branchesxclient', branchesxclient)
-      setBranchesXClient(branchesxclient);
+      setBranchesXClient(branchesxclient as any);
       setIsLoading(false);
     } catch (error) {
       console.error(`getBranchesxClient. Ocurrió el error: ${error}`);
@@ -232,10 +248,10 @@ const AdminFiltersProvider: FC = ({ children }) => {
       if (!chain.ID) return setBranchesXChain(branchesXClient);
 
       const branchesxchain = branchesXClient.filter(
-        b => b.chainId == `${chain.ID}`
+        (b: any) => b.chainId == `${chain.ID}`
       );
 
-      const onlyWithReports = branchesxchain.filter(branch =>
+      const onlyWithReports = branchesxchain.filter((branch: any) =>
         reportsBranchsIds.includes(branch.ID)
       );
 
@@ -252,8 +268,8 @@ const AdminFiltersProvider: FC = ({ children }) => {
       const ids = clientsData.map(c => c.ID);
 
       const totalcoverages = getCoveragesFirebase();
-      let covxadmin = [];
-      totalcoverages.forEach(c => {
+      const covxadmin: any[] = [];
+      totalcoverages.forEach((c: any) => {
         if (ids.includes(c.clientId)) {
           covxadmin.push(b);
         }
@@ -286,7 +302,8 @@ const AdminFiltersProvider: FC = ({ children }) => {
     setIsLoading(true);
     try {
       if (client) {
-        const result = await firebase.db
+        const result = await firebase
+          .firestore()
           .collection('reports')
           .where('clientId', '==', `${client}`)
           //.where("createdAt", ">", new Date(Date.now() - 60 * 60 * 1000))
@@ -365,7 +382,7 @@ const AdminFiltersProvider: FC = ({ children }) => {
     setIsLoading(true);
     try {
       if (client) {
-        const result = await firebase.db
+        const result = await firebase.firestore
           .collection('clients')
           .where('ID', '==', `${client}`)
           .get();
@@ -386,7 +403,8 @@ const AdminFiltersProvider: FC = ({ children }) => {
     setIsLoading(true);
     try {
       if (client) {
-        const result = await firebase.db
+        const result = await firebase
+          .firestore()
           .collection('categories')
           .where('clientId', '==', +client)
           .get();
@@ -509,7 +527,7 @@ const AdminFiltersProvider: FC = ({ children }) => {
   }, [client, chain, branch, reportsXClient, category]);
 
   return (
-    <FiltersContext.Provider
+    <AdminFiltersContext.Provider
       value={{
         chain,
         chains,
@@ -557,7 +575,7 @@ const AdminFiltersProvider: FC = ({ children }) => {
       }}
     >
       {children}
-    </FiltersContext.Provider>
+    </AdminFiltersContext.Provider>
   );
 };
 

@@ -15,7 +15,7 @@ const ClientLayout: FC = ({ children }) => {
   return (
     <ClientsFiltersProvider>
       <div className={classes.wrapper}>
-        <div className={classes.mainPanel}>
+        <div id="mainpanel" className={classes.mainPanel}>
           <ClientNavbar logo={logo} />
           <div className={classes.content}>
             <div className={classes.container}>{children}</div>

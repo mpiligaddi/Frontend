@@ -9,11 +9,36 @@ export interface User {
 }
 
 export interface Chain {
-  id: string;
   ID: string;
   name: string;
 }
 
+export interface Comercial {
+  ID: string;
+  name: string;
+  email: string;
+}
+
+export interface Coverage {
+  id: string;
+  clientId: number;
+  branchId: string;
+  frequency: number;
+  intensity: number;
+}
+
+export interface Supervisor {
+  ID: string;
+  name: string;
+  email: string;
+  coordinatorId: string;
+}
+
+export interface Admin {
+  ID: string;
+  name: string;
+  email: string;
+}
 export interface Category {
   clientId: string;
   name: string;
@@ -21,9 +46,15 @@ export interface Category {
   ID: string;
 }
 
+export interface Zone {
+  ID: string;
+  name: string;
+  region: string;
+  supervisorId: string;
+}
+
 export interface Client {
   CUIT: string;
-  id: string;
   ID: string;
   address: string;
   adminId: string;
@@ -31,7 +62,6 @@ export interface Client {
   companyName: string;
   contactName: string;
   control: string;
-  email: string;
   name: string;
   periodReportId: 'FS' | string;
 }
@@ -76,7 +106,6 @@ export interface Report {
 
 export interface Branch {
   ID: string;
-  id: string;
   address: string;
   chainId: string;
   chainName: string;

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import firebase from 'firebase/app';
+import { Client } from '@/lib/types';
 
 export const useAdmin = () => {
   const [name, setName] = useState('');
@@ -42,7 +43,7 @@ export const useAdmin = () => {
 
 export const useAdminClients = () => {
   const { adminID } = useAdmin();
-  const [clientsData, setClientsData] = useState([]);
+  const [clientsData, setClientsData] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
 
   const getClients = async () => {
@@ -73,5 +74,3 @@ export const useAdminClients = () => {
     clientsData
   };
 };
-
-const AdminProvider = () => {};
