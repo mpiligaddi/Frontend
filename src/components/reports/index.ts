@@ -3,3 +3,4 @@ export { default as Report } from './Report';
 export { default as FilterBar } from './FilterBar';
 export { default as Accordion } from './Accordion';
 export { default as FilterImages } from './FilterImages';
+export { default as FavoritesReports } from './FavoritesReportsCarousel';

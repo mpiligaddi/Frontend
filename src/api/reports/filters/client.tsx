@@ -3,22 +3,22 @@ import { useClient } from '@/api/user/client';
 import firebase from 'firebase/app';
 import coveragesJSON from '@/data/coverage';
 import branchesJSON from '@/data/branches';
-import { Report, Branch } from '@/lib/types';
+import { Report, Branch, Chain, Category } from '@/lib/types';
 
 const noop = () => {};
 
 const ClientsFiltersContext = createContext({
   branch: {} as Branch,
-  category: '',
-  chain: '',
-  chains: [],
+  category: {} as Category,
+  chain: {} as Chain,
+  chains: [] as Chain[],
   reports: [] as Report[],
   branches: [] as Branch[],
-  categories: [],
+  categories: [] as Category[],
   branchesXChain: [] as Branch[],
   branchesXClient: [] as Branch[],
   branchesWithReports: [] as Branch[],
-  chainsWithReports: [],
+  chainsWithReports: [] as Chain[],
   coverageXClient: [],
   coverages: [],
   reportsXClient: [] as Report[],

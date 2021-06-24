@@ -5,6 +5,7 @@ import IconButton from '@material-ui/core/IconButton';
 import DeleteTile from './DeleteTile';
 import Image from 'next/image';
 
+import { Image as IImage, Report } from '@/lib/types';
 import firebase from 'firebase/app';
 import { useAdminFilters } from '@/api/reports/filters';
 import { useCarousel } from '../Carousel/CarouselProvider';
@@ -12,8 +13,8 @@ import { useCarousel } from '../Carousel/CarouselProvider';
 import { useStyles } from './styles';
 
 type TileProps = {
-  tile: any;
-  report: any;
+  tile: IImage;
+  report: Report;
   catIndex: number;
   disableAction?: boolean;
 };
@@ -33,10 +34,10 @@ const Tile: FC<TileProps> = ({
 
   const handleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const categories = report.realCategories.map((category: any) => {
+    const categories = report.realCategories!.map(category => {
       if (!category.images) return category;
 
-      const images = category.images.map((image: any) =>
+      const images = category.images.map(image =>
         image.name === tile.name
           ? {
               ...image,
@@ -55,8 +56,8 @@ const Tile: FC<TileProps> = ({
       categories
     });
 
-    setReportsXClient((reports: any) =>
-      reports.map((r: any) => (r.id === report.id ? { ...r, categories } : r))
+    setReportsXClient(reports =>
+      reports.map(r => (r.id === report.id ? { ...r, categories } : r))
     );
 
     setFavorite(!favorite);
@@ -69,9 +70,9 @@ const Tile: FC<TileProps> = ({
       .delete()
       .catch(() => console.log('La imagen no existe'));
 
-    const categories = report.realCategories.map((category: any) => {
+    const categories = report.realCategories!.map(category => {
       if (!category.images) return category;
-      const images = category.images.map((image: any) =>
+      const images = category.images.map(image =>
         image.name === tile.name ? { ...image, isDeleted: true, reason } : image
       );
 
@@ -85,8 +86,8 @@ const Tile: FC<TileProps> = ({
       categories
     });
 
-    setReportsXClient((reports: any) =>
-      reports.map((r: any) => (r.id === report.id ? { ...r, categories } : r))
+    setReportsXClient(reports =>
+      reports.map(r => (r.id === report.id ? { ...r, categories } : r))
     );
 
     setOpenModal(false);

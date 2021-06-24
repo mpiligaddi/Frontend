@@ -5,6 +5,7 @@ import firebase from 'firebase/app';
 
 import { format } from 'date-fns';
 import { useAdminFilters } from '@/api/reports/filters';
+import { Report as IReport, Category } from '@/lib/types';
 
 import { primaryColor } from '@/utils/styles';
 
@@ -13,8 +14,8 @@ import Tile from '../Tile';
 import { useStyles } from './styles';
 
 type ReportProps = {
-  report: any;
-  category: any;
+  report: IReport;
+  category: Category;
   disableAction?: boolean;
   revisable?: boolean;
 };
@@ -34,10 +35,8 @@ const Report: FC<ReportProps> = ({
       revised: !revised
     });
 
-    setReportsXClient((reports: any) =>
-      reports.map((r: any) =>
-        r.id === report.id ? { ...r, revised: !revised } : r
-      )
+    setReportsXClient(reports =>
+      reports.map(r => (r.id === report.id ? { ...r, revised: !revised } : r))
     );
     setRevised(!revised);
   };
@@ -68,7 +67,7 @@ const Report: FC<ReportProps> = ({
           </span>
         )}
       </div>
-      {report.categories.map((cat: any, catIndex: number) => (
+      {report.categories.map((cat, catIndex: number) => (
         <GridContainer key={catIndex} className={classes.report}>
           {!category.ID && (
             <div className={classes.reportDate}>
@@ -76,7 +75,7 @@ const Report: FC<ReportProps> = ({
             </div>
           )}
           <GridList className={classes.gridList2} cols={4}>
-            {cat.images.map((tile: any, key: number) => (
+            {cat.images.map((tile, key: number) => (
               <GridListTile key={key}>
                 <Tile
                   report={report}

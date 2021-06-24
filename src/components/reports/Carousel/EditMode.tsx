@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, FC } from 'react';
 import { Container, Graphics, Sprite, Stage, Text } from '@inlet/react-pixi';
 import { Backdrop, CircularProgress, makeStyles } from '@material-ui/core';
 import { TextStyle } from '@pixi/text';
@@ -98,7 +98,11 @@ const RotationSlider = ({ width, height, rotation, ...props }) => {
   return <Graphics interactive={true} {...props} draw={draw} />;
 };
 
-function EditMode({ close }) {
+type EditModeProps = {
+  close(): void;
+};
+
+const EditMode: FC<EditModeProps> = ({ close }) => {
   const classes = useStyles();
 
   const [editMode, setMode] = useState(0);
@@ -186,7 +190,7 @@ function EditMode({ close }) {
   };
 
   useEffect(() => {
-    console.log(imageRef.current.texture);
+    console.log(imageRef?.current?.texture);
     if (imageRef.current) {
       let sprite = imageRef.current;
       let width = sprite.texture.width;
@@ -312,6 +316,6 @@ function EditMode({ close }) {
       </Backdrop>
     </Wrapper>
   );
-}
+};
 
 export default EditMode;

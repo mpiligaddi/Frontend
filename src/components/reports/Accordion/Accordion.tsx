@@ -3,12 +3,15 @@ import { AccordionActions, Typography, Divider } from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
 import { Card, CardBody, CardHeader } from '@/components/ui';
 import { useClientsFilters } from '@/api/reports/filters';
-// core components
 import FilterImages from '../FilterImages';
 
 import { useStyles } from './styles';
 
-const Accordion: FC<{ type: string }> = ({ type }) => {
+type AccordionProps = {
+  type: 'revised' | 'all' | 'pendings' | 'favorites';
+};
+
+const Accordion: FC<AccordionProps> = ({ type }) => {
   const classes = useStyles();
   const { chain, branch, category } = useClientsFilters();
 

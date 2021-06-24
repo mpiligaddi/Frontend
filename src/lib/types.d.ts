@@ -1,9 +1,50 @@
+import firebase from 'firebase/app';
+
 export interface User {
   role: string;
   ID: string;
   displayName: string;
   email: string;
   key: string;
+}
+
+export interface Chain {
+  id: string;
+  ID: string;
+  name: string;
+}
+
+export interface Category {
+  clientId: string;
+  name: string;
+  id: string;
+  ID: string;
+}
+
+export interface Client {
+  CUIT: string;
+  id: string;
+  ID: string;
+  address: string;
+  adminId: string;
+  comercialId: string;
+  companyName: string;
+  contactName: string;
+  control: string;
+  email: string;
+  name: string;
+  periodReportId: 'FS' | string;
+}
+
+export interface Image {
+  revised?: boolean;
+  isDeleted?: boolean;
+  comment: string;
+  reason?: string;
+  favorite?: boolean;
+  name: string;
+  type: string;
+  uri: string;
 }
 
 export interface ReportCategory {
@@ -13,15 +54,7 @@ export interface ReportCategory {
   badCategory: boolean;
   clientId: number;
   id: string;
-  images: {
-    revised?: boolean;
-    isDeleted?: boolean;
-    comment: string;
-    favorite?: boolean;
-    name: string;
-    type: string;
-    uri: string;
-  }[];
+  images: Image[];
 }
 
 export interface Report {
@@ -29,7 +62,7 @@ export interface Report {
   branchId: string;
   chainId: string;
   clientId: string;
-  createdAt: Date;
+  createdAt: firebase.firestore.Timestamp;
   createdBy: string;
   isComplete: boolean;
   revised: boolean;
