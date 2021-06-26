@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, FC } from 'react';
-import { styled } from '@material-ui/core';
+import { styled } from '@material-ui/core/styles';
 import { useCarousel } from './CarouselProvider';
 import CarouselItem from './CarouselItem';
 import dynamic from 'next/dynamic';

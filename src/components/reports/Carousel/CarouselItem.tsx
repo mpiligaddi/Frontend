@@ -1,6 +1,6 @@
 import { useState, FC } from 'react';
 import { useAdminFilters } from '@/api/reports/filters';
-import { styled } from '@material-ui/core';
+import { styled } from '@material-ui/core/styles';
 import firebase from 'firebase/app';
 import DeleteTile from '../Tile/DeleteTile';
 import { useCarousel } from './CarouselProvider';
