@@ -9,7 +9,7 @@ import Head from 'next/head';
 import { QueryClientProvider, QueryClient } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
 
-import { ThemeProvider } from '@material-ui/core';
+import { ThemeProvider } from '@material-ui/core/styles';
 import theme from '@/config/theme';
 
 type MyAppProps = AppProps & {

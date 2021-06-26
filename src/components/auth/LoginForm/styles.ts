@@ -1,4 +1,4 @@
-import { makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import { hexToRgb, grayColor, blackColor, cardTitle } from '@/utils/styles';
 
 export const useStyles = makeStyles(theme => ({

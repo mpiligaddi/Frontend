@@ -1,7 +1,10 @@
-import { FC } from 'react';
+import { AdminLayout } from '@/components/common';
+import { Page } from '@/typings/page';
 
-const AdminDashboard: FC = () => {
-  return <h1>Hello World</h1>;
+const AdminDashboard: Page = () => {
+  return <h1>Dashboard</h1>;
 };
+
+AdminDashboard.Layout = AdminLayout;
 
 export default AdminDashboard;

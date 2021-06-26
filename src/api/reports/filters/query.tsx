@@ -1,4 +1,11 @@
-import { useState, useEffect, FC, createContext, SetStateAction } from 'react';
+import {
+  useState,
+  useEffect,
+  FC,
+  createContext,
+  SetStateAction,
+  useCallback
+} from 'react';
 import { useReports, useCategories, useChains, useBranches } from '@/api/data';
 import { useClient } from '@/api/user';
 import { UseQueryResult } from 'react-query';
@@ -42,49 +49,47 @@ const ClientsFiltersProvider: FC = ({ children }) => {
     reports: reports.data
   });
 
-  useEffect(() => {
-    const getReports = async () => {
-      if (!reports.data) return;
+  const getReports = useCallback(async () => {
+    if (!reports.data || !filters) return;
 
-      if (!filters) return;
+    if (!filters.chain?.ID || !filters.branch?.ID) return;
 
-      if (!filters.chain?.ID || !filters.branch?.ID) return;
+    let filteredReports = reports.data.filter(report => {
+      if (
+        filters.chain?.ID &&
+        !filters.branch?.ID &&
+        report.chainId === filters.chain.ID
+      )
+        return true;
+      else if (
+        filters.chain?.ID &&
+        filters.branch?.ID &&
+        report.chainId === filters.chain?.ID &&
+        report.branchId === filters.branch?.ID
+      )
+        return true;
+      else return false;
+    });
 
-      let filteredReports = reports.data.filter(report => {
-        if (
-          filters.chain?.ID &&
-          !filters.branch?.ID &&
-          report.chainId === filters.chain.ID
-        )
-          return true;
-        else if (
-          filters.chain?.ID &&
-          filters.branch?.ID &&
-          report.chainId === filters.chain?.ID &&
-          report.branchId === filters.branch?.ID
-        )
-          return true;
-        else return false;
+    if (filters?.category?.ID) {
+      filteredReports = filteredReports?.map(report => {
+        const categories = report.categories.filter(
+          c => c.ID === filters?.category?.ID
+        );
+
+        return {
+          ...report,
+          categories
+        };
       });
+    }
 
-      if (filters?.category?.ID) {
-        filteredReports = filteredReports?.map(report => {
-          const categories = report.categories.filter(
-            c => c.ID === filters?.category?.ID
-          );
+    setFilteredReports(filteredReports);
+  }, [reports.data, filters]);
 
-          return {
-            ...report,
-            categories
-          };
-        });
-      }
-
-      setFilteredReports(filteredReports);
-    };
-
+  useEffect(() => {
     getReports();
-  }, [filters, reports.data]);
+  }, [filters, reports.data, getReports]);
 
   return (
     <ClientsFiltersContext.Provider

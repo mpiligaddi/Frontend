@@ -6,7 +6,7 @@ import {
   grayColor,
   hexToRgb
 } from '@/utils/styles';
-import { makeStyles } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 
 export const useSelectStyles = makeStyles({
   select: {
