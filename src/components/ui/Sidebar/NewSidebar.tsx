@@ -13,6 +13,7 @@ import {
 } from '@material-ui/icons';
 import SidebarItem from './SidebarItem';
 import firebase from 'firebase/app';
+import { useUI } from '@/components/ui';
 
 import { useStyles, Avatar } from './styles';
 import { useMe } from '@/api/user';
@@ -55,22 +56,22 @@ type SidebarProps = {
 };
 
 const Sidebar: FC<SidebarProps> = ({ routes = baseRoutes }) => {
-  const [open, setOpen] = useState(true);
   const classes = useStyles();
   const user = useMe();
+  const { displayMiniSidebar } = useUI();
 
   return (
     <Drawer
       variant="permanent"
       classes={{
         paper: cn({
-          [classes.drawerOpen]: open,
-          [classes.drawerClose]: !open
+          [classes.drawerOpen]: !displayMiniSidebar,
+          [classes.drawerClose]: displayMiniSidebar
         })
       }}
       className={cn(classes.drawer, {
-        [classes.drawerOpen]: open,
-        [classes.drawerClose]: !open
+        [classes.drawerOpen]: !displayMiniSidebar,
+        [classes.drawerClose]: displayMiniSidebar
       })}
     >
       <div className={classes.user}>
@@ -78,7 +79,7 @@ const Sidebar: FC<SidebarProps> = ({ routes = baseRoutes }) => {
           src={firebase.auth().currentUser?.photoURL}
           default={avatar.src}
         />
-        {user.isLoading ? <p>Loading...</p> : <p>{user.data?.displayName}</p>}
+        {!displayMiniSidebar && <p>{user.data?.displayName}</p>}
       </div>
       <Divider className={classes.divider} />
       <List component="nav" className={classes.listRoot}>

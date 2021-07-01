@@ -5,3 +5,4 @@ export { default as Input } from './Input';
 export * from './Grid';
 export * from './Navbars';
 export * from './Card';
+export * from './context';

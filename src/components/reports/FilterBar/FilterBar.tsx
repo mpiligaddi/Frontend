@@ -1,7 +1,8 @@
-import { FC } from 'react';
+import type { FC } from 'react';
 import { Select, MenuItem, FormControl, InputLabel } from '@material-ui/core';
 import { GridItem, GridContainer } from '@/components/ui';
 import { useClientsFilters } from '@/api/reports/filters/query';
+import type { ChangeEvent } from '@/typings';
 
 import { useStyles } from './styles';
 import { useSelectStyles } from '@/styles/select';
@@ -12,7 +13,7 @@ const FilterBar: FC = () => {
   const { chains, categories, setFilters, filters, branches } =
     useClientsFilters();
 
-  const handleSelectChain = (event: any) => {
+  const handleSelectChain = (event: ChangeEvent) => {
     setFilters(filters => ({
       ...filters,
       branch: undefined
@@ -24,9 +25,8 @@ const FilterBar: FC = () => {
     }));
   };
 
-  const handleSelectBranch = (event: any) => {
-    const { value } = event.target;
-    const branch = branches.data?.find(b => b.ID === value);
+  const handleSelectBranch = (event: ChangeEvent) => {
+    const branch = branches.data?.find(b => b.ID === event.target.value);
 
     setFilters(filters => ({
       ...filters,
@@ -34,9 +34,10 @@ const FilterBar: FC = () => {
     }));
   };
 
-  const handleSelectCategory = (event: any) => {
-    const { value } = event.target;
-    const category = categories.data?.find(category => category.ID === value);
+  const handleSelectCategory = (event: ChangeEvent) => {
+    const category = categories.data?.find(
+      category => category.ID === event.target.value
+    );
     setFilters(filters => ({
       ...filters,
       category
@@ -164,7 +165,7 @@ const FilterBar: FC = () => {
                   onChange={handleSelectCategory}
                   inputProps={{
                     name: 'selectCategory',
-                    id: 'select-branch'
+                    id: 'select-category'
                   }}
                 >
                   <MenuItem

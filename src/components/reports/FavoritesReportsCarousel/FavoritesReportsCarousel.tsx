@@ -79,10 +79,10 @@ const FavoritesReportsCarousel: FC = () => {
         <h3 className={classes.carouselTitle}>Fotografías destacadas</h3>
         <p className={classes.carouselDetail}>
           {activeImage?.date && (
-            <p>
+            <>
               {activeImage.date} - {activeImage.chain?.name} -{' '}
               {activeImage.branch?.name} - {activeImage.category}
-            </p>
+            </>
           )}
         </p>
       </CardFooter>

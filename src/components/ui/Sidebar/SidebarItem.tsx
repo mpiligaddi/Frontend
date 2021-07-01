@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import cn from 'classnames';
 import { primaryColor, hexToRgb, grayColor } from '@/utils/styles';
 import Link from 'next/link';
+import { useUI } from '@/components/ui';
 
 import {
   ListItem,
@@ -53,64 +54,72 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const SidebarItem = React.forwardRef<HTMLDivElement, SidebarItemProps>(
-  ({ route }, ref) => {
-    const router = useRouter();
-    const classes = useStyles();
-    const [open, setOpen] = useState(false);
+const SidebarItem: FC<SidebarItemProps> = ({ route }) => {
+  const router = useRouter();
+  const classes = useStyles();
+  const [open, setOpen] = useState(false);
+  const { displayMiniSidebar } = useUI();
 
-    const handleClick = () => {
-      if (!route.collapse) {
-        router.push(route.path!);
-        return;
-      }
+  const handleClick = () => {
+    if (!route.collapse) {
+      router.push(route.path!);
+      return;
+    }
 
-      setOpen(!open);
-    };
+    setOpen(!open);
+  };
 
-    return (
-      <>
-        <ListItem
-          onClick={handleClick}
-          className={cn(classes.listItem, {
-            [classes.listActive]: router.pathname === route.path
-          })}
-          button
-          ref={ref}
-        >
-          <ListItemIcon className={classes.listItemIcon}>
-            {route.icon}
-          </ListItemIcon>
+  return (
+    <>
+      <ListItem
+        onClick={handleClick}
+        className={cn(classes.listItem, {
+          [classes.listActive]: router.pathname === route.path
+        })}
+        button
+      >
+        <ListItemIcon className={classes.listItemIcon}>
+          {route.icon}
+        </ListItemIcon>
+
+        {!displayMiniSidebar && (
           <ListItemText className={classes.listItemText} primary={route.name} />
-
-          {route.collapse ? open ? <ExpandLess /> : <ExpandMore /> : null}
-        </ListItem>
-        <Collapse in={open} timeout="auto" unmountOnExit>
-          <List component="div" disablePadding>
-            {route.routes?.map((route, i) => (
-              <Link key={route.path! + i} passHref href={route.path!}>
-                <ListItem
-                  button
-                  className={cn(classes.nested, classes.listItem, {
-                    [classes.listActive]: router.pathname === route.path
-                  })}
-                >
-                  <ListItemIcon className={classes.listItemIcon}>
-                    {route.icon}
-                  </ListItemIcon>
+        )}
+        {!displayMiniSidebar && route.collapse ? (
+          open ? (
+            <ExpandLess />
+          ) : (
+            <ExpandMore />
+          )
+        ) : null}
+      </ListItem>
+      <Collapse in={open} timeout="auto" unmountOnExit>
+        <List component="div" disablePadding>
+          {route.routes?.map((route, i) => (
+            <Link key={route.path! + i} passHref href={route.path!}>
+              <ListItem
+                button
+                className={cn(classes.nested, classes.listItem, {
+                  [classes.listActive]: router.pathname === route.path
+                })}
+              >
+                <ListItemIcon className={classes.listItemIcon}>
+                  {route.icon}
+                </ListItemIcon>
+                {!displayMiniSidebar && (
                   <ListItemText
                     className={classes.listItemText}
                     primary={route.name}
                   />
-                </ListItem>
-              </Link>
-            ))}
-          </List>
-        </Collapse>
-      </>
-    );
-  }
-);
+                )}
+              </ListItem>
+            </Link>
+          ))}
+        </List>
+      </Collapse>
+    </>
+  );
+};
 
 SidebarItem.displayName = 'SidebarItem';
 

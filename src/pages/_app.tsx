@@ -8,6 +8,7 @@ import type { Page } from '@/typings/page';
 import Head from 'next/head';
 import { QueryClientProvider, QueryClient } from 'react-query';
 import { ReactQueryDevtools } from 'react-query/devtools';
+import { UIProvider } from '@/components/ui';
 
 import { ThemeProvider } from '@material-ui/core/styles';
 import theme from '@/config/theme';
@@ -34,13 +35,15 @@ const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme}>
-        <Head>
-          <title>Chek</title>
-        </Head>
-        <Layout>
-          <Component {...pageProps} />
-          <ReactQueryDevtools />
-        </Layout>
+        <UIProvider>
+          <Head>
+            <title>Chek</title>
+          </Head>
+          <Layout>
+            <Component {...pageProps} />
+            <ReactQueryDevtools />
+          </Layout>
+        </UIProvider>
       </ThemeProvider>
     </QueryClientProvider>
   );

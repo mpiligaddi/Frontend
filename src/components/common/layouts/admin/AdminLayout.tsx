@@ -2,7 +2,7 @@ import React, { useState, useEffect, FC } from 'react';
 import cx from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 
-import AdminNavbar from '@/components/ui/Navbars/AdminNavbar';
+import { AdminNavbar } from '@/components/ui';
 import Sidebar from '@/components/ui/Sidebar/NewSidebar';
 import { AdminFiltersProvider } from '@/api/reports/filters';
 //styles
@@ -14,13 +14,15 @@ const useStyles = makeStyles(theme => ({
     display: 'flex'
   },
   content: {
-    marginLeft: 10
+    marginLeft: 10,
+    marginTop: 70
   }
 }));
 
 const AdminLayout: FC = ({ children }) => {
   const user = useMe();
   const classes = useStyles();
+  const [miniActive, setMiniActive] = useState(false);
 
   if (user.isIdle || user.isLoading) return <p>Loading...</p>;
 
@@ -28,6 +30,12 @@ const AdminLayout: FC = ({ children }) => {
     // <AdminFiltersProvider>
     <div className={classes.root}>
       <Sidebar />
+      <AdminNavbar
+        sidebarMinimize={() => {}}
+        logo={logo}
+        miniActive={miniActive}
+        handleDrawerToggle={() => setMiniActive(!miniActive)}
+      />
       {/* <div id="mainpanel" className={mainPanelClasses} ref={mainPanel}>
           <AdminNavbar
             sidebarMinimize={sidebarMinimize.bind(this)}

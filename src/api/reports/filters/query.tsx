@@ -4,14 +4,15 @@ import {
   FC,
   createContext,
   SetStateAction,
-  useCallback
+  useCallback,
+  Dispatch,
+  useContext,
+  useMemo
 } from 'react';
 import { useReports, useCategories, useChains, useBranches } from '@/api/data';
 import { useClient } from '@/api/user';
 import { UseQueryResult } from 'react-query';
 import { Branch, Category, Chain, Report } from '@/lib/types';
-import { Dispatch } from 'react';
-import { useContext } from 'react';
 
 interface Filters {
   branch?: Branch;
@@ -19,7 +20,7 @@ interface Filters {
   category?: Category;
 }
 
-interface ClientsFiltersState {
+interface State {
   reports: UseQueryResult<Report[]>;
   chains: UseQueryResult<Chain[]>;
   branches: UseQueryResult<Branch[]>;
@@ -29,7 +30,7 @@ interface ClientsFiltersState {
   setFilters: Dispatch<SetStateAction<Filters | undefined>>;
 }
 
-const ClientsFiltersContext = createContext({} as ClientsFiltersState);
+const ClientsFiltersContext = createContext({} as State);
 
 const ClientsFiltersProvider: FC = ({ children }) => {
   const { client } = useClient();
@@ -49,7 +50,7 @@ const ClientsFiltersProvider: FC = ({ children }) => {
     reports: reports.data
   });
 
-  const getReports = useCallback(async () => {
+  const getReports = useCallback(() => {
     if (!reports.data || !filters) return;
 
     if (!filters.chain?.ID || !filters.branch?.ID) return;
@@ -91,18 +92,21 @@ const ClientsFiltersProvider: FC = ({ children }) => {
     getReports();
   }, [filters, reports.data, getReports]);
 
+  const value = useMemo(
+    () => ({
+      filteredReports,
+      chains,
+      categories,
+      branches,
+      reports,
+      filters,
+      setFilters
+    }),
+    [filteredReports, chains, categories, branches, reports, filters]
+  );
+
   return (
-    <ClientsFiltersContext.Provider
-      value={{
-        reports,
-        chains,
-        categories,
-        filters,
-        setFilters,
-        filteredReports,
-        branches
-      }}
-    >
+    <ClientsFiltersContext.Provider value={value}>
       {children}
     </ClientsFiltersContext.Provider>
   );
