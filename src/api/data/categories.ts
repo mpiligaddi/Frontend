@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import firebase from 'firebase/app';
 import { Category } from '@/lib/types';
 
-export const useCategories = (clientId: number) => {
+export const useCategories = (clientId?: number) => {
   const getCategories = async () => {
     const result = await firebase
       .firestore()

@@ -322,7 +322,7 @@ const tooltip = {
   fontFamily: '"Helvetica Neue",Helvetica,Arial,sans-serif',
   fontSize: '12px',
   fontStyle: 'normal',
-  fontWeight: '400',
+  fontWeight: 400,
   textShadow: 'none',
   textTransform: 'none',
   letterSpacing: 'normal',
@@ -330,9 +330,9 @@ const tooltip = {
   wordSpacing: 'normal',
   wordWrap: 'normal',
   whiteSpace: 'normal',
-  lineBreak: 'auto',
-  cursor: 'pointer'
-};
+  cursor: 'pointer',
+  lineBreak: 'auto'
+} as const;
 
 const title = {
   color: grayColor[2],

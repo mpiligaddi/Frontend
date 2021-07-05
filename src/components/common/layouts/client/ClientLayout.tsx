@@ -13,7 +13,7 @@ const ClientLayout: FC = ({ children }) => {
   }, []);
 
   return (
-    <ClientsFiltersProvider>
+    <ClientsFiltersProvider reported>
       <div className={classes.wrapper}>
         <div id="mainpanel" className={classes.mainPanel}>
           <ClientNavbar logo={logo} />

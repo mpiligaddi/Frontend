@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 export const useStyles = makeStyles(theme => ({
   root: {
     width: '100%',
-    flexDirection: 'column'
+    marginTop: '6px'
   },
   heading1: {
     marginLeft: '15px',

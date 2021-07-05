@@ -9,12 +9,13 @@ import {
   useContext,
   useMemo
 } from 'react';
-import { useReports, useCategories, useChains, useBranches } from '@/api/data';
+import { useReports, useClients } from '@/api/data';
 import { useClient } from '@/api/user';
 import { UseQueryResult } from 'react-query';
-import { Branch, Category, Chain, Report } from '@/lib/types';
+import { Branch, Category, Chain, Report, Client } from '@/lib/types';
 
 interface Filters {
+  client?: Client;
   branch?: Branch;
   chain?: Chain;
   category?: Category;
@@ -22,38 +23,25 @@ interface Filters {
 
 interface State {
   reports: UseQueryResult<Report[]>;
-  chains: UseQueryResult<Chain[]>;
-  branches: UseQueryResult<Branch[]>;
-  categories: UseQueryResult<Category[]>;
   filteredReports: Report[];
   filters?: Filters;
   setFilters: Dispatch<SetStateAction<Filters | undefined>>;
 }
 
-const ClientsFiltersContext = createContext({} as State);
+const FiltersContext = createContext({} as State);
 
-const ClientsFiltersProvider: FC = ({ children }) => {
-  const { client } = useClient();
+const FiltersProvider: FC = ({ children }) => {
+  const client = useClient();
   const [filters, setFilters] = useState<Filters>();
   const [filteredReports, setFilteredReports] = useState<Report[]>([]);
 
-  const categories = useCategories(+client);
-  const reports = useReports(+client);
-  const chains = useChains({
-    clientId: client,
-    reported: true,
-    reports: reports.data
-  });
-  const branches = useBranches({
-    chain: filters?.chain?.ID,
-    reported: true,
-    reports: reports.data
-  });
+  const clients = useClients();
+  const reports = useReports(+filters?.client?.ID!);
 
   const getReports = useCallback(() => {
     if (!reports.data || !filters) return;
 
-    if (!filters.chain?.ID || !filters.branch?.ID) return;
+    if (!filters.chain?.ID) return;
 
     let filteredReports = reports.data.filter(report => {
       if (
@@ -92,26 +80,37 @@ const ClientsFiltersProvider: FC = ({ children }) => {
     getReports();
   }, [filters, reports.data, getReports]);
 
+  useEffect(() => {
+    if (client.isLoading) return;
+
+    if (client.data) {
+      setFilters(filters => ({
+        ...filters,
+        client: client.data!
+      }));
+    } else if (clients.data) {
+      setFilters(filters => ({
+        ...filters,
+        client: clients.data[0]
+      }));
+    }
+  }, [client.data, clients.data, client.isLoading]);
+
   const value = useMemo(
     () => ({
       filteredReports,
-      chains,
-      categories,
-      branches,
       reports,
       filters,
       setFilters
     }),
-    [filteredReports, chains, categories, branches, reports, filters]
+    [filteredReports, reports, filters]
   );
 
   return (
-    <ClientsFiltersContext.Provider value={value}>
-      {children}
-    </ClientsFiltersContext.Provider>
+    <FiltersContext.Provider value={value}>{children}</FiltersContext.Provider>
   );
 };
 
-export const useClientsFilters = () => useContext(ClientsFiltersContext);
+export const useFilters = () => useContext(FiltersContext);
 
-export default ClientsFiltersProvider;
+export default FiltersProvider;

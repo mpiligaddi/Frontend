@@ -2,7 +2,7 @@ import { useQuery } from 'react-query';
 import firebase from 'firebase/app';
 import { Report } from '@/lib/types';
 
-export const useReports = (clientId: number) => {
+export const useReports = (clientId?: number) => {
   const getReports = async () => {
     const result = await firebase
       .firestore()

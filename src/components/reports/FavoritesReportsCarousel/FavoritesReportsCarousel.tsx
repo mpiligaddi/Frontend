@@ -4,7 +4,7 @@ import { format } from 'date-fns';
 
 import { Branch, Chain } from '@/lib/types';
 import { getImages, FilteredImage } from '@/utils/images';
-import { useClientsFilters } from '@/api/reports/filters/query';
+import { useFilteredData } from '@/api/reports/filters/use-filtered-data';
 import branches from '@/data/branches';
 
 import { Card, CardBody, CardFooter } from '@/components/ui';
@@ -21,7 +21,7 @@ const FavoritesReportsCarousel: FC = () => {
   const classes = useStyles();
   const [images, setImages] = useState<FilteredImage[]>([]);
   const [activeImage, setActiveImage] = useState<ActiveImage>();
-  const { reports, chains } = useClientsFilters();
+  const { reports, chains } = useFilteredData(true);
 
   useEffect(() => {
     if (!reports.data) return;

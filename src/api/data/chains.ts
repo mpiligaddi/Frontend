@@ -3,7 +3,7 @@ import firebase from 'firebase/app';
 import { Chain, Report } from '@/lib/types';
 
 interface Data {
-  clientId: string;
+  clientId?: string;
   reported?: boolean;
   reports?: Report[];
 }
@@ -54,7 +54,7 @@ export const useChains = ({ clientId, reported, reports }: Data) => {
     return onlyWithReports;
   };
 
-  return useQuery(['chains', clientId], getChains, {
+  return useQuery(['chains', { clientId, reported }], getChains, {
     enabled: reported ? !!clientId && !!reports : !!clientId,
     keepPreviousData: true
   });

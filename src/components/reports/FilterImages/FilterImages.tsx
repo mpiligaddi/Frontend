@@ -2,14 +2,14 @@ import { useState, useEffect, FC } from 'react';
 import { LinearProgress } from '@/components/ui';
 
 import Report from '../Report';
-import { useClientsFilters } from '@/api/reports/filters/query';
+import { useFilters } from '@/api/reports/filters/';
 import CarouselProvider from '../Carousel/CarouselProvider';
 import { ReportCategory, Report as IReport } from '@/lib/types';
 
 const FilterImages: FC<{ type: string }> = ({ type }) => {
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState<IReport[]>([]);
-  const { filteredReports, filters } = useClientsFilters();
+  const { filteredReports, filters } = useFilters();
 
   useEffect(() => {
     if (!filteredReports) return;

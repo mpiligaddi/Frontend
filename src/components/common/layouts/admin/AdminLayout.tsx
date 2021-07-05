@@ -1,11 +1,11 @@
 import React, { useState, useEffect, FC } from 'react';
-import cx from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { AdminNavbar } from '@/components/ui';
 import Sidebar from '@/components/ui/Sidebar/NewSidebar';
-import { AdminFiltersProvider } from '@/api/reports/filters';
-//styles
+import ClientsFiltersProvider from '@/api/reports/filters/query';
+
+import { containerFluid, transition } from '@/utils/styles';
 import logo from '@/assets/img/CHEK-NEGRO (1).png';
 import { useMe } from '@/api/user';
 
@@ -14,8 +14,21 @@ const useStyles = makeStyles(theme => ({
     display: 'flex'
   },
   content: {
-    marginLeft: 10,
-    marginTop: 70
+    marginTop: '70px',
+    padding: '30px 15px'
+  },
+  container: containerFluid,
+  mainPanel: {
+    transitionProperty: 'top, bottom, width',
+    transitionDuration: '.2s, .2s, .35s',
+    transitionTimingFunction: 'linear, linear, ease',
+    overflow: 'auto',
+    position: 'relative',
+    float: 'right',
+    ...transition,
+    maxHeight: '100%',
+    width: '100%',
+    overflowScrolling: 'touch'
   }
 }));
 
@@ -27,38 +40,22 @@ const AdminLayout: FC = ({ children }) => {
   if (user.isIdle || user.isLoading) return <p>Loading...</p>;
 
   return (
-    // <AdminFiltersProvider>
-    <div className={classes.root}>
-      <Sidebar />
-      <AdminNavbar
-        sidebarMinimize={() => {}}
-        logo={logo}
-        miniActive={miniActive}
-        handleDrawerToggle={() => setMiniActive(!miniActive)}
-      />
-      {/* <div id="mainpanel" className={mainPanelClasses} ref={mainPanel}>
-          <AdminNavbar
-            sidebarMinimize={sidebarMinimize.bind(this)}
-            miniActive={miniActive}
-            logo={logo}
-            brandText="Chek"
-            handleDrawerToggle={handleDrawerToggle}
-          />
-          {getRoute() ? (
-            <div className={classes.content}>
-              <div className={classes.container}>
-                {children}
-              </div>
-            </div>
-          ) : (
-            <div className={classes.map}>
-              {children}
-            </div>
-          )}
-        </div> */}
-      <main className={classes.content}>{children}</main>
-    </div>
-    // </AdminFiltersProvider>
+    <ClientsFiltersProvider>
+      <div className={classes.root}>
+        <Sidebar />
+        <AdminNavbar
+          sidebarMinimize={() => {}}
+          logo={logo}
+          miniActive={miniActive}
+          handleDrawerToggle={() => setMiniActive(!miniActive)}
+        />
+        <div id="mainpanel" className={classes.mainPanel}>
+          <main className={classes.content}>
+            <div className={classes.container}>{children}</div>
+          </main>
+        </div>
+      </div>
+    </ClientsFiltersProvider>
   );
 };
 

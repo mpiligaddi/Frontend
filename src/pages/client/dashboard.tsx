@@ -1,7 +1,6 @@
-import { useEffect } from 'react';
 import { useClient } from '@/api/user';
 import { Page } from '@/typings/page';
-import { useClientsFilters } from '@/api/reports/filters/query';
+import { useFilters, useFilteredData } from '@/api/reports/filters';
 import { ClientLayout } from '@/components/common/';
 import { makeStyles } from '@material-ui/core/styles';
 import { FavoritesReports } from '@/components/reports';
@@ -94,8 +93,11 @@ const useStyles = makeStyles({
 
 const Dashboard: Page = () => {
   const classes = useStyles();
-  const { name, client } = useClient();
-  const { chains, filters } = useClientsFilters();
+  const client = useClient();
+  const { filters } = useFilters();
+  const { chains } = useFilteredData(true);
+
+  if ((client.isLoading, client.isIdle)) return <LinearProgress />;
 
   return (
     <GridContainer>
@@ -106,7 +108,7 @@ const Dashboard: Page = () => {
         lg={4}
         className={classes.filtersContainer}
       >
-        <h3 className={classes.titleName}>{name}</h3>
+        <h3 className={classes.titleName}>{client.data?.name}</h3>
         <h4>Bienvenido a sus reportes fotográficos</h4>
       </GridItem>
 
@@ -120,7 +122,7 @@ const Dashboard: Page = () => {
         >
           <br />
           <p>Aplique los filtros para ver imágenes específicas</p>
-          {client && <FilterBar />}
+          {client && <FilterBar reported />}
         </GridItem>
         <GridItem xs={12} sm={8} md={8} lg={8}>
           {filters?.chain && filters?.branch?.name ? (

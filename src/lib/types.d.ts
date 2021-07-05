@@ -1,13 +1,12 @@
 import firebase from 'firebase/app';
 
-export interface User {
-  role: string;
+type User = {
+  role: 'sadmin' | 'admin' | 'client' | 'merchandiser';
   ID: string;
   displayName: string;
   email: string;
   key: string;
-}
-
+};
 export interface Chain {
   ID: string;
   name: string;

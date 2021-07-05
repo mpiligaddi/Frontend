@@ -2,7 +2,7 @@ import { FC } from 'react';
 import { AccordionActions, Typography, Divider } from '@material-ui/core';
 import Pagination from '@material-ui/lab/Pagination';
 import { Card, CardBody, CardHeader } from '@/components/ui';
-import { useClientsFilters } from '@/api/reports/filters/query';
+import { useFilters } from '@/api/reports/filters';
 import FilterImages from '../FilterImages';
 
 import { useStyles } from './styles';
@@ -13,7 +13,7 @@ type AccordionProps = {
 
 const Accordion: FC<AccordionProps> = ({ type }) => {
   const classes = useStyles();
-  const { filters } = useClientsFilters();
+  const { filters } = useFilters();
 
   if (!filters?.chain?.name || !filters?.branch?.name) return null;
 

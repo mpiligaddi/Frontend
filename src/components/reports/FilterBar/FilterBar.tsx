@@ -1,17 +1,51 @@
-import type { FC } from 'react';
+import { FC, useMemo } from 'react';
 import { Select, MenuItem, FormControl, InputLabel } from '@material-ui/core';
 import { GridItem, GridContainer } from '@/components/ui';
-import { useClientsFilters } from '@/api/reports/filters/query';
+import { useFilters, useFilteredData } from '@/api/reports/filters';
 import type { ChangeEvent } from '@/typings';
 
 import { useStyles } from './styles';
 import { useSelectStyles } from '@/styles/select';
 
-const FilterBar: FC = () => {
+type FilterBarProps = {
+  client?: boolean;
+  chain?: boolean;
+  branch?: boolean;
+  category?: boolean;
+  horizontal?: boolean;
+  reported?: boolean;
+  allChains?: boolean;
+};
+
+const FilterBar: FC<FilterBarProps> = ({
+  client = false,
+  chain = true,
+  branch = true,
+  category = true,
+  horizontal = false,
+  reported = false,
+  allChains = false
+}) => {
   const classes = useStyles();
   const selectClasses = useSelectStyles();
-  const { chains, categories, setFilters, filters, branches } =
-    useClientsFilters();
+  const { setFilters, filters } = useFilters();
+  const size = useMemo(() => (horizontal ? 6 : 10), [horizontal]);
+  const { chains, categories, branches, clients } = useFilteredData(reported);
+
+  const handleSelectClient = (event: ChangeEvent) => {
+    setFilters(filters => ({
+      ...filters,
+      chain: undefined,
+      branch: undefined
+    }));
+    const client = clients.data?.find(
+      client => client.ID === event.target.value
+    );
+    setFilters(filters => ({
+      ...filters,
+      client
+    }));
+  };
 
   const handleSelectChain = (event: ChangeEvent) => {
     setFilters(filters => ({
@@ -46,152 +80,218 @@ const FilterBar: FC = () => {
 
   return (
     <div className={classes.root}>
+      <br />
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <GridContainer>
-            <GridItem xs={10} sm={10} md={10}>
-              <FormControl
-                fullWidth
-                className={selectClasses.selectFormControl}
-              >
-                <InputLabel
-                  shrink
-                  htmlFor="select-chain"
-                  className={selectClasses.selectLabel}
+            {client && (
+              <GridItem xs={size} sm={size} md={size}>
+                <FormControl
+                  fullWidth
+                  className={selectClasses.selectFormControl}
                 >
-                  Cadena
-                </InputLabel>
-                <Select
-                  displayEmpty
-                  MenuProps={{
-                    className: selectClasses.selectMenu
-                  }}
-                  classes={{
-                    select: selectClasses.select
-                  }}
-                  value={filters?.chain?.ID || ''}
-                  onChange={handleSelectChain}
-                  inputProps={{
-                    name: 'selectChain',
-                    id: 'select-chain'
-                  }}
-                >
-                  <MenuItem value={''} disabled>
-                    Seleccione cadena
-                  </MenuItem>
-
-                  {chains.data?.map((chain: any) => (
-                    <MenuItem
-                      key={chain.ID}
-                      classes={{
-                        root: selectClasses.selectMenuItem,
-                        selected: selectClasses.selectMenuItemSelected
-                      }}
-                      value={chain.ID}
-                    >
-                      {chain.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </GridItem>
-            <GridItem xs={10} sm={10} md={10}>
-              <FormControl
-                fullWidth
-                className={selectClasses.selectFormControl}
-              >
-                <InputLabel
-                  shrink
-                  htmlFor="select-branch"
-                  className={selectClasses.selectLabel}
-                >
-                  Sucursal
-                </InputLabel>
-                <Select
-                  disabled={filters?.chain?.name ? false : true}
-                  displayEmpty
-                  MenuProps={{
-                    className: selectClasses.selectMenu
-                  }}
-                  classes={{
-                    select: selectClasses.select
-                  }}
-                  value={filters?.branch?.ID || ''}
-                  onChange={handleSelectBranch}
-                  inputProps={{
-                    name: 'selectBranch',
-                    id: 'select-branch'
-                  }}
-                >
-                  <MenuItem value={''} disabled>
-                    Seleccione sucursal
-                  </MenuItem>
-                  {branches.data?.map((branch: any) => (
-                    <MenuItem
-                      key={branch.ID}
-                      classes={{
-                        root: selectClasses.selectMenuItem,
-                        selected: selectClasses.selectMenuItemSelected
-                      }}
-                      value={branch.ID}
-                    >
-                      {branch.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </GridItem>
-            <GridItem xs={10} sm={10} md={10}>
-              <FormControl
-                fullWidth
-                className={selectClasses.selectFormControl}
-              >
-                <InputLabel
-                  shrink
-                  htmlFor="select-category"
-                  className={selectClasses.selectLabel}
-                >
-                  Categoría
-                </InputLabel>
-                <Select
-                  displayEmpty
-                  MenuProps={{
-                    className: selectClasses.selectMenu
-                  }}
-                  classes={{
-                    select: selectClasses.select
-                  }}
-                  value={filters?.category?.ID || ''}
-                  onChange={handleSelectCategory}
-                  inputProps={{
-                    name: 'selectCategory',
-                    id: 'select-category'
-                  }}
-                >
-                  <MenuItem
-                    classes={{
-                      root: selectClasses.selectMenuItem,
-                      selected: selectClasses.selectMenuItemSelected
-                    }}
-                    value={''}
+                  <InputLabel
+                    shrink
+                    htmlFor="select-client"
+                    className={selectClasses.selectLabel}
                   >
-                    Todas las categorías
-                  </MenuItem>
-                  {categories.data?.map(category => (
+                    Cliente
+                  </InputLabel>
+                  <Select
+                    displayEmpty
+                    MenuProps={{
+                      className: selectClasses.selectMenu
+                    }}
+                    classes={{
+                      select: selectClasses.select
+                    }}
+                    value={filters?.client?.ID || ''}
+                    onChange={handleSelectClient}
+                    inputProps={{
+                      name: 'selectClient',
+                      id: 'select-client'
+                    }}
+                  >
+                    <MenuItem value={''} disabled>
+                      Seleccione Cliente
+                    </MenuItem>
+
+                    {clients.data?.map(client => (
+                      <MenuItem
+                        key={client.ID}
+                        classes={{
+                          root: selectClasses.selectMenuItem,
+                          selected: selectClasses.selectMenuItemSelected
+                        }}
+                        value={client.ID}
+                      >
+                        {client.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </GridItem>
+            )}
+            {chain && (
+              <GridItem xs={size} sm={size} md={size}>
+                <FormControl
+                  fullWidth
+                  className={selectClasses.selectFormControl}
+                >
+                  <InputLabel
+                    shrink
+                    htmlFor="select-chain"
+                    className={selectClasses.selectLabel}
+                  >
+                    Cadena
+                  </InputLabel>
+                  <Select
+                    displayEmpty
+                    MenuProps={{
+                      className: selectClasses.selectMenu
+                    }}
+                    classes={{
+                      select: selectClasses.select
+                    }}
+                    value={filters?.chain?.ID || ''}
+                    onChange={handleSelectChain}
+                    inputProps={{
+                      name: 'selectChain',
+                      id: 'select-chain'
+                    }}
+                  >
+                    <MenuItem value={''} disabled>
+                      Seleccione cadena
+                    </MenuItem>
+                    {allChains && (
+                      <MenuItem
+                        classes={{
+                          root: selectClasses.selectMenuItem,
+                          selected: selectClasses.selectMenuItemSelected
+                        }}
+                        value={''}
+                      >
+                        Todas
+                      </MenuItem>
+                    )}
+
+                    {chains.data?.map(chain => (
+                      <MenuItem
+                        key={chain.ID}
+                        classes={{
+                          root: selectClasses.selectMenuItem,
+                          selected: selectClasses.selectMenuItemSelected
+                        }}
+                        value={chain.ID}
+                      >
+                        {chain.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </GridItem>
+            )}
+            {branch && (
+              <GridItem xs={10} sm={10} md={10}>
+                <FormControl
+                  fullWidth
+                  className={selectClasses.selectFormControl}
+                >
+                  <InputLabel
+                    shrink
+                    htmlFor="select-branch"
+                    className={selectClasses.selectLabel}
+                  >
+                    Sucursal
+                  </InputLabel>
+                  <Select
+                    disabled={filters?.chain?.name ? false : true}
+                    displayEmpty
+                    MenuProps={{
+                      className: selectClasses.selectMenu
+                    }}
+                    classes={{
+                      select: selectClasses.select
+                    }}
+                    value={filters?.branch?.ID || ''}
+                    onChange={handleSelectBranch}
+                    inputProps={{
+                      name: 'selectBranch',
+                      id: 'select-branch'
+                    }}
+                  >
+                    <MenuItem value={''} disabled>
+                      Seleccione sucursal
+                    </MenuItem>
+                    {branches.data?.map(branch => (
+                      <MenuItem
+                        key={branch.ID}
+                        classes={{
+                          root: selectClasses.selectMenuItem,
+                          selected: selectClasses.selectMenuItemSelected
+                        }}
+                        value={branch.ID}
+                      >
+                        {branch.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </GridItem>
+            )}
+            {category && (
+              <GridItem xs={10} sm={10} md={10}>
+                <FormControl
+                  fullWidth
+                  className={selectClasses.selectFormControl}
+                >
+                  <InputLabel
+                    shrink
+                    htmlFor="select-category"
+                    className={selectClasses.selectLabel}
+                  >
+                    Categoría
+                  </InputLabel>
+                  <Select
+                    displayEmpty
+                    MenuProps={{
+                      className: selectClasses.selectMenu
+                    }}
+                    classes={{
+                      select: selectClasses.select
+                    }}
+                    value={filters?.category?.ID || ''}
+                    onChange={handleSelectCategory}
+                    inputProps={{
+                      name: 'selectCategory',
+                      id: 'select-category'
+                    }}
+                  >
                     <MenuItem
-                      key={category.ID}
                       classes={{
                         root: selectClasses.selectMenuItem,
                         selected: selectClasses.selectMenuItemSelected
                       }}
-                      value={category.ID}
+                      value={''}
                     >
-                      {category.name}
+                      Todas las categorías
                     </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </GridItem>
+                    {categories.data?.map(category => (
+                      <MenuItem
+                        key={category.ID}
+                        classes={{
+                          root: selectClasses.selectMenuItem,
+                          selected: selectClasses.selectMenuItemSelected
+                        }}
+                        value={category.ID}
+                      >
+                        {category.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </GridItem>
+            )}
           </GridContainer>
         </GridItem>
       </GridContainer>

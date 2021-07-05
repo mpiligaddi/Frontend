@@ -1,28 +1,35 @@
 import { useEffect, useState } from 'react';
-import { useQuery } from 'react-query';
+import {
+  useQuery,
+  useQueryClient,
+  useQueryErrorResetBoundary
+} from 'react-query';
 import firebase from 'firebase/app';
-import { User } from '@/lib/types';
+import { Admin, Client, User } from '@/lib/types';
+
+const collections = {
+  sadmin: 'superadmins',
+  admin: 'admins',
+  client: 'clients'
+};
+
+const getUser = async (): Promise<User | null> => {
+  const uid = firebase.auth().currentUser?.uid;
+
+  if (!uid) return null;
+
+  const userDoc = await firebase.firestore().collection('users').doc(uid).get();
+
+  if (!userDoc.exists) return null;
+
+  const userData = userDoc.data() as User;
+
+  return userData;
+};
 
 export const useMe = () => {
   const [initialized, setInitialized] = useState(false);
-
-  const getUser = async () => {
-    const uid = firebase.auth().currentUser?.uid;
-
-    if (!uid) return null;
-
-    const userDoc = await firebase
-      .firestore()
-      .collection('users')
-      .doc(uid)
-      .get();
-
-    if (!userDoc.exists) return null;
-
-    const userData = userDoc.data() as User;
-
-    return userData;
-  };
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const unsubscribe = firebase
@@ -33,6 +40,53 @@ export const useMe = () => {
   }, []);
 
   return useQuery('me', getUser, {
-    enabled: initialized
+    enabled: initialized,
+    async onSuccess(user) {
+      if (!user) return;
+
+      const collection = (collections as any)[user.role];
+
+      if (collection) {
+        const { docs, empty } = await firebase
+          .firestore()
+          .collection(collection)
+          .where('email', '==', user.email)
+          .get();
+
+        if (empty) return;
+
+        const roleData = docs.map(doc => doc.data())[0];
+
+        queryClient.setQueryData(['user', user.role], roleData);
+      }
+    }
   });
+};
+
+export const useClient = () => {
+  const getClient = async () => {
+    const user = await getUser();
+
+    if (!user) return null;
+
+    const { docs, empty } = await firebase
+      .firestore()
+      .collection('clients')
+      .where('email', '==', user.email)
+      .get();
+
+    if (empty) return null;
+
+    const clientData = docs.map(doc => doc.data())[0] as Client;
+
+    return clientData;
+  };
+
+  return useQuery(['user', 'client'], getClient);
+};
+
+export const useAdmin = () => {
+  useMe();
+
+  useQuery<Admin>(['user', 'admin']);
 };
