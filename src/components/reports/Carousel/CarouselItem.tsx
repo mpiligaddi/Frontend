@@ -1,8 +1,8 @@
 import { useState, FC } from 'react';
-import { useAdminFilters } from '@/api/reports/filters';
-import { styled } from '@material-ui/core/styles';
-import firebase from 'firebase/app';
+import { useFilters } from '@/api/reports/filters';
+import { styled, Theme } from '@material-ui/core/styles';
 import DeleteTile from '../Tile/DeleteTile';
+import { useDeleteTile, useAddFavorite } from '@/api/reports';
 import { useCarousel } from './CarouselProvider';
 
 const CarouselContainer = styled('div')({
@@ -13,7 +13,7 @@ const CarouselContainer = styled('div')({
   height: '100%'
 });
 
-const CarouselImage = styled('div')<unknown, { img: string }>({
+const CarouselImage = styled('div')<Theme, { img: string }>({
   backgroundImage: props => `url(${props.img})`,
   backgroundSize: 'contain',
   backgroundRepeat: 'no-repeat',
@@ -75,64 +75,25 @@ const CarouselItem: FC<CarouselItemProps> = ({ tile, toggleEdit }) => {
   const [openModal, setOpenModal] = useState(false);
   const [favorite, setFavorite] = useState(tile.favorite ?? false);
   const { report, disableAction } = useCarousel();
-  const { setReportsXClient, branch } = useAdminFilters();
+  const { filters } = useFilters();
+  const { mutateAsync: addFavorite } = useAddFavorite();
+  const { mutateAsync: deleteTile } = useDeleteTile();
 
   const handleFavorite = async () => {
-    const categories = report.realCategories!.map(category => {
-      if (!category.images) return category;
-
-      const images = category.images.map(image =>
-        image.name === tile.name
-          ? {
-              ...image,
-              favorite: !favorite
-            }
-          : image
-      );
-
-      return {
-        ...category,
-        images
-      };
+    await addFavorite({
+      report,
+      tile,
+      favorite
     });
-
-    await firebase.firestore().collection('reports').doc(report.id).update({
-      categories
-    });
-
-    setReportsXClient(reports =>
-      reports.map(r => (r.id === report.id ? { ...r, categories } : r))
-    );
-
     setFavorite(!favorite);
   };
 
   const handleDelete = async (reason: string) => {
-    await firebase
-      .storage()
-      .refFromURL(tile.uri)
-      .delete()
-      .catch(() => console.log('La imagen no existe'));
-
-    const categories = report.realCategories!.map(category => {
-      if (!category.images) return category;
-      const images = category.images.map(image =>
-        image.name === tile.name ? { ...image, isDeleted: true, reason } : image
-      );
-
-      return {
-        ...category,
-        images
-      };
-    }, []);
-
-    await firebase.firestore().collection('reports').doc(report.id).update({
-      categories
+    await deleteTile({
+      report,
+      tile,
+      reason
     });
-
-    setReportsXClient(reports =>
-      reports.map(r => (r.id === report.id ? { ...r, categories } : r))
-    );
 
     //if (closeCarousel) closeCarousel({ data: {}, pictureId: "", actions: [] });
 
@@ -150,7 +111,7 @@ const CarouselItem: FC<CarouselItemProps> = ({ tile, toggleEdit }) => {
 
       <CarouselId>{tile.comment}</CarouselId>
       <CarouselId>
-        {branch.chainName} - {branch.name}
+        {filters?.branch?.chainName} - {filters?.branch?.name}
       </CarouselId>
       <CarouselCategory>
         Exhibición {tile.type == 'primary' ? 'Primaria' : 'Secundaria'}

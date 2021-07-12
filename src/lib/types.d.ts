@@ -7,6 +7,9 @@ type User = {
   email: string;
   key: string;
 };
+
+export type ReportType = 'revised' | 'all' | 'pendings' | 'favorites' | '';
+
 export interface Chain {
   ID: string;
   name: string;
@@ -16,6 +19,12 @@ export interface Comercial {
   ID: string;
   name: string;
   email: string;
+}
+
+export interface OFC {
+  categoryId: string;
+  branchId: string;
+  done: boolean;
 }
 
 export interface Coverage {
@@ -62,7 +71,7 @@ export interface Client {
   contactName: string;
   control: string;
   name: string;
-  periodReportId: 'FS' | string;
+  periodReportId: 'FS' | 'FQ' | 'FM' | 'FV';
 }
 
 export interface Image {

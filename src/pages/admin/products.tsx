@@ -1,6 +1,6 @@
-import { FC } from 'react';
+import { Page } from '@/typings';
 
-const Products: FC = () => {
+const Products: Page = () => {
   return <h1>Hello World</h1>;
 };
 

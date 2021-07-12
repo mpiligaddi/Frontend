@@ -8,20 +8,23 @@ import { useStyles } from './styles';
 
 type CardDataProps = {
   image: StaticImageData;
+  isOpen?: boolean;
   title: string;
   content: React.ReactNode;
   sub?: React.ReactNode;
   contentColor?: 'red' | 'normal';
+  onOpen(): void;
 };
 
 const CardData: FC<CardDataProps> = ({
   image,
   title,
   content,
+  isOpen,
   sub,
-  contentColor = 'normal'
+  contentColor = 'normal',
+  onOpen
 }) => {
-  const [open, setOpen] = useState(false);
   const classes = useStyles();
 
   return (
@@ -52,10 +55,10 @@ const CardData: FC<CardDataProps> = ({
             underline="none"
             color="textSecondary"
             align="center"
-            onClick={() => setOpen(!open)}
+            onClick={onOpen}
             href="#"
           >
-            {open ? <span>Ocultar detalle</span> : <span>Ver detalle</span>}
+            {isOpen ? <span>Ocultar detalle</span> : <span>Ver detalle</span>}
           </Link>
         </div>
       </CardFooter>

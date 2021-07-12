@@ -4,6 +4,12 @@ import { FilterBar } from '@/components/reports';
 import { GridContainer, GridItem, CardData } from '@/components/ui';
 import { useMe } from '@/api/user';
 import { useFilters, useFilteredData } from '@/api/reports/filters';
+import {
+  ChainsDetail,
+  PhotosDetail,
+  StoresDetail,
+  ComplianceDetail
+} from '@/components/data/details';
 import { useBranches } from '@/api/data';
 
 import shop from '@/assets/img/icon-shop.png';
@@ -16,11 +22,18 @@ import { Page } from '@/typings';
 const AdminDashboard: Page = () => {
   const user = useMe();
   const { filters, filteredReports } = useFilters();
-  const { chains, branches, reports, ofc } = useFilteredData();
+  const { branches, reports, ofc } = useFilteredData(false, {
+    chains: false,
+    categories: false
+  });
   const { data: allBranches } = useBranches({
     clientId: +filters?.client?.ID!
   });
   const [OFCPercent, setOFCPercent] = useState(0);
+  const [chainsOpen, setChainsOpen] = useState(false);
+  const [photosOpen, setPhotosOpen] = useState(false);
+  const [storesOpen, setStoresOpen] = useState(false);
+  const [complianceOpen, setComplianceOpen] = useState(false);
 
   const getOfcPercent = useCallback(() => {
     if (!ofc.data) return;
@@ -33,6 +46,13 @@ const AdminDashboard: Page = () => {
     getOfcPercent();
   }, [ofc.data, getOfcPercent]);
 
+  useEffect(() => {
+    setChainsOpen(false);
+    setPhotosOpen(false);
+    setStoresOpen(false);
+    setComplianceOpen(false);
+  }, [filters]);
+
   return (
     <GridContainer>
       <GridItem xs={12} sm={6} md={6}>
@@ -41,8 +61,13 @@ const AdminDashboard: Page = () => {
       </GridItem>
       <GridItem xs={12} sm={6} md={6}>
         <FilterBar
+          withSpace
           allChains
-          horizontal
+          size={{
+            xs: 6,
+            md: 6,
+            sm: 6
+          }}
           client
           category={false}
           branch={false}
@@ -53,17 +78,27 @@ const AdminDashboard: Page = () => {
         <CardData
           image={shop}
           title="Tiendas Contratadas"
+          isOpen={chainsOpen}
+          onOpen={() => setChainsOpen(!chainsOpen)}
           content={branches.data?.length}
           sub={filters?.chain && allBranches?.length}
         />
       </GridItem>
       <GridItem xs={12} sm={6} md={6} lg={3}>
-        <CardData image={camera} title="OFC" content={ofc.data?.length} />
+        <CardData
+          isOpen={photosOpen}
+          onOpen={() => setPhotosOpen(!photosOpen)}
+          image={camera}
+          title="OFC"
+          content={ofc.data?.length}
+        />
       </GridItem>
       <GridItem xs={12} sm={6} md={6} lg={3}>
         <CardData
-          image={visits}
+          isOpen={storesOpen}
           title="Tiendas con Fotos"
+          image={visits}
+          onOpen={() => setStoresOpen(!storesOpen)}
           content={
             filters?.chain ? filteredReports.length : reports.data?.length
           }
@@ -75,9 +110,16 @@ const AdminDashboard: Page = () => {
           image={alert}
           contentColor="red"
           title="Cumplimiento OFC"
+          isOpen={complianceOpen}
+          onOpen={() => setComplianceOpen(!complianceOpen)}
           content={`${OFCPercent}%`}
         />
       </GridItem>
+
+      {chainsOpen && <ChainsDetail />}
+      {photosOpen && <PhotosDetail />}
+      {storesOpen && <StoresDetail />}
+      {complianceOpen && <ComplianceDetail />}
     </GridContainer>
   );
 };

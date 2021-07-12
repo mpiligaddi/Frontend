@@ -1,5 +1,11 @@
 import { FC, useMemo } from 'react';
-import { Select, MenuItem, FormControl, InputLabel } from '@material-ui/core';
+import {
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  GridSize
+} from '@material-ui/core';
 import { GridItem, GridContainer } from '@/components/ui';
 import { useFilters, useFilteredData } from '@/api/reports/filters';
 import type { ChangeEvent } from '@/typings';
@@ -12,9 +18,14 @@ type FilterBarProps = {
   chain?: boolean;
   branch?: boolean;
   category?: boolean;
-  horizontal?: boolean;
   reported?: boolean;
   allChains?: boolean;
+  withSpace?: boolean;
+  size?: {
+    xs: GridSize;
+    sm: GridSize;
+    md: GridSize;
+  };
 };
 
 const FilterBar: FC<FilterBarProps> = ({
@@ -22,14 +33,14 @@ const FilterBar: FC<FilterBarProps> = ({
   chain = true,
   branch = true,
   category = true,
-  horizontal = false,
+  withSpace = false,
   reported = false,
-  allChains = false
+  allChains = false,
+  size
 }) => {
   const classes = useStyles();
   const selectClasses = useSelectStyles();
   const { setFilters, filters } = useFilters();
-  const size = useMemo(() => (horizontal ? 6 : 10), [horizontal]);
   const { chains, categories, branches, clients } = useFilteredData(reported);
 
   const handleSelectClient = (event: ChangeEvent) => {
@@ -80,12 +91,12 @@ const FilterBar: FC<FilterBarProps> = ({
 
   return (
     <div className={classes.root}>
-      <br />
+      {withSpace && <br />}
       <GridContainer>
         <GridItem xs={12} sm={12} md={12}>
           <GridContainer>
             {client && (
-              <GridItem xs={size} sm={size} md={size}>
+              <GridItem {...size}>
                 <FormControl
                   fullWidth
                   className={selectClasses.selectFormControl}
@@ -133,7 +144,7 @@ const FilterBar: FC<FilterBarProps> = ({
               </GridItem>
             )}
             {chain && (
-              <GridItem xs={size} sm={size} md={size}>
+              <GridItem {...size}>
                 <FormControl
                   fullWidth
                   className={selectClasses.selectFormControl}
@@ -192,7 +203,7 @@ const FilterBar: FC<FilterBarProps> = ({
               </GridItem>
             )}
             {branch && (
-              <GridItem xs={10} sm={10} md={10}>
+              <GridItem {...size}>
                 <FormControl
                   fullWidth
                   className={selectClasses.selectFormControl}
@@ -240,7 +251,7 @@ const FilterBar: FC<FilterBarProps> = ({
               </GridItem>
             )}
             {category && (
-              <GridItem xs={10} sm={10} md={10}>
+              <GridItem {...size}>
                 <FormControl
                   fullWidth
                   className={selectClasses.selectFormControl}

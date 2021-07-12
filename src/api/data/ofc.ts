@@ -1,15 +1,16 @@
-import { Branch, Category, Report } from '@/lib/types';
-import { useQuery } from 'react-query';
+import { Branch, Category, Report, OFC } from '@/lib/types';
+import { useQuery, UseQueryOptions } from 'react-query';
 
 type Data = {
   branches?: Branch[];
   reports?: Report[];
   categories?: Category[];
+  options?: UseQueryOptions<OFC[]>;
 };
 
-export const useOFC = ({ branches, reports, categories }: Data) => {
+export const useOFC = ({ branches, reports, categories, options }: Data) => {
   const getOFC = () => {
-    const ofcs: { categoryId: string; branchId: string; done: boolean }[] = [];
+    const ofcs: OFC[] = [];
 
     branches?.forEach(bxc => {
       const filteredReports = reports?.filter(
@@ -45,7 +46,8 @@ export const useOFC = ({ branches, reports, categories }: Data) => {
     ['ofc', branches?.length, reports?.length, categories?.length],
     getOFC,
     {
-      keepPreviousData: true
+      keepPreviousData: true,
+      ...options
     }
   );
 };

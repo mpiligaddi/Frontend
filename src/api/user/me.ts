@@ -1,13 +1,9 @@
 import { useEffect, useState } from 'react';
-import {
-  useQuery,
-  useQueryClient,
-  useQueryErrorResetBoundary
-} from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import firebase from 'firebase/app';
 import { Admin, Client, User } from '@/lib/types';
 
-const collections = {
+const collections: Record<string, string> = {
   sadmin: 'superadmins',
   admin: 'admins',
   client: 'clients'
@@ -44,7 +40,7 @@ export const useMe = () => {
     async onSuccess(user) {
       if (!user) return;
 
-      const collection = (collections as any)[user.role];
+      const collection = collections[user.role];
 
       if (collection) {
         const { docs, empty } = await firebase

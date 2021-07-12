@@ -1,39 +1,18 @@
-/*/////////////////////////////////////////////////////////////////////////////
-
-props: Columns , data , title, isLoading
-
-//embedding components in the file that will use it
-
-Format example: 
-columns = [{title: "", field: "", validate: rowData => rowData.field === '' ? { isValid: false, helperText: 'text' } : true, },{.....}, {.....}]
-
-for data:
-const [data, setData] = useState([])
-const get .. {
-  setData(data)
-}
-
-<TableCrud data={data} columns={columns} title='some title'/>
-
-/////////////////////////////////////////////////////////////////////////////*/
+import { FC } from 'react';
 import MaterialTable from 'material-table';
-import _filefy, { CsvBuilder } from 'filefy';
-import moment from 'moment';
+import { format } from 'date-fns';
 
-export default function TableCrud(props) {
+type TableCrudProps = {
+  data: any;
+  columns: any;
+  title: string;
+  isLoading?: boolean;
+  editable?: boolean;
+};
+
+const TableCrud: FC<TableCrudProps> = props => {
   const { data, columns, title, editable, isLoading } = props;
 
-  //Export to cvs wiht columns
-  const exportedData = data.map(rowData =>
-    columns.map(columnDef => rowData[columnDef.field])
-  );
-  const exportCsv = function () {
-    new CsvBuilder(`${title}.csv`)
-      .setColumns(columns.map(columnDef => columnDef.title))
-      .setDelimeter(';')
-      .addRows(exportedData)
-      .exportFile();
-  };
   return (
     <div>
       <MaterialTable
@@ -43,7 +22,7 @@ export default function TableCrud(props) {
         isLoading={isLoading}
         options={{
           exportButton: true,
-          exportFileName: `${title}_${moment().format('DD-MM-YYYY')}`,
+          exportFileName: `${title}_${format(new Date(), 'dd-mm-yyyy')}`,
           addRowPosition: 'first',
           exportAllData: true,
           actionsColumnIndex: -1,
@@ -52,13 +31,11 @@ export default function TableCrud(props) {
           headerStyle: {
             backgroundColor: '#9e9e9e',
             color: '#FFF',
-            justifyItems: 'center',
+            justifyItems: 'center'
           },
           pageSizeOptions: [10, 30, 50],
-          pageSize: 30,
-          exportCsv
+          pageSize: 30
         }}
-        editable={editable}
         localization={{
           header: {
             actions: 'Acciones'
@@ -70,7 +47,7 @@ export default function TableCrud(props) {
             editTooltip: 'Editar',
             addTooltip: 'Añadir registro',
             filterRow: {
-              filterPlaceHolder: 'Buscar...', 
+              filterPlaceHolder: 'Buscar...',
               filterTooltip: 'Filtrar'
             },
 
@@ -84,8 +61,7 @@ export default function TableCrud(props) {
             searchTooltip: 'Buscador',
             searchPlaceholder: 'Buscar..',
             exportTitle: 'Exportar',
-            exportAriaLabel: 'Exportar',
-            toolbarExportName: 'Exportar en CSV'
+            exportAriaLabel: 'Exportar'
           },
           pagination: {
             labelRowsSelect: 'registros por página',
@@ -99,4 +75,6 @@ export default function TableCrud(props) {
       />
     </div>
   );
-}
+};
+
+export default TableCrud;

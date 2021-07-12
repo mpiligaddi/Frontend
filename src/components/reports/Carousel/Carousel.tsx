@@ -87,6 +87,14 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
   let mainPanel = document.querySelector('#mainpanel');
   let lastScroll = 0;
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, []);
+
   const {
     report,
     tileInfo: { tile, catIndex }

@@ -1,36 +1,49 @@
-import React, { useState, useEffect, FC } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
+import React, { useState, FC } from 'react';
 
 import { AdminNavbar } from '@/components/ui';
-import Sidebar from '@/components/ui/Sidebar/NewSidebar';
-import ClientsFiltersProvider from '@/api/reports/filters/query';
+import Sidebar, { Route } from '@/components/ui/Sidebar/NewSidebar';
+import { FiltersProvider } from '@/api/reports/filters';
 
-import { containerFluid, transition } from '@/utils/styles';
 import logo from '@/assets/img/CHEK-NEGRO (1).png';
 import { useMe } from '@/api/user';
+import { useStyles } from './styles';
+import {
+  Dashboard,
+  PhotoLibrary,
+  Pageview,
+  Person,
+  AddPhotoAlternate
+} from '@material-ui/icons';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex'
+const routes: Route[] = [
+  {
+    name: 'Resumen',
+    path: '/admin/dashboard',
+    icon: <Dashboard />
   },
-  content: {
-    marginTop: '70px',
-    padding: '30px 15px'
+  {
+    collapse: true,
+    name: 'Reportes',
+    icon: <PhotoLibrary />,
+    routes: [
+      {
+        path: '/admin/revision',
+        name: 'Revisar Reportes',
+        icon: <Pageview />
+      },
+      {
+        path: '/admin/reports/new',
+        name: 'Crear Reporte',
+        icon: <AddPhotoAlternate />
+      }
+    ]
   },
-  container: containerFluid,
-  mainPanel: {
-    transitionProperty: 'top, bottom, width',
-    transitionDuration: '.2s, .2s, .35s',
-    transitionTimingFunction: 'linear, linear, ease',
-    overflow: 'auto',
-    position: 'relative',
-    float: 'right',
-    ...transition,
-    maxHeight: '100%',
-    width: '100%',
-    overflowScrolling: 'touch'
+  {
+    name: 'Clientes',
+    path: '/admin/clients',
+    icon: <Person />
   }
-}));
+];
 
 const AdminLayout: FC = ({ children }) => {
   const user = useMe();
@@ -40,9 +53,9 @@ const AdminLayout: FC = ({ children }) => {
   if (user.isIdle || user.isLoading) return <p>Loading...</p>;
 
   return (
-    <ClientsFiltersProvider>
+    <FiltersProvider>
       <div className={classes.root}>
-        <Sidebar />
+        <Sidebar routes={routes} />
         <AdminNavbar
           sidebarMinimize={() => {}}
           logo={logo}
@@ -55,7 +68,7 @@ const AdminLayout: FC = ({ children }) => {
           </main>
         </div>
       </div>
-    </ClientsFiltersProvider>
+    </FiltersProvider>
   );
 };
 

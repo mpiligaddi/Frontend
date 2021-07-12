@@ -1,17 +1,27 @@
 import { FC } from 'react';
 import { AccordionActions, Typography, Divider } from '@material-ui/core';
+import cn from 'classnames';
 import Pagination from '@material-ui/lab/Pagination';
 import { Card, CardBody, CardHeader } from '@/components/ui';
 import { useFilters } from '@/api/reports/filters';
 import FilterImages from '../FilterImages';
 
 import { useStyles } from './styles';
+import { ReportType } from '@/lib/types';
 
 type AccordionProps = {
-  type: 'revised' | 'all' | 'pendings' | 'favorites';
+  type: ReportType;
+  disableAction?: boolean;
+  revisable?: boolean;
+  top?: boolean;
 };
 
-const Accordion: FC<AccordionProps> = ({ type }) => {
+const Accordion: FC<AccordionProps> = ({
+  type,
+  revisable,
+  disableAction,
+  top
+}) => {
   const classes = useStyles();
   const { filters } = useFilters();
 
@@ -19,7 +29,11 @@ const Accordion: FC<AccordionProps> = ({ type }) => {
 
   return (
     <>
-      <Card className={classes.card}>
+      <Card
+        className={cn(classes.card, {
+          [classes.cardTop]: top
+        })}
+      >
         <CardHeader>
           <Typography className={classes.heading1}>
             {filters.chain?.name}
@@ -30,7 +44,13 @@ const Accordion: FC<AccordionProps> = ({ type }) => {
           </Typography>
         </CardHeader>
         <CardBody>
-          {filters.branch?.name !== '' && <FilterImages type={type} />}
+          {filters.branch?.name !== '' && (
+            <FilterImages
+              disableAction={disableAction}
+              revisable={revisable}
+              type={type}
+            />
+          )}
         </CardBody>
         <Divider />
         <AccordionActions>

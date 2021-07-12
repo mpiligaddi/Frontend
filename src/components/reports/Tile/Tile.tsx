@@ -1,4 +1,4 @@
-import React, { useState, FC } from 'react';
+import React, { useState, FC, useEffect } from 'react';
 import GridListTileBar from '@material-ui/core/GridListTileBar';
 import Icon from '@material-ui/core/Icon';
 import IconButton from '@material-ui/core/IconButton';
@@ -6,8 +6,7 @@ import DeleteTile from './DeleteTile';
 import Image from 'next/image';
 
 import { Image as IImage, Report } from '@/lib/types';
-import firebase from 'firebase/app';
-import { useAdminFilters } from '@/api/reports/filters';
+import { useAddFavorite, useDeleteTile } from '@/api/reports';
 import { useCarousel } from '../Carousel/CarouselProvider';
 
 import { useStyles } from './styles';
@@ -28,67 +27,30 @@ const Tile: FC<TileProps> = ({
   const classes = useStyles();
   const [favorite, setFavorite] = useState(tile.favorite ?? false);
   const [openModal, setOpenModal] = useState(false);
-  const { setReportsXClient } = useAdminFilters();
+  const { mutateAsync: addFavorite } = useAddFavorite();
+  const { mutateAsync: deleteTile } = useDeleteTile();
 
   const { setCarouselInfo } = useCarousel();
 
+  useEffect(() => {
+    setFavorite(tile.favorite ?? false);
+  }, [tile.favorite]);
+
   const handleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const categories = report.realCategories!.map(category => {
-      if (!category.images) return category;
-
-      const images = category.images.map(image =>
-        image.name === tile.name
-          ? {
-              ...image,
-              favorite: !favorite
-            }
-          : image
-      );
-
-      return {
-        ...category,
-        images
-      };
+    await addFavorite({
+      report,
+      favorite,
+      tile
     });
-
-    await firebase.firestore().collection('reports').doc(report.id).update({
-      categories
-    });
-
-    setReportsXClient(reports =>
-      reports.map(r => (r.id === report.id ? { ...r, categories } : r))
-    );
-
-    setFavorite(!favorite);
   };
 
-  const deleteTile = async (reason: string) => {
-    await firebase
-      .storage()
-      .refFromURL(tile.uri)
-      .delete()
-      .catch(() => console.log('La imagen no existe'));
-
-    const categories = report.realCategories!.map(category => {
-      if (!category.images) return category;
-      const images = category.images.map(image =>
-        image.name === tile.name ? { ...image, isDeleted: true, reason } : image
-      );
-
-      return {
-        ...category,
-        images
-      };
-    }, []);
-
-    await firebase.firestore().collection('reports').doc(report.id).update({
-      categories
+  const onDeleteTile = async (reason: string) => {
+    await deleteTile({
+      report,
+      tile,
+      reason
     });
-
-    setReportsXClient(reports =>
-      reports.map(r => (r.id === report.id ? { ...r, categories } : r))
-    );
 
     setOpenModal(false);
   };
@@ -106,7 +68,7 @@ const Tile: FC<TileProps> = ({
       <DeleteTile
         onClose={() => setOpenModal(false)}
         isOpen={openModal}
-        onDelete={deleteTile}
+        onDelete={onDeleteTile}
       />
       <div className={classes.photo}>
         <Image

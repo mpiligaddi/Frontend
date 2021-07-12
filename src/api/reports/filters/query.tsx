@@ -30,7 +30,7 @@ interface State {
 
 const FiltersContext = createContext({} as State);
 
-const FiltersProvider: FC = ({ children }) => {
+export const FiltersProvider: FC = ({ children }) => {
   const client = useClient();
   const [filters, setFilters] = useState<Filters>();
   const [filteredReports, setFilteredReports] = useState<Report[]>([]);
@@ -112,5 +112,3 @@ const FiltersProvider: FC = ({ children }) => {
 };
 
 export const useFilters = () => useContext(FiltersContext);
-
-export default FiltersProvider;

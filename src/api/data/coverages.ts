@@ -1,8 +1,8 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryOptions } from 'react-query';
 import firebase from 'firebase/app';
 import { Coverage } from '@/lib/types';
 
-export const useCoverages = () => {
+export const useCoverages = (options?: UseQueryOptions<Coverage[]>) => {
   const getCoverages = async () => {
     const result = await firebase
       .firestore()
@@ -18,5 +18,5 @@ export const useCoverages = () => {
     return coverages;
   };
 
-  return useQuery('coverages', getCoverages);
+  return useQuery('coverages', getCoverages, options);
 };

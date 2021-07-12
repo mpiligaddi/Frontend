@@ -177,9 +177,10 @@ const primaryBackgroundText = {
   padding: '6px 10px',
   margin: '.3125rem 1px',
   fontSize: '12px',
-  fontWeight: '500',
+  fontWeight: 500,
   textTransform: 'uppercase'
-};
+} as const;
+
 const primaryBoxShadow = {
   boxShadow:
     '0 4px 20px 0 rgba(' +

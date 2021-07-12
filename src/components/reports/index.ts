@@ -4,3 +4,5 @@ export { default as FilterBar } from './FilterBar';
 export { default as Accordion } from './Accordion';
 export { default as FilterImages } from './FilterImages';
 export { default as FavoritesReports } from './FavoritesReportsCarousel';
+export { default as SelectClient } from './SelectClient';
+export { default as ReportTypeSelector } from './ReportTypeSelector';

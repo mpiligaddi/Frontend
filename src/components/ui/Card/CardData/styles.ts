@@ -9,7 +9,7 @@ import {
 } from '@/utils/styles';
 import { makeStyles } from '@material-ui/core/styles';
 
-export const useStyles = makeStyles({
+export const useStyles = makeStyles(theme => ({
   tooltip,
   cardTitle: {
     ...cardTitle,
@@ -177,5 +177,10 @@ export const useStyles = makeStyles({
   cardContentRight: {
     padding: '15px 20px 15px 0px',
     position: 'relative'
+  },
+  button: {
+    color: theme.palette.text.secondary,
+    fontWeight: 200,
+    fontSize: '12px'
   }
-});
+}));

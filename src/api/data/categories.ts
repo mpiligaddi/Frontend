@@ -1,8 +1,11 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryOptions } from 'react-query';
 import firebase from 'firebase/app';
 import { Category } from '@/lib/types';
 
-export const useCategories = (clientId?: number) => {
+export const useCategories = (
+  clientId?: number,
+  options?: UseQueryOptions<Category[]>
+) => {
   const getCategories = async () => {
     const result = await firebase
       .firestore()
@@ -18,6 +21,7 @@ export const useCategories = (clientId?: number) => {
   };
 
   return useQuery(['categories', clientId], getCategories, {
-    enabled: !!clientId
+    enabled: !!clientId,
+    ...options
   });
 };

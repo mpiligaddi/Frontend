@@ -1,5 +1,13 @@
-import { useCallback, useEffect, useRef, useState, FC } from 'react';
-import { Container, Graphics, Sprite, Stage, Text } from '@inlet/react-pixi';
+import { useCallback, useEffect, useRef, useState, FC, useMemo } from 'react';
+import {
+  Container,
+  Graphics,
+  Sprite,
+  Stage,
+  Text,
+  PixiRef,
+  _ReactPixi
+} from '@inlet/react-pixi';
 import { Backdrop, CircularProgress } from '@material-ui/core';
 import { makeStyles, styled } from '@material-ui/core/styles';
 import { TextStyle } from '@pixi/text';
@@ -12,6 +20,16 @@ const useStyles = makeStyles(theme => ({
   backdrop: {
     zIndex: theme.zIndex.drawer + 4,
     color: '#fff'
+  },
+  canvas: {
+    width: 'calc(100vw * (9 / 16)) !important',
+    height: 'calc(100vh - 17rem) !important',
+    backgroundColor: '#fff',
+    backgroundImage: `linear-gradient(#efefef 1px, transparent 1px),
+    linear-gradient(to right, #efefef 1px, #fff 1px)`,
+    backgroundSize: '20px 20px',
+    borderRadius: '18px',
+    margin: '20px auto'
   }
 }));
 
@@ -63,19 +81,24 @@ const EditAction = styled('a')<
   }
 });
 
-const Canvas = styled(Stage)({
-  width: 'calc(100vw * 9 / 16)',
-  height: 'calc(100vh - 17rem)',
-  backgroundColor: '#fff',
-  backgroundImage: `linear-gradient(#efefef 1px, transparent 1px),
-  linear-gradient(to right, #efefef 1px, #fff 1px)`,
-  backgroundSize: '20px 20px',
-  borderRadius: '18px',
-  margin: '20px auto'
-});
+const Canvas = styled(Stage)({});
 
-const RotationSlider = ({ width, height, rotation, ...props }) => {
-  let { x, y } = { ...props };
+type RotationSliderProps = _ReactPixi.IGraphics & {
+  x: number;
+  y: number;
+  rotation: number;
+  width: number;
+  height: number;
+};
+
+const RotationSlider: FC<RotationSliderProps> = ({
+  width,
+  height,
+  rotation,
+  x,
+  y,
+  ...props
+}) => {
   const draw = useCallback(
     g => {
       g.clear();
@@ -92,10 +115,10 @@ const RotationSlider = ({ width, height, rotation, ...props }) => {
       g.drawCircle(15, rotation, 8);
       g.endFill();
     },
-    [width, height, rotation]
+    [width, height, rotation, x, y]
   );
 
-  return <Graphics interactive={true} {...props} draw={draw} />;
+  return <Graphics interactive={true} {...props} x={x} y={y} draw={draw} />;
 };
 
 type EditModeProps = {
@@ -113,25 +136,25 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
     report,
     tileInfo: { tile }
   } = useCarousel();
-  const viewportRef = useRef();
-  const imageRef = useRef();
+  const viewportRef = useRef<any>(null);
+  const imageRef = useRef<PixiRef<typeof Sprite>>(null);
 
   const { setReportsXClient } = useAdminFilters();
 
-  let _width = (document.body.getBoundingClientRect().width * 9) / 16;
-  let _height = document.body.getBoundingClientRect().height - 16 * 17;
+  const _width = document.body.getBoundingClientRect().width * (9 / 16);
+  const _height = document.body.getBoundingClientRect().height - 16 * 17;
   const [rotation, setRotation] = useState(0);
   const [rotationDelta, setRotationDelta] = useState(0);
 
-  const handleSlideDown = e => {
+  const handleSlideDown = () => {
     setInteractive(true);
   };
 
-  const handleSlideUp = e => {
+  const handleSlideUp = () => {
     setInteractive(false);
   };
 
-  const handleSlideMove = e => {
+  const handleSlideMove = (e: any) => {
     if (isInteractive) {
       let globalY = e.data.global.y;
 
@@ -140,19 +163,18 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
     }
   };
 
-  const handleSaveImage = e => {
+  const handleSaveImage = () => {
     setSave(true);
-    let app = viewportRef.current.app;
+    let app: any = viewportRef.current?.app;
     setTimeout(() => {
-      app.renderer.plugins.extract.canvas(app.stage).toBlob(async b => {
-        console.log(tile, report);
-        const ref = firebase.storage.ref(
-          `reports/${report.createdBy}/${tile.name}`
-        );
+      app.renderer.plugins.extract.canvas(app.stage).toBlob(async (b: Blob) => {
+        const ref = firebase
+          .storage()
+          .ref(`reports/${report.createdBy}/${tile.name}`);
         ref.put(b).then(async task => {
-          let nuri = await task.ref.getDownloadURL();
+          const nuri = await task.ref.getDownloadURL();
 
-          const categories = report.realCategories.map(category => {
+          const categories = report.realCategories!.map(category => {
             if (!category.images) return category;
 
             const images = category.images.map(image =>
@@ -170,9 +192,13 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
             };
           });
 
-          await firebase.db.collection('reports').doc(report.id).update({
-            categories
-          });
+          await firebase
+            .firestore()
+            .collection('reports')
+            .doc(report.id)
+            .update({
+              categories
+            });
 
           setReportsXClient(reports =>
             reports.map(r => (r.id === report.id ? { ...r, categories } : r))
@@ -190,7 +216,6 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
   };
 
   useEffect(() => {
-    console.log(imageRef?.current?.texture);
     if (imageRef.current) {
       let sprite = imageRef.current;
       let width = sprite.texture.width;
@@ -199,7 +224,6 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
       if (transform.width > 1) {
         sprite.width = transform.width;
         sprite.height = transform.height;
-        console.log(transform);
         return;
       }
 
@@ -218,20 +242,23 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
       sprite.width = width;
       sprite.height = height;
       setTransform({ width: width, height: height });
-      console.log('T', transform);
     }
-  }, [imageRef.current]);
+  }, [_width, _height, transform]);
 
   return (
     <Wrapper>
-      <Canvas
-        mode={editMode}
+      <Stage
         width={_width}
         height={_height}
+        className={classes.canvas}
         options={{
           antialias: true,
           autoDensity: true,
           backgroundAlpha: 0
+        }}
+        style={{
+          width: _width,
+          height: _height
         }}
       >
         <Container
@@ -290,7 +317,7 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
             />
           </>
         )}
-      </Canvas>
+      </Stage>
       <EditActions>
         <EditAction disabled>
           <i className="fas fa-hand-paper"></i> Mover

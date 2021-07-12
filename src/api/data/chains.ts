@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryOptions } from 'react-query';
 import firebase from 'firebase/app';
 import { Chain, Report } from '@/lib/types';
 
@@ -6,9 +6,10 @@ interface Data {
   clientId?: string;
   reported?: boolean;
   reports?: Report[];
+  options?: UseQueryOptions<Chain[]>;
 }
 
-export const useChains = ({ clientId, reported, reports }: Data) => {
+export const useChains = ({ clientId, reported, reports, options }: Data) => {
   const getChains = async () => {
     const result = await firebase
       .firestore()
@@ -56,6 +57,7 @@ export const useChains = ({ clientId, reported, reports }: Data) => {
 
   return useQuery(['chains', { clientId, reported }], getChains, {
     enabled: reported ? !!clientId && !!reports : !!clientId,
-    keepPreviousData: true
+    keepPreviousData: true,
+    ...options
   });
 };

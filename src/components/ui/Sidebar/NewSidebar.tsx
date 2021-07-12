@@ -1,16 +1,9 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import cn from 'classnames';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
 
 import { Drawer, List, Divider } from '@material-ui/core';
 import avatar from '@/assets/img/placeholder.jpg';
-import {
-  Dashboard,
-  PhotoLibrary,
-  Pageview,
-  AddPhotoAlternate
-} from '@material-ui/icons';
+
 import SidebarItem from './SidebarItem';
 import firebase from 'firebase/app';
 import { useUI } from '@/components/ui';
@@ -26,36 +19,11 @@ export interface Route {
   routes?: Omit<Route, 'routes' | 'collapse'>[];
 }
 
-const baseRoutes: Route[] = [
-  {
-    name: 'Resumen',
-    path: '/admin/dashboard',
-    icon: <Dashboard />
-  },
-  {
-    collapse: true,
-    name: 'Reportes',
-    icon: <PhotoLibrary />,
-    routes: [
-      {
-        path: '/admin/revision',
-        name: 'Revisar Reportes',
-        icon: <Pageview />
-      },
-      {
-        path: '/admin/new-report',
-        name: 'Crear Reporte',
-        icon: <AddPhotoAlternate />
-      }
-    ]
-  }
-];
-
 type SidebarProps = {
-  routes?: Route[];
+  routes: Route[];
 };
 
-const Sidebar: FC<SidebarProps> = ({ routes = baseRoutes }) => {
+const Sidebar: FC<SidebarProps> = ({ routes }) => {
   const classes = useStyles();
   const user = useMe();
   const { displayMiniSidebar } = useUI();

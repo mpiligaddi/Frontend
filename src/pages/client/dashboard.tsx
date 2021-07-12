@@ -122,11 +122,20 @@ const Dashboard: Page = () => {
         >
           <br />
           <p>Aplique los filtros para ver imágenes específicas</p>
-          {client && <FilterBar reported />}
+          {client && (
+            <FilterBar
+              reported
+              size={{
+                xs: 10,
+                md: 10,
+                sm: 10
+              }}
+            />
+          )}
         </GridItem>
         <GridItem xs={12} sm={8} md={8} lg={8}>
           {filters?.chain && filters?.branch?.name ? (
-            <Accordion type="revised" />
+            <Accordion top disableAction revisable={false} type="revised" />
           ) : (
             <>{chains.isLoading ? <LinearProgress /> : <FavoritesReports />}</>
           )}

@@ -30,6 +30,7 @@ export const useStyles = makeStyles({
     //display: 'flex',
     marginLeft: '15px',
     width: '15%',
+    color: 'black',
     //flexDirection: 'row',
     display: 'inline'
   },

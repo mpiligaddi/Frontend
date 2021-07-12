@@ -67,7 +67,7 @@ const Report: FC<ReportProps> = ({
           </span>
         )}
       </div>
-      {report.categories.map((cat, catIndex: number) => (
+      {report.categories.map((cat, catIndex) => (
         <GridContainer key={catIndex} className={classes.report}>
           {!category && (
             <div className={classes.reportDate}>

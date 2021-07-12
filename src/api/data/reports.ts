@@ -1,8 +1,11 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryOptions } from 'react-query';
 import firebase from 'firebase/app';
 import { Report } from '@/lib/types';
 
-export const useReports = (clientId?: number) => {
+export const useReports = (
+  clientId?: number,
+  options?: UseQueryOptions<Report[]>
+) => {
   const getReports = async () => {
     const result = await firebase
       .firestore()
@@ -21,6 +24,7 @@ export const useReports = (clientId?: number) => {
 
   return useQuery(['reports', clientId], getReports, {
     enabled: !!clientId,
-    keepPreviousData: true
+    keepPreviousData: true,
+    ...options
   });
 };

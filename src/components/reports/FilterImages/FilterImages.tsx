@@ -6,7 +6,17 @@ import { useFilters } from '@/api/reports/filters/';
 import CarouselProvider from '../Carousel/CarouselProvider';
 import { ReportCategory, Report as IReport } from '@/lib/types';
 
-const FilterImages: FC<{ type: string }> = ({ type }) => {
+type FilterImagesProps = {
+  type: string;
+  disableAction?: boolean;
+  revisable?: boolean;
+};
+
+const FilterImages: FC<FilterImagesProps> = ({
+  type,
+  disableAction,
+  revisable
+}) => {
   const [loading, setLoading] = useState(true);
   const [reports, setReports] = useState<IReport[]>([]);
   const { filteredReports, filters } = useFilters();
@@ -16,7 +26,8 @@ const FilterImages: FC<{ type: string }> = ({ type }) => {
 
     setLoading(true);
     const newReports = filteredReports.reduce((reports: IReport[], report) => {
-      if (!report.revised) return reports;
+      if (type === 'revised' && !report.revised) return reports;
+      if (type === 'pendings' && report.revised) return reports;
 
       const categories = report.categories.reduce(
         (categories: ReportCategory[], category) => {
@@ -64,14 +75,14 @@ const FilterImages: FC<{ type: string }> = ({ type }) => {
   if (loading) return <LinearProgress />;
 
   return (
-    <CarouselProvider disableAction>
+    <CarouselProvider disableAction={disableAction}>
       {reports.map(report => (
         <Report
           key={report.id}
           report={report}
           category={filters?.category}
-          disableAction
-          revisable={false}
+          disableAction={disableAction}
+          revisable={revisable}
         />
       ))}
     </CarouselProvider>

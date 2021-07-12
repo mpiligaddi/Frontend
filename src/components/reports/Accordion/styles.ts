@@ -14,8 +14,11 @@ export const useStyles = makeStyles(theme => ({
     marginTop: '10px'
   },
   card: {
-    marginTop: '-60px',
+    // marginTop: '-60px',
     padding: '0'
+  },
+  cardTop: {
+    marginTop: '-60px'
   },
   //Images grid
   cardBody: {

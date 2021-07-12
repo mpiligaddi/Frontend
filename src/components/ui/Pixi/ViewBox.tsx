@@ -6,7 +6,7 @@ import { Viewport } from 'pixi-viewport';
 PIXI.settings.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
 
 const PixiViewportComponent = PixiComponent('Viewport', {
-  create(props) {
+  create(props: any) {
     const { app, ...viewportProps } = props;
 
     const viewport = new Viewport({
@@ -15,8 +15,8 @@ const PixiViewportComponent = PixiComponent('Viewport', {
       ...viewportProps
     });
 
-    (props.plugins || []).forEach(plugin => {
-      viewport[plugin]();
+    (props.plugins || []).forEach((plugin: any) => {
+      (viewport as any)[plugin]();
     });
 
     return viewport;
@@ -35,7 +35,7 @@ const PixiViewportComponent = PixiComponent('Viewport', {
 
     Object.keys(newProps).forEach(p => {
       if (oldProps[p] !== newProps[p]) {
-        viewport[p] = newProps[p];
+        (viewport as any)[p] = newProps[p];
       }
     });
   },
@@ -44,9 +44,11 @@ const PixiViewportComponent = PixiComponent('Viewport', {
   }
 });
 
-const PixiViewport = React.forwardRef((props, ref: any) => (
-  <PixiViewportComponent ref={ref} {...props} />
-));
+const PixiViewport = React.forwardRef<unknown, any>((props, ref: any) => {
+  const app = useApp();
+
+  return <PixiViewportComponent ref={ref} app={app} {...props} />;
+});
 
 PixiViewport.displayName = 'PixiViewport';
 

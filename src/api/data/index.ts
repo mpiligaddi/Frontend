@@ -5,3 +5,7 @@ export * from './branches';
 export * from './clients';
 export * from './coverages';
 export * from './ofc';
+export * from './zones';
+export * from './supervisors';
+export * from './admins';
+export * from './comercials';

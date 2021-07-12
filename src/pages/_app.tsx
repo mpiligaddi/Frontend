@@ -19,7 +19,15 @@ type MyAppProps = AppProps & {
 
 const Noop: FC = ({ children }) => <>{children}</>;
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      refetchOnMount: false,
+      cacheTime: 1000 * 60 * 60 * 24
+    }
+  }
+});
 
 const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
   const Layout = Component.Layout ?? Noop;

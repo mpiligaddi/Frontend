@@ -1,4 +1,4 @@
-import { useQuery } from 'react-query';
+import { useQuery, UseQueryOptions } from 'react-query';
 import firebase from 'firebase/app';
 import { Branch, Report } from '@/lib/types';
 import { useCoverages } from '.';
@@ -9,9 +9,16 @@ interface Data {
   reported?: boolean;
   reports?: Report[];
   clientId: number;
+  options?: UseQueryOptions<Branch[]>;
 }
 
-export const useBranches = ({ chain, reported, reports, clientId }: Data) => {
+export const useBranches = ({
+  chain,
+  reported,
+  reports,
+  clientId,
+  options
+}: Data) => {
   const coverages = useCoverages();
 
   const getBranches = async (): Promise<Branch[]> => {
@@ -50,6 +57,7 @@ export const useBranches = ({ chain, reported, reports, clientId }: Data) => {
   return useQuery(['branches', { chain, reported, clientId }], getBranches, {
     // enabled: reported ? !!reports && !!chain : !!chain,
     enabled: !coverages.isLoading,
-    keepPreviousData: true
+    keepPreviousData: true,
+    ...options
   });
 };
