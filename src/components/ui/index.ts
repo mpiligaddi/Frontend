@@ -2,6 +2,7 @@ export { default as Button, SignOutButton } from './Button';
 export { default as LinearProgress } from './LinearProgress';
 export { default as Input } from './Input';
 export { default as Tabs } from './Tabs';
+export { default as ComingSoon } from './ComingSoon';
 
 export * from './Grid';
 export * from './Navbars';

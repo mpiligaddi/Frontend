@@ -139,12 +139,19 @@ export const ComplianceDetail: FC = () => {
     }
   };
 
-  const getDataSupervisors = () => {
+  const getOFCPending = useCallback(() => {
+    if (!ofc.data) return;
+    const pending = ofc.data.filter(ofc => !ofc.done);
+
+    return pending;
+  }, [ofc.data]);
+
+  const getDataSupervisors = useCallback(() => {
     const zoneIds: string[] = [];
     const sups: string[] = [];
     //console.log(allBranches)
 
-    let branchIds = getOFCPending()?.map(pend => pend.branchId);
+    const branchIds = getOFCPending()?.map(pend => pend.branchId);
 
     //console.log(branchIds)
 
@@ -166,14 +173,7 @@ export const ComplianceDetail: FC = () => {
     const counts = getCount(sups);
     setLabelsSupervisors(Object.keys(counts));
     setDataSupervisors(Object.values(counts));
-  };
-
-  const getOFCPending = () => {
-    if (!ofc.data) return;
-    const pending = ofc.data.filter(ofc => !ofc.done);
-
-    return pending;
-  };
+  }, [zones, branches.data, getOFCPending]);
 
   const getDataCategories = () => {
     const param = getOFCPending()?.map(pending => pending.categoryId);
@@ -225,7 +225,7 @@ export const ComplianceDetail: FC = () => {
     getDataSupervisors();
     getDataCategories();
     getDataChainsChart();
-  }, [dataClient, dataChain]);
+  }, [dataClient, dataChain, getDataSupervisors]);
 
   const getCount = (list: any[]) => {
     const counts: Record<any, number> = {};

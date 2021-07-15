@@ -71,7 +71,7 @@ export interface Client {
   contactName: string;
   control: string;
   name: string;
-  periodReportId: 'FS' | 'FQ' | 'FM' | 'FV';
+  periodReportId: 'FS' | 'FQ' | 'FM' | 'FV' | 'IN';
 }
 
 export interface Image {

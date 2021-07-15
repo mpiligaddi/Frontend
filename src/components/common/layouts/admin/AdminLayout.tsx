@@ -12,7 +12,11 @@ import {
   PhotoLibrary,
   Pageview,
   Person,
-  AddPhotoAlternate
+  AddPhotoAlternate,
+  Store,
+  ShoppingCart,
+  TrendingUp,
+  List
 } from '@material-ui/icons';
 
 const routes: Route[] = [
@@ -42,6 +46,26 @@ const routes: Route[] = [
     name: 'Clientes',
     path: '/admin/clients',
     icon: <Person />
+  },
+  {
+    name: 'Anexos',
+    path: '/admin/coverages',
+    icon: <List />
+  },
+  {
+    name: 'Tiendas',
+    path: '/admin/stores',
+    icon: <Store />
+  },
+  {
+    name: 'Productos',
+    path: '/admin/products',
+    icon: <ShoppingCart />
+  },
+  {
+    name: 'Mi Productividad',
+    path: '/admin/productivity',
+    icon: <TrendingUp />
   }
 ];
 

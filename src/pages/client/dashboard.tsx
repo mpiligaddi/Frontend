@@ -1,4 +1,4 @@
-import { useClient } from '@/api/user';
+import { useClient, useMe } from '@/api/user';
 import { Page } from '@/typings/page';
 import { useFilters, useFilteredData } from '@/api/reports/filters';
 import { ClientLayout } from '@/components/common/';
@@ -16,88 +16,27 @@ const useStyles = makeStyles({
   container: {
     margin: '10px'
   },
-
   filtersContainer: {
     marginTop: '10px'
   },
-  item: {
-    marginBottom: '10px',
-    height: '100px'
-  },
-  gridImages: {
-    width: '20%',
-    height: '100px'
-  },
-  pagination: {
-    margin: 'auto',
-    marginTop: '30px'
-  },
-
   titleName: {
     color: primaryColor[0],
     fontWeight: 'bold'
   },
-
-  root: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    overflow: 'hidden'
-  },
-  gridList: {
-    width: '85%',
-    display: 'flex',
-    paddingTop: '30px',
-    flexWrap: 'nowrap',
-    transform: 'translateZ(0)',
-    cursor: 'pointer'
-  },
-  gridList2: {
-    width: '80%',
-    display: 'flex',
-    paddingTop: '20px',
-    flexWrap: 'nowrap',
-    transform: 'translateZ(0)',
-    cursor: 'pointer'
-  },
-  icon: {
-    color: 'rgba(255, 255, 255, 0.54)'
-  },
   titleBar: {
     background:
       'linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0) 100%)'
-  },
-  title: {
-    color: 'rgba(255, 255, 255, 0.54)',
-    padding: 5
-  },
-  modal: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '10%'
-  },
-  paper: {
-    backgroundColor: 'white',
-    border: '2px solid black',
-    boxShadow: '0 3px 7px rgba(0, 0, 0, 0.3)',
-    padding: '5%'
-  },
-  dialog: {
-    height: '90vh',
-    width: '600px'
-  },
-  backdrop: {
-    color: '#fff'
   }
 });
 
 const Dashboard: Page = () => {
   const classes = useStyles();
+  const user = useMe();
   const client = useClient();
   const { filters } = useFilters();
   const { chains } = useFilteredData(true);
 
-  if ((client.isLoading, client.isIdle)) return <LinearProgress />;
+  if (user.isLoading || user.isIdle) return <LinearProgress />;
 
   return (
     <GridContainer>

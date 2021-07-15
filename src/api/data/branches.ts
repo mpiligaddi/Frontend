@@ -1,5 +1,5 @@
+import { useMemo } from 'react';
 import { useQuery, UseQueryOptions } from 'react-query';
-import firebase from 'firebase/app';
 import { Branch, Report } from '@/lib/types';
 import { useCoverages } from '.';
 import branchesJson from '@/data/branches';
@@ -8,7 +8,8 @@ interface Data {
   chain?: string;
   reported?: boolean;
   reports?: Report[];
-  clientId: number;
+  all?: boolean;
+  clientId?: number;
   options?: UseQueryOptions<Branch[]>;
 }
 
@@ -17,11 +18,20 @@ export const useBranches = ({
   reported,
   reports,
   clientId,
-  options
+  options,
+  all
 }: Data) => {
   const coverages = useCoverages();
+  const key = useMemo(
+    () => (all ? { all } : { chain, reported, clientId }),
+    [all, reported, clientId, chain]
+  );
 
   const getBranches = async (): Promise<Branch[]> => {
+    if (all) {
+      return branchesJson;
+    }
+
     const clientCoverages = coverages.data?.filter(
       coverage => coverage.clientId === clientId
     );
@@ -54,9 +64,8 @@ export const useBranches = ({
     return onlyWithReports;
   };
 
-  return useQuery(['branches', { chain, reported, clientId }], getBranches, {
-    // enabled: reported ? !!reports && !!chain : !!chain,
-    enabled: !coverages.isLoading,
+  return useQuery(['branches', key], getBranches, {
+    enabled: all ? true : false || !coverages.isLoading,
     keepPreviousData: true,
     ...options
   });

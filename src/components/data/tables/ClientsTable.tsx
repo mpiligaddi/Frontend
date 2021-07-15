@@ -12,6 +12,7 @@ const columns = [
 ];
 
 const ClientsTable: FC = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const clients = useClients();
   const admins = useAdmins();
   const comercials = useComercials();
@@ -21,6 +22,7 @@ const ClientsTable: FC = () => {
     if (!clients.data || !admins.data || !comercials.data) return;
 
     const getClients = async () => {
+      setIsLoading(true);
       try {
         const data = clients.data.map(client => ({
           id: client.ID,
@@ -35,6 +37,7 @@ const ClientsTable: FC = () => {
       } catch (error) {
         console.error(`getClients. Ocurrió el error: ${error}`);
       }
+      setIsLoading(false);
     };
     getClients();
   }, [clients.data, admins.data, comercials.data]);
@@ -50,9 +53,7 @@ const ClientsTable: FC = () => {
             title="Clientes"
             data={data}
             columns={columns}
-            isLoading={
-              clients.isLoading || admins.isLoading || comercials.isLoading
-            }
+            isLoading={isLoading}
           />
         </div>
       )}

@@ -2,13 +2,7 @@ import { FC } from 'react';
 import { useFilters, useFilteredData } from '@/api/reports/filters';
 import { GridContainer, GridItem, TableOFC } from '@/components/ui';
 import { primaryBackgroundText, primaryColor } from '@/utils/styles';
-
-const frequency = {
-  FV: 'Foto Visita',
-  FS: 'Foto Semanal',
-  FQ: 'Foto Quincenal',
-  FM: 'Foto Mensual'
-};
+import frequency from '@/utils/frequency';
 
 export const PhotosDetail: FC = () => {
   const { filters } = useFilters();

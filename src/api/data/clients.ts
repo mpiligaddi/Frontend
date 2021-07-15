@@ -1,9 +1,19 @@
 import { useQuery, UseQueryOptions, useMutation } from 'react-query';
 import firebase from 'firebase/app';
 import { Client } from '@/lib/types';
+import clientsJson from '@/data/clients';
 
-export const useClients = (options?: UseQueryOptions<Client[]>) => {
+type Config = {
+  all?: boolean;
+  options?: UseQueryOptions<Client[]>;
+};
+
+export const useClients = (config?: Config) => {
   const getClients = async () => {
+    if (config?.all) {
+      return clientsJson as Client[];
+    }
+
     const { docs } = await firebase.firestore().collection('clients').get();
 
     const clients = docs.map(doc => doc.data());
@@ -11,7 +21,7 @@ export const useClients = (options?: UseQueryOptions<Client[]>) => {
     return clients as Client[];
   };
 
-  return useQuery('clients', getClients, options);
+  return useQuery(['clients', config?.all], getClients, config?.options);
 };
 
 export type CreateClientFields = {

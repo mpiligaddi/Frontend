@@ -1,16 +1,16 @@
 import { FC } from 'react';
-import MaterialTable from 'material-table';
+import MaterialTable, { MaterialTableProps, Column } from 'material-table';
 import { format } from 'date-fns';
 
-type TableCrudProps = {
-  data: any;
-  columns: any;
+type TableCrudProps<T extends object = any> = {
+  data: T[];
+  columns: Column<T>[];
   title: string;
   isLoading?: boolean;
-  editable?: boolean;
+  editable?: MaterialTableProps<T>['editable'];
 };
 
-const TableCrud: FC<TableCrudProps> = props => {
+const TableCrud = <T extends object = any>(props: TableCrudProps<T>) => {
   const { data, columns, title, editable, isLoading } = props;
 
   return (
@@ -20,6 +20,7 @@ const TableCrud: FC<TableCrudProps> = props => {
         data={data}
         columns={columns}
         isLoading={isLoading}
+        editable={editable}
         options={{
           exportButton: true,
           exportFileName: `${title}_${format(new Date(), 'dd-mm-yyyy')}`,

@@ -1,5 +1,5 @@
-import ClientsTable from '@/components/clients/ClientTable';
-import CreateClient from '@/components/clients/CreateClient';
+import { ClientsTable } from '@/components/data/tables';
+import { CreateClient } from '@/components/data/forms';
 import { AdminLayout } from '@/components/common';
 import { GridContainer, GridItem, Tabs } from '@/components/ui';
 import { Page } from '@/typings';

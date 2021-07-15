@@ -28,9 +28,10 @@ export const useMe = () => {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    const unsubscribe = firebase
-      .auth()
-      .onAuthStateChanged(() => setInitialized(true));
+    const unsubscribe = firebase.auth().onAuthStateChanged(() => {
+      setInitialized(true);
+      unsubscribe();
+    });
 
     return () => unsubscribe();
   }, []);

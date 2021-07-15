@@ -1,16 +1,34 @@
+import { useMemo } from 'react';
 import { useQuery, UseQueryOptions } from 'react-query';
 import firebase from 'firebase/app';
 import { Chain, Report } from '@/lib/types';
+import chainsJson from '@/data/chains';
 
 interface Data {
   clientId?: string;
   reported?: boolean;
+  all?: boolean;
   reports?: Report[];
   options?: UseQueryOptions<Chain[]>;
 }
 
-export const useChains = ({ clientId, reported, reports, options }: Data) => {
+export const useChains = ({
+  clientId,
+  reported,
+  reports,
+  options,
+  all
+}: Data) => {
+  const key = useMemo(
+    () => (all ? { all } : { reported, clientId }),
+    [all, reported, clientId]
+  );
+
   const getChains = async () => {
+    if (all) {
+      return chainsJson;
+    }
+
     const result = await firebase
       .firestore()
       .collection('chainsxclient')
@@ -55,8 +73,12 @@ export const useChains = ({ clientId, reported, reports, options }: Data) => {
     return onlyWithReports;
   };
 
-  return useQuery(['chains', { clientId, reported }], getChains, {
-    enabled: reported ? !!clientId && !!reports : !!clientId,
+  return useQuery(['chains', key], getChains, {
+    enabled: all
+      ? true
+      : false || reported
+      ? !!clientId && !!reports
+      : !!clientId,
     keepPreviousData: true,
     ...options
   });
