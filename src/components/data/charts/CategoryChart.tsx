@@ -1,12 +1,19 @@
+import { FC } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
-const CustomChart = ({ labels, dataCate, title }) => {
+type CategoryChartProps = {
+  labels: string[];
+  values: number[];
+  title: string;
+};
+
+const CategoryChart: FC<CategoryChartProps> = ({ labels, values, title }) => {
   const data = {
     labels: labels,
     datasets: [
       {
         label: '%',
-        data: dataCate,
+        data: values,
         backgroundColor: [
           '#333333',
           '#666666',
@@ -63,4 +70,4 @@ const CustomChart = ({ labels, dataCate, title }) => {
   );
 };
 
-export default CustomChart;
+export default CategoryChart;

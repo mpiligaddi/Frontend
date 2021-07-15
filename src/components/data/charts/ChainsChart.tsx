@@ -1,13 +1,19 @@
 import { FC } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
-const ChainsChart: FC = ({ labels, dataChainsChart, title }) => {
+type ChainsChartProps = {
+  title: string;
+  labels: string[];
+  values: number[];
+};
+
+const ChainsChart: FC<ChainsChartProps> = ({ labels, values, title }) => {
   const data = {
     labels: labels,
     datasets: [
       {
         label: '%',
-        data: dataChainsChart,
+        data: values,
         backgroundColor: [
           '#FFE5B6',
           '#FFD27A',

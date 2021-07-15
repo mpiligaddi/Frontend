@@ -54,8 +54,8 @@ export const ComplianceDetail: FC = () => {
   const [loading, setLoading] = useState(false);
   const [pending, setPendings] = useState(0);
   //const [OFCpendings, setOFCpendings] = useState([]);
-  const [dataChain, setDataChain] = useState([]);
-  const [dataClient, setDataClient] = useState([]);
+  const [dataChain, setDataChain] = useState<any>([]);
+  const [dataClient, setDataClient] = useState<any>([]);
   const [OFCPorcIncump, setOFCPorcIncump] = useState(0);
   const { data: supervisors } = useSupervisors();
 
@@ -92,15 +92,15 @@ export const ComplianceDetail: FC = () => {
     getOFCPorcIncump();
   }, [ofc.data, getOFCPorcIncump]);
 
-  const getDataXChain = () => {
+  const getDataXChain = useCallback(() => {
     try {
       const dataXChain = branches.data?.map(comp => ({
         chain: comp.chainName,
         branch: branches.data?.find(b => b.ID == comp.ID)?.name,
-        supervisor: supervisors?.filter(
-          s => s.ID == zones?.filter(z => z.ID == comp.zoneId)[0]?.supervisorId
-        )[0]?.name,
-        zone: zones?.filter(z => z.ID == comp.zoneId)[0]?.name,
+        supervisor: supervisors?.find(
+          s => s.ID == zones?.find(z => z.ID == comp.zoneId)?.supervisorId
+        )?.name,
+        zone: zones?.find(z => z.ID == comp.zoneId)?.name,
         lastReport:
           reports.data
             ?.filter(report => report.branchId === comp.ID)
@@ -113,9 +113,9 @@ export const ComplianceDetail: FC = () => {
     } catch (error) {
       console.error(`getDataXChain. Ocurrió el error: ${error}`);
     }
-  };
+  }, [zones, branches.data, supervisors, reports.data]);
 
-  const getDataXClient = () => {
+  const getDataXClient = useCallback(() => {
     try {
       const dataXClient = branches.data?.map(comp => ({
         chain: comp.chainName,
@@ -137,7 +137,7 @@ export const ComplianceDetail: FC = () => {
     } catch (error) {
       console.error(`getDataXClient. Ocurrió el error: ${error}`);
     }
-  };
+  }, [branches.data, supervisors, zones, reports.data]);
 
   const getOFCPending = useCallback(() => {
     if (!ofc.data) return;
@@ -175,7 +175,7 @@ export const ComplianceDetail: FC = () => {
     setDataSupervisors(Object.values(counts));
   }, [zones, branches.data, getOFCPending]);
 
-  const getDataCategories = () => {
+  const getDataCategories = useCallback(() => {
     const param = getOFCPending()?.map(pending => pending.categoryId);
     if (!param) return;
     const counts = getCount(param);
@@ -188,9 +188,9 @@ export const ComplianceDetail: FC = () => {
     });
     setLabelsCategories(cats);
     setDataCategories(Object.values(counts));
-  };
+  }, [categories.data, getOFCPending]);
 
-  const getDataChainsChart = () => {
+  const getDataChainsChart = useCallback(() => {
     const param = getOFCPending()?.map(pending =>
       pending.branchId.substr(0, 3)
     );
@@ -198,7 +198,7 @@ export const ComplianceDetail: FC = () => {
     const counts = getCount(param);
     setLabelsChainsChart(Object.keys(counts));
     setDataChainsChart(Object.values(counts));
-  };
+  }, [getOFCPending]);
 
   const getCompliances = useCallback(() => {
     setLoading(true);
@@ -211,7 +211,7 @@ export const ComplianceDetail: FC = () => {
       setDataClient(compliances);
     }
     setLoading(false);
-  }, [filters?.chain]);
+  }, [filters?.chain, getDataXChain, getDataXClient]);
 
   useEffect(() => {
     getCompliances();
@@ -225,7 +225,13 @@ export const ComplianceDetail: FC = () => {
     getDataSupervisors();
     getDataCategories();
     getDataChainsChart();
-  }, [dataClient, dataChain, getDataSupervisors]);
+  }, [
+    dataClient,
+    dataChain,
+    getDataSupervisors,
+    getDataCategories,
+    getDataChainsChart
+  ]);
 
   const getCount = (list: any[]) => {
     const counts: Record<any, number> = {};
@@ -306,8 +312,8 @@ export const ComplianceDetail: FC = () => {
                           <CardBody>
                             <ChartResp
                               labels={labelsSupervisors}
-                              dataResp={dataSupervisors}
-                              title={'Incumplimiento por responsables'}
+                              values={dataSupervisors}
+                              title="Incumplimiento por responsables"
                             />
                           </CardBody>
                           <CardFooter chart>
@@ -324,7 +330,7 @@ export const ComplianceDetail: FC = () => {
                         <Card chart>
                           <CardBody>
                             <ChartChains
-                              dataChainsChart={dataChainsChart}
+                              values={dataChainsChart}
                               labels={labelsChainsChart}
                               title={'Incumplimiento por cadenas'}
                             />
@@ -343,7 +349,7 @@ export const ComplianceDetail: FC = () => {
                           <CardBody>
                             <ChartCate
                               labels={labelsCategories}
-                              dataCate={dataCategories}
+                              values={dataCategories}
                               title={'Incumplimiento por categorías'}
                             />
                           </CardBody>

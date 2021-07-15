@@ -1,12 +1,23 @@
+import { FC } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 
-const ResponsibleChart = ({ labels, dataResp, title }) => {
+type ResponsibleChartProps = {
+  labels: string[];
+  values: number[];
+  title: string;
+};
+
+const ResponsibleChart: FC<ResponsibleChartProps> = ({
+  labels,
+  values,
+  title
+}) => {
   const data = {
     labels: labels,
     datasets: [
       {
         label: '%',
-        data: dataResp,
+        data: values,
         backgroundColor: [
           '#243954',
           '#365670',
@@ -47,7 +58,6 @@ const ResponsibleChart = ({ labels, dataResp, title }) => {
               boxWidth: 200,
               padding: 5
             },
-            animateScale: true,
             animateScale: true
           },
           borderAlign: 'inner'
