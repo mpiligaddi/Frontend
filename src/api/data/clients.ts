@@ -1,4 +1,9 @@
-import { useQuery, UseQueryOptions, useMutation } from 'react-query';
+import {
+  useQuery,
+  UseQueryOptions,
+  useMutation,
+  useQueryClient
+} from 'react-query';
 import firebase from 'firebase/app';
 import { Client } from '@/lib/types';
 import clientsJson from '@/data/clients';
@@ -16,7 +21,7 @@ export const useClients = (config?: Config) => {
 
     const { docs } = await firebase.firestore().collection('clients').get();
 
-    const clients = docs.map(doc => doc.data());
+    const clients = docs.map(doc => ({ ...doc.data(), id: doc.id }));
 
     return clients as Client[];
   };
@@ -81,4 +86,56 @@ export const useCreateClient = () => {
   };
 
   return useMutation(createClient);
+};
+
+interface UpdateData {
+  id: string;
+  adminId: string;
+  comercialId: string;
+  name: string;
+  companyName: string;
+  contactName: string;
+}
+
+export const useUpdateClient = () => {
+  const queryClient = useQueryClient();
+
+  const updateClient = async ({ id, ...data }: UpdateData) => {
+    await firebase.firestore().collection('clients').doc(id).update(data);
+
+    return {
+      id,
+      ...data
+    };
+  };
+
+  return useMutation(updateClient, {
+    onSuccess(newClient) {
+      queryClient.setQueryData<Client[]>(['clients', null], data =>
+        (data || []).map(client =>
+          client.id === newClient.id ? { ...client, ...newClient } : client
+        )
+      );
+    }
+  });
+};
+
+export const useDeleteClient = () => {
+  const queryClient = useQueryClient();
+
+  const deleteClient = async (id: string) => {
+    await firebase.firestore().collection('clients').doc(id).delete();
+
+    return {
+      id
+    };
+  };
+
+  return useMutation(deleteClient, {
+    onSuccess({ id }) {
+      queryClient.setQueryData<Client[]>(['clients', null], data =>
+        (data || []).filter(client => client.id !== id)
+      );
+    }
+  });
 };

@@ -64,7 +64,7 @@ export const useStyles = makeStyles(theme => ({
     width: '100%'
   },
   heading1: {
-    //marginLeft: '15px',
+    marginLeft: '10px',
     fontSize: '25px',
     color: primaryColor[0],
     fontWeight: 'lighter'

@@ -24,8 +24,12 @@ type AdminNavbarProps = {
 const AdminNavbar: FC<AdminNavbarProps> = props => {
   const classes = useStyles();
   const { color, logo } = props;
-  const { openSidebar, displayMiniSidebar, toggleMiniSidebar, displaySidebar } =
-    useUI();
+  const {
+    toggleSidebar,
+    displayMiniSidebar,
+    toggleMiniSidebar,
+    displaySidebar
+  } = useUI();
 
   const sidebarMinimize = classes.sidebarMinimize + ' ';
 
@@ -34,7 +38,7 @@ const AdminNavbar: FC<AdminNavbarProps> = props => {
       position="sticky"
       className={cn(classes.appBar, {
         [classes.appBarWithSidebar]: displaySidebar,
-        [classes.appBarWithSidebarMini]: displayMiniSidebar,
+        [classes.appBarWithSidebarMini]: displaySidebar && displayMiniSidebar,
         [classes[color!]]: color
       })}
     >
@@ -77,7 +81,7 @@ const AdminNavbar: FC<AdminNavbarProps> = props => {
             color="transparent"
             justIcon
             aria-label="open drawer"
-            onClick={openSidebar}
+            onClick={toggleSidebar}
           >
             <Menu />
           </Button>

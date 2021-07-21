@@ -22,9 +22,9 @@ import { Page } from '@/typings';
 const AdminDashboard: Page = () => {
   const user = useMe();
   const { filters, filteredReports } = useFilters();
-  const { branches, reports, ofc } = useFilteredData(false, {
-    chains: false,
-    categories: false
+  const { branches, reports, ofc } = useFilteredData({
+    reported: true,
+    enabled: { chains: false, categories: false }
   });
   const { data: allBranches } = useBranches({
     clientId: +filters?.client?.ID!

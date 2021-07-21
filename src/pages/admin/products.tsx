@@ -2,9 +2,12 @@ import { GridContainer, GridItem, Tabs, ComingSoon } from '@/components/ui';
 import { Page } from '@/typings';
 import { ListAlt } from '@material-ui/icons';
 import { AdminLayout } from '@/components/common';
+import { CategoriesTable } from '@/components/data/tables';
 
-const Content = () => (
-  <ComingSoon message="Podrás administrar los productos de las cuentas a tu cargo" />
+const Content = ({ type }: { type: string }) => (
+  <ComingSoon
+    message={`Podrás administrar ${type} de las cuentas a tu cargo`}
+  />
 );
 
 const Products: Page = () => {
@@ -18,22 +21,22 @@ const Products: Page = () => {
             {
               tabName: 'Categorías',
               tabIcon: ListAlt,
-              tabContent: <Content />
+              tabContent: <CategoriesTable />
             },
             {
               tabName: 'SKU',
               tabIcon: ListAlt,
-              tabContent: <Content />
+              tabContent: <Content type="los productos" />
             },
             {
               tabName: 'Quiebre',
               tabIcon: ListAlt,
-              tabContent: <Content />
+              tabContent: <Content type="el quiebre" />
             },
             {
               tabName: 'Precios',
               tabIcon: ListAlt,
-              tabContent: <Content />
+              tabContent: <Content type="los precios" />
             }
           ]}
         />

@@ -55,16 +55,15 @@ const Tile: FC<TileProps> = ({
     setOpenModal(false);
   };
 
+  const openTile = () => {
+    setCarouselInfo({
+      report,
+      tileInfo: { tile, catIndex }
+    });
+  };
+
   return (
-    <div
-      onClick={() =>
-        setCarouselInfo({
-          report,
-          tileInfo: { tile, catIndex }
-        })
-      }
-      className={classes.container}
-    >
+    <div onClick={openTile} className={classes.container}>
       <DeleteTile
         onClose={() => setOpenModal(false)}
         isOpen={openModal}

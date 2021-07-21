@@ -5,8 +5,8 @@ import { SelectClient, FilterBar, Accordion } from '@/components/reports';
 import { ReportType } from '@/lib/types';
 
 const Revision: Page = () => {
-  const [type, setType] = useState<ReportType>('');
-  const [filtersVisible, setFiltersVisible] = useState(false);
+  const [type, setType] = useState<ReportType>('all');
+  const [filtersVisible, setFiltersVisible] = useState(true);
 
   const showFilters = (type: ReportType) => {
     setFiltersVisible(true);

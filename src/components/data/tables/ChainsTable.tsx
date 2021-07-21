@@ -3,25 +3,6 @@ import firebase from 'firebase/app';
 import { Column } from 'material-table';
 import { TableCrud } from '@/components/ui';
 
-const columns: Column<any>[] = [
-  {
-    title: 'Identificador',
-    field: 'ID',
-    validate: rowData =>
-      rowData.ID === ''
-        ? { isValid: false, helperText: 'Campo obligatorio' }
-        : true
-  },
-  {
-    title: 'Nombre',
-    field: 'name',
-    validate: rowData =>
-      rowData.name === ''
-        ? { isValid: false, helperText: 'Campo obligatorio' }
-        : true
-  }
-];
-
 const ChainsTable: FC = () => {
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState([
@@ -62,7 +43,24 @@ const ChainsTable: FC = () => {
       <TableCrud
         title="Cadenas"
         data={data}
-        columns={columns}
+        columns={[
+          {
+            title: 'Identificador',
+            field: 'ID',
+            validate: rowData =>
+              rowData.ID === ''
+                ? { isValid: false, helperText: 'Campo obligatorio' }
+                : true
+          },
+          {
+            title: 'Nombre',
+            field: 'name',
+            validate: rowData =>
+              rowData.name === ''
+                ? { isValid: false, helperText: 'Campo obligatorio' }
+                : true
+          }
+        ]}
         isLoading={loading}
         editable={{
           async onRowAdd(data: any) {

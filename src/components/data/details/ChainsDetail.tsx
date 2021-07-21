@@ -33,10 +33,12 @@ const columnsByClient = [
 
 const ChainsCardDetail: FC = () => {
   const { filters } = useFilters();
-  const { branches, chains } = useFilteredData(false, {
-    categories: false,
-    ofc: false,
-    reports: false
+  const { branches, chains } = useFilteredData({
+    enabled: {
+      categories: false,
+      ofc: false,
+      reports: false
+    }
   });
   const { data: coverages } = useCoverages();
   const { data: zones } = useZones();

@@ -95,7 +95,7 @@ export const useStyles = makeStyles(theme => ({
     }),
     backgroundColor: '#333333'
   },
-  drawerClose: {
+  drawerMini: {
     padding: 10,
     transition: theme.transitions.create('width', {
       easing: theme.transitions.easing.sharp,
@@ -107,6 +107,14 @@ export const useStyles = makeStyles(theme => ({
     [theme.breakpoints.up('sm')]: {
       width: theme.spacing(9) + 1
     }
+  },
+  drawerClose: {
+    transition: theme.transitions.create('width', {
+      easing: theme.transitions.easing.sharp,
+      duration: theme.transitions.duration.leavingScreen
+    }),
+    width: 0,
+    padding: 0
   },
   listRoot: {
     width: '100%',

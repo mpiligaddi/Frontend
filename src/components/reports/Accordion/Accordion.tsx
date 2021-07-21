@@ -29,34 +29,14 @@ const Accordion: FC<AccordionProps> = ({
 
   return (
     <>
-      <Card
-        className={cn(classes.card, {
-          [classes.cardTop]: top
-        })}
-      >
-        <CardHeader>
-          <Typography className={classes.heading1}>
-            {filters.chain?.name}
-            {filters.branch?.name && ` / ${filters.branch.name}`}
-            {filters?.category?.ID
-              ? ` / ${filters.category.name}`
-              : ' / Todas las categorías'}
-          </Typography>
-        </CardHeader>
-        <CardBody>
-          {filters.branch?.name !== '' && (
-            <FilterImages
-              disableAction={disableAction}
-              revisable={revisable}
-              type={type}
-            />
-          )}
-        </CardBody>
-        <Divider />
-        <AccordionActions>
-          <Pagination count={1} className={classes.pagination} />
-        </AccordionActions>
-      </Card>
+      {filters.branch?.name !== '' && (
+        <FilterImages
+          disableAction={disableAction}
+          revisable={revisable}
+          type={type}
+        />
+      )}
+      <Divider />
     </>
   );
 };

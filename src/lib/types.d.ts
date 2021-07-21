@@ -62,6 +62,7 @@ export interface Zone {
 }
 
 export interface Client {
+  id?: string;
   CUIT: string;
   ID: string;
   address: string;

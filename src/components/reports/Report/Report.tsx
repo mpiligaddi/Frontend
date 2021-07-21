@@ -3,8 +3,7 @@ import { GridContainer } from '@/components/ui';
 import { GridListTile, IconButton, Icon, GridList } from '@material-ui/core';
 import firebase from 'firebase/app';
 
-import { format } from 'date-fns';
-import { useAdminFilters } from '@/api/reports/filters';
+import dayjs from 'dayjs';
 import { Report as IReport, Category } from '@/lib/types';
 
 import { primaryColor } from '@/utils/styles';
@@ -28,16 +27,12 @@ const Report: FC<ReportProps> = ({
 }) => {
   const classes = useStyles();
   const [revised, setRevised] = useState(report.revised ?? false);
-  const { setReportsXClient } = useAdminFilters();
 
   const handleRevised = async () => {
     await firebase.firestore().collection('reports').doc(report.id).update({
       revised: !revised
     });
 
-    setReportsXClient(reports =>
-      reports.map(r => (r.id === report.id ? { ...r, revised: !revised } : r))
-    );
     setRevised(!revised);
   };
 
@@ -45,7 +40,7 @@ const Report: FC<ReportProps> = ({
     <div>
       <div>
         <p className={classes.date}>
-          {format(report.createdAt.toDate(), 'dd/mm/yyyy')}
+          {dayjs(report.createdAt.toDate()).format('DD/MM/YYYY')}
         </p>
         {revisable && (
           <span style={{ display: 'flex' }}>
@@ -68,15 +63,15 @@ const Report: FC<ReportProps> = ({
         )}
       </div>
       {report.categories.map((cat, catIndex) => (
-        <GridContainer key={catIndex} className={classes.report}>
+        <GridContainer key={cat.id} className={classes.report}>
           {!category && (
             <div className={classes.reportDate}>
               <p>{cat.name}</p>
             </div>
           )}
           <GridList className={classes.gridList2} cols={4}>
-            {cat.images.map((tile, key: number) => (
-              <GridListTile key={key}>
+            {cat.images.map(tile => (
+              <GridListTile key={tile.name}>
                 <Tile
                   report={report}
                   disableAction={disableAction}

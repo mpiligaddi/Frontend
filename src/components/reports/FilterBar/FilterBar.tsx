@@ -19,6 +19,7 @@ type FilterBarProps = {
   branch?: boolean;
   category?: boolean;
   reported?: boolean;
+  revised?: boolean;
   allChains?: boolean;
   withSpace?: boolean;
   size?: {
@@ -35,13 +36,17 @@ const FilterBar: FC<FilterBarProps> = ({
   category = true,
   withSpace = false,
   reported = false,
+  revised = false,
   allChains = false,
   size
 }) => {
   const classes = useStyles();
   const selectClasses = useSelectStyles();
   const { setFilters, filters } = useFilters();
-  const { chains, categories, branches, clients } = useFilteredData(reported);
+  const { chains, categories, branches, clients } = useFilteredData({
+    reported,
+    revised
+  });
 
   const handleSelectClient = (event: ChangeEvent) => {
     setFilters(filters => ({

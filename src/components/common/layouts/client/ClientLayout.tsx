@@ -6,7 +6,11 @@ import { ClientNavbar } from '@/components/ui';
 import logo from '@/assets/img/CHEK-NEGRO (1).png';
 import { useStyles } from './styles';
 
-const ClientLayout: FC = ({ children }) => {
+type ClientLayoutProps = {
+  clean?: boolean;
+};
+
+const ClientLayout: FC<ClientLayoutProps> = ({ children, clean = false }) => {
   const user = useMe();
   const classes = useStyles();
 
@@ -18,6 +22,7 @@ const ClientLayout: FC = ({ children }) => {
 
   return (
     <FiltersProvider>
+      {clean && <>{children}</>}
       <div className={classes.wrapper}>
         <div id="mainpanel" className={classes.mainPanel}>
           <ClientNavbar logo={logo} />

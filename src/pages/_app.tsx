@@ -30,7 +30,8 @@ const queryClient = new QueryClient({
 });
 
 const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
-  const Layout = Component.Layout ?? Noop;
+  const Layout = Component.Layout || Noop;
+  const getLayout = Component.getLayout;
 
   useEffect(() => {
     // Remove the server-side injected CSS.
@@ -47,10 +48,19 @@ const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
           <Head>
             <title>Chek</title>
           </Head>
-          <Layout>
-            <Component {...pageProps} />
-            <ReactQueryDevtools />
-          </Layout>
+          {getLayout ? (
+            getLayout(
+              <>
+                <Component {...pageProps} />
+                <ReactQueryDevtools />
+              </>
+            )
+          ) : (
+            <Layout>
+              <Component {...pageProps} />
+              <ReactQueryDevtools />
+            </Layout>
+          )}
         </UIProvider>
       </ThemeProvider>
     </QueryClientProvider>

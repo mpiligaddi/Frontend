@@ -11,7 +11,7 @@ export const useReports = (
       .firestore()
       .collection('reports')
       .where('clientId', '==', `${clientId}`)
-      .orderBy('createdAt', 'asc')
+      .orderBy('createdAt', 'desc')
       .get();
 
     const reports = result.docs.map(report => ({
@@ -26,5 +26,24 @@ export const useReports = (
     enabled: !!clientId,
     keepPreviousData: true,
     ...options
+  });
+};
+
+export const useReport = (id: string) => {
+  const getReport = async () => {
+    const result = await firebase
+      .firestore()
+      .collection('reports')
+      .doc(id)
+      .get();
+
+    const report = { ...result.data(), id: result.id };
+
+    return report as Report;
+  };
+
+  return useQuery(['report', id], getReport, {
+    enabled: id !== null,
+    keepPreviousData: true
   });
 };

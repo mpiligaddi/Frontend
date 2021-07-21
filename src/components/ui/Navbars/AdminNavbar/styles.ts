@@ -18,13 +18,13 @@ export const useStyles = makeStyles(theme => ({
     backgroundColor: 'transparent',
     marginBottom: '0',
     position: 'absolute',
-    width: `100%`,
+    width: '100%',
     paddingTop: '0px',
     zIndex: 1029,
     color: grayColor[6],
     minHeight: '50px',
     display: 'block',
-    marginLeft: drawerWidth,
+    marginLeft: 0,
     ...defaultBoxShadow
   },
   appBarWithSidebar: {

@@ -10,13 +10,17 @@ export const useStyles = makeStyles(theme => ({
     flexDirection: 'column'
   },
   carousel: {
-    height: '400px',
-    justifyContent: 'space-around'
+    height: '100%',
+    width: '100%',
+    justifyContent: 'space-around',
+    borderRadius: '23px'
   },
   carouselImage: {
-    transform: 'rotate(-90deg) scale(1.4)',
-    width: 280,
-    height: 'auto',
+    height: '500px',
+    objectFit: 'cover',
+    maxWidth: '100%',
+    borderRadius: '20px',
+    width: '100%',
     display: 'flex',
     margin: 'auto',
     marginTop: '-30px'

@@ -7,6 +7,7 @@ import chainsJson from '@/data/chains';
 interface Data {
   clientId?: string;
   reported?: boolean;
+  revised?: boolean;
   all?: boolean;
   reports?: Report[];
   options?: UseQueryOptions<Chain[]>;
@@ -15,13 +16,15 @@ interface Data {
 export const useChains = ({
   clientId,
   reported,
+  revised,
   reports,
   options,
   all
 }: Data) => {
   const key = useMemo(
-    () => (all ? { all } : { reported, clientId }),
-    [all, reported, clientId]
+    () =>
+      all ? { all } : { reported, clientId, reports: reports?.length, revised },
+    [all, reported, clientId, reports, revised]
   );
 
   const getChains = async () => {
@@ -52,6 +55,8 @@ export const useChains = ({
 
     const chains = chainDocs.map(doc => doc.data()) as Chain[];
 
+    console.log(reports);
+
     const chainsData: Chain[] = [];
 
     chains.forEach(chain => {
@@ -62,9 +67,15 @@ export const useChains = ({
 
     if (!reported) return chainsData;
 
-    const reportsChainIds = reports!
-      .filter(report => report.revised)
-      .map(report => report.chainId);
+    let reportsChainIds: string[];
+
+    if (revised) {
+      reportsChainIds = reports!
+        .filter(report => report.revised)
+        .map(report => report.chainId);
+    } else {
+      reportsChainIds = reports!.map(report => report.chainId);
+    }
 
     const onlyWithReports = chainsData.filter(chain =>
       reportsChainIds.includes(chain.ID)

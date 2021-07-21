@@ -1,10 +1,8 @@
 /* eslint-disable react/display-name */
 import { useState, useEffect, FC } from 'react';
 import firebase from 'firebase/app';
-import { TableCrud, SuccessAlert, LinearProgress } from '@/components/ui';
-import { useChains, useZones } from '@/api/data';
-import Autocomplete from '@material-ui/lab/Autocomplete';
-import TextField from '@material-ui/core/TextField';
+import { TableCrud, SuccessAlert } from '@/components/ui';
+import { useChains, useZones, useUpdateBranch } from '@/api/data';
 import { Branch, Chain, Zone } from '@/lib/types';
 
 const BranchesTable: FC = () => {
@@ -19,6 +17,7 @@ const BranchesTable: FC = () => {
   const [selectedAddress, setSelectedAddress] = useState('');
   const [selectedZone, setSelectedZone] = useState<Zone | undefined>();
   const [create, setCreate] = useState(false);
+  const updateBranch = useUpdateBranch();
 
   const onConfirm = () => {
     setCreate(false);
@@ -88,89 +87,34 @@ const BranchesTable: FC = () => {
                   validate: rowData =>
                     rowData.ID === ''
                       ? { isValid: false, helperText: 'Campo obligatorio' }
-                      : true,
-                  editComponent: () => (
-                    <TextField
-                      InputLabelProps={{
-                        shrink: true
-                      }}
-                      id="selectedIdentifier"
-                      variant="standard"
-                      label="Identificador"
-                      value={selectedIdentifier}
-                      onChange={e => setSelectedIdentifier(e.target.value)}
-                      helperText="ID Cadena + N° Sucursal"
-                    />
-                  )
+                      : true
                 },
                 {
                   title: 'Nombre',
                   field: 'name',
                   validate: rowData =>
-                    rowData.name === '' || rowData.name?.length > 3
+                    rowData.name === '' || rowData.name?.length < 3
                       ? { isValid: false, helperText: 'Revise este campo' }
-                      : true,
-                  editComponent: props => (
-                    <TextField
-                      InputLabelProps={{
-                        shrink: true
-                      }}
-                      id="selectedName"
-                      variant="standard"
-                      label="Nombre"
-                      value={selectedName}
-                      onChange={e => setSelectedName(e.target.value)}
-                      helperText="Nombre de la sucursal"
-                    />
-                  )
+                      : true
                 },
                 {
                   title: 'Cadena',
-                  field: 'chainName',
+                  field: 'chainId',
                   validate: rowData =>
                     rowData.chainId === ''
                       ? { isValid: false, helperText: 'Campo obligatorio' }
                       : true,
-                  editComponent: props => (
-                    <Autocomplete
-                      disableClearable
-                      id="selectedChain"
-                      options={allChains!}
-                      value={selectedChain}
-                      getOptionLabel={option => option.name}
-                      onChange={(_, value) => setSelectedChain(value)}
-                      size="small"
-                      renderInput={params => (
-                        <TextField
-                          {...params}
-                          InputLabelProps={{
-                            shrink: true
-                          }}
-                          variant="standard"
-                          label="Cadena"
-                          helperText="Cadena de la sucursal"
-                        />
-                      )}
-                    />
-                  ),
-                  initialEditValue: (rowData: Chain) => rowData.name
+                  lookup: allChains?.reduce(
+                    (chains, chain) => ({
+                      ...chains,
+                      [chain.ID]: chain.name
+                    }),
+                    {}
+                  )
                 },
                 {
                   title: 'Dirección',
-                  field: 'address',
-                  editComponent: props => (
-                    <TextField
-                      InputLabelProps={{
-                        shrink: true
-                      }}
-                      id="selectedAddress"
-                      variant="standard"
-                      label="Dirección"
-                      value={selectedAddress}
-                      onChange={e => setSelectedAddress(e.target.value)}
-                      helperText="Calle y numeración"
-                    />
-                  )
+                  field: 'address'
                 },
                 {
                   title: 'Zona',
@@ -179,37 +123,27 @@ const BranchesTable: FC = () => {
                     rowData.zoneId === ''
                       ? { isValid: false, helperText: 'Campo obligatorio' }
                       : true,
-                  render: rowData =>
-                    zones!.find(z => z.ID == rowData.zoneId)?.name,
-                  editComponent: () => {
-                    return (
-                      <Autocomplete
-                        disableClearable
-                        id="selectedZone"
-                        options={zones!}
-                        value={selectedZone}
-                        getOptionLabel={option => option.name}
-                        onChange={(_, value) => setSelectedZone(value)}
-                        size="small"
-                        renderInput={params => (
-                          <TextField
-                            {...params}
-                            InputLabelProps={{
-                              shrink: true
-                            }}
-                            variant="standard"
-                            label="Zona"
-                            id="zone"
-                            helperText="Zona geográfica"
-                          />
-                        )}
-                      />
-                    );
-                  }
+                  lookup: zones?.reduce(
+                    (zones, zone) => ({ ...zones, [zone.ID]: zone.name }),
+                    {}
+                  )
                 }
               ]}
               isLoading={loading}
               editable={{
+                async onRowUpdate(data) {
+                  updateBranch.mutate({
+                    id: data.id,
+                    ID: data.ID,
+                    address: data.address,
+                    chainId: data.chainId,
+                    chainName: allChains!.find(
+                      chain => chain.ID === data.chainId
+                    )!.name,
+                    name: data.name,
+                    zoneId: data.zoneId
+                  });
+                },
                 onRowAdd: async () => saveNewBranch(),
                 onRowDelete: oldData =>
                   firebase

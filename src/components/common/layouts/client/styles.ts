@@ -34,13 +34,17 @@ export const useStyles = makeStyles(theme => ({
     }
   },
   content: {
-    marginTop: '70px',
+    marginTop: '30px',
     padding: '30px 15px',
     minHeight: 'calc(100vh - 123px)'
   },
   container: { ...containerFluid },
   map: {
     marginTop: '70px'
+  },
+  clean: {
+    marginTop: 0,
+    paddingTop: 0
   },
   mainPanelSidebarMini: {
     // [theme.breakpoints.up("md")]: {

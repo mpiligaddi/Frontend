@@ -15,6 +15,9 @@ export const useStyles = makeStyles({
     padding: 5
   },
   photo: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
     //transform: 'rotate(-90deg)',
     transition: '100ms ease',
     transitionProperty: 'transform box-shadow',
@@ -22,10 +25,16 @@ export const useStyles = makeStyles({
       opacity: '0.5'
     },
     objectFit: 'cover',
-    maxWidth: '100%'
+    maxWidth: '100%',
+    minWidth: '100%',
+    '& div': {
+      minWidth: '100% !important'
+    }
   },
   container: {
+    cursor: 'pointer',
     position: 'relative',
-    maxHeight: '100%'
+    maxHeight: '100%',
+    marginRight: 15
   }
 });

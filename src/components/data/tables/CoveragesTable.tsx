@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-import { useState, useEffect, FC } from 'react';
+import { useState, useEffect, FC, useRef, useCallback } from 'react';
 import { TableCrud, SuccessAlert } from '@/components/ui';
 import { useFilters, useFilteredData } from '@/api/reports/filters';
 import {
@@ -8,11 +8,13 @@ import {
   useBranches,
   useClients,
   useCreateCoverage,
-  useDeleteCoverage
+  useDeleteCoverage,
+  useUpdateCoverage
 } from '@/api/data';
 import frequencyString from '@/utils/frequency';
 import { TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
+import { Branch, Chain, Client } from '@/lib/types';
 
 interface Data {
   client?: string;
@@ -27,12 +29,14 @@ interface Data {
 const CoveragesTable: FC = () => {
   const coverages = useCoverages();
   const { chains, branches } = useFilteredData();
+  const [client, setClient] = useState({});
   const { setFilters } = useFilters();
   const allChains = useChains({ all: true });
   const allBranches = useBranches({ all: true });
   const allClients = useClients({ all: true });
   const createCoverage = useCreateCoverage();
   const deleteCoverage = useDeleteCoverage();
+  const updateCoverage = useUpdateCoverage();
 
   const [data, setData] = useState<Data[]>([]);
   const [loading, setLoading] = useState(false);
@@ -51,12 +55,11 @@ const CoveragesTable: FC = () => {
             : 'No Definido';
 
           return {
-            client: client?.name,
+            client: client?.ID,
             chain: allChains.data?.find(
               ch => ch.ID == coverage.branchId.substr(0, 3)
-            )?.name,
-            branch: allBranches.data?.find(b => b.ID == coverage.branchId)
-              ?.name,
+            )?.ID,
+            branch: allBranches.data?.find(b => b.ID == coverage.branchId)?.ID,
             intensity: coverage.intensity,
             frequency: coverage.frequency,
             periodReport,
@@ -89,34 +92,12 @@ const CoveragesTable: FC = () => {
                 field: 'client',
                 validate: rowData =>
                   rowData.client === '' ? 'Campo obligatorio' : '',
-                editComponent: props => (
-                  <Autocomplete
-                    disableClearable
-                    id="client"
-                    options={allClients.data!}
-                    value={props.value || null}
-                    getOptionLabel={option => option.name}
-                    onChange={(_, client) => {
-                      props.onChange(client);
-                      setFilters(filters => ({
-                        ...filters,
-                        client,
-                        branch: undefined,
-                        chain: undefined
-                      }));
-                    }}
-                    renderInput={params => (
-                      <TextField
-                        {...params}
-                        variant="standard"
-                        label="Cliente"
-                        InputLabelProps={{
-                          shrink: true
-                        }}
-                        helperText="Cliente del anexo"
-                      />
-                    )}
-                  />
+                lookup: allClients.data?.reduce(
+                  (clients, client) => ({
+                    ...clients,
+                    [client.ID]: client.name
+                  }),
+                  {}
                 )
               },
               {
@@ -124,67 +105,28 @@ const CoveragesTable: FC = () => {
                 field: 'chain',
                 validate: rowData =>
                   rowData.chain === '' ? 'Campo obligatorio' : '',
-                editComponent: props => (
-                  <Autocomplete
-                    disableClearable
-                    id="chain"
-                    disabled={!props.rowData.client}
-                    loading={chains.isLoading}
-                    options={chains.data || []}
-                    value={props.value || null}
-                    getOptionLabel={option => option.name}
-                    onChange={(_, chain) => {
-                      props.onChange(chain);
-                      setFilters(filters => ({
-                        ...filters,
-                        chain,
-                        branch: undefined
-                      }));
-                    }}
-                    renderInput={params => (
-                      <TextField
-                        {...params}
-                        variant="standard"
-                        label="Cadena"
-                        InputLabelProps={{
-                          shrink: true
-                        }}
-                        helperText="Cadena del anexo"
-                      />
-                    )}
-                  />
+                lookup: allChains.data?.reduce(
+                  (chains, chain) => ({
+                    ...chains,
+                    [chain.ID]: chain.name
+                  }),
+                  {}
                 )
               },
               {
                 title: 'Sucursal',
                 field: 'branch',
+                render: row =>
+                  allBranches.data?.find(branch => row.branch === branch.ID)
+                    ?.name,
                 validate: rowData =>
                   rowData.branch === '' ? 'Campo obligatorio' : '',
-                editComponent: props => (
-                  <Autocomplete
-                    disableClearable
-                    disabled={!props.rowData.chain}
-                    id="branch"
-                    loading={branches.isLoading}
-                    value={props.value || null}
-                    options={branches.data || []}
-                    getOptionLabel={option => option.name}
-                    onChange={(_, branch) => {
-                      props.onChange(branch);
-                      setFilters(filters => ({ ...filters, branch }));
-                    }}
-                    renderInput={params => (
-                      <TextField
-                        {...params}
-                        variant="standard"
-                        label="Sucursal"
-                        InputLabelProps={{
-                          shrink: true
-                        }}
-                        helperText="Punto de venta"
-                      />
-                    )}
-                  />
+                lookup: branches.data?.reduce(
+                  (branches, branch) => ({
+                    ...branches,
+                    [branch.ID]: branch.name
+                  }),
+                  {}
                 )
               },
               {
@@ -192,40 +134,12 @@ const CoveragesTable: FC = () => {
                 field: 'frequency',
                 type: 'numeric',
                 validate: rowData =>
-                  !rowData.frequency ? 'Campo obligatorio' : '',
-                editComponent: props => (
-                  <TextField
-                    variant="standard"
-                    label="Frecuencia"
-                    id="frequency"
-                    type="number"
-                    value={props.value || null}
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    onChange={e => props.onChange(e.target.value)}
-                    helperText="Días a la semana"
-                  />
-                )
+                  !rowData.frequency ? 'Campo obligatorio' : ''
               },
               {
                 title: 'Intensidad',
                 field: 'intensity',
-                type: 'numeric',
-                editComponent: props => (
-                  <TextField
-                    variant="standard"
-                    label="Intensidad"
-                    id="intensity"
-                    type="number"
-                    value={props.value || null}
-                    InputLabelProps={{
-                      shrink: true
-                    }}
-                    onChange={e => props.onChange(e.target.value)}
-                    helperText="Horas en visita"
-                  />
-                )
+                type: 'numeric'
               },
               {
                 title: 'PRA',
@@ -254,38 +168,28 @@ const CoveragesTable: FC = () => {
                 // )
               }
             ]}
-            isLoading={loading}
             editable={{
-              async onRowAdd(data: any) {
+              async onRowAdd(data) {
                 createCoverage.mutate({
-                  branchId: data.branch.ID,
-                  clientId: data.client.ID,
+                  branchId: data.branch!,
+                  clientId: +data.client!,
                   frequency: data.frequency,
                   intensity: data.intensity
                 });
               },
-              // onRowUpdate: (newData, oldData) =>
-              //   new Promise((resolve) => {
-              //       firebase.db
-              //         .collection('coverages')
-              //         .doc(`${oldData.id}`)
-              //         .set({
-              //           clientId: newData.client,
-              //           chainId: newData.chain,
-              //           branchId: newData.branch,
-              //           frequency: newData.frequency,
-              //           intensity: newData.intensity,
-              //           periodReport: newData.periodReport,
-              //         })
-              //         .then(function () {
-              //           console.log('Document successfully written!');
-              //           refreshCoverages();
-              //         })
-              //         .catch(function (error) {
-              //           console.error('Error writing document: ', error);
-              //         });
-              //       resolve();
-              //   }),
+              async onRowUpdateCancelled() {
+                console.log('cancelled');
+              },
+              async onRowUpdate(data) {},
+              //   console.log(data);
+              //   // updateCoverage.mutate({
+              //   //   id: data.id,
+              //   //   branchId: data.branch!.ID,
+              //   //   clientId: +data.client!.ID,
+              //   //   frequency: data.frequency,
+              //   //   intensity: data.intensity
+              //   // });
+              // },
               async onRowDelete({ id }) {
                 deleteCoverage.mutate(id);
               }

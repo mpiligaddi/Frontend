@@ -26,7 +26,7 @@ type SidebarProps = {
 const Sidebar: FC<SidebarProps> = ({ routes }) => {
   const classes = useStyles();
   const user = useMe();
-  const { displayMiniSidebar } = useUI();
+  const { displayMiniSidebar, displaySidebar } = useUI();
 
   return (
     <Drawer
@@ -34,12 +34,14 @@ const Sidebar: FC<SidebarProps> = ({ routes }) => {
       classes={{
         paper: cn({
           [classes.drawerOpen]: !displayMiniSidebar,
-          [classes.drawerClose]: displayMiniSidebar
+          [classes.drawerMini]: displayMiniSidebar,
+          [classes.drawerClose]: !displaySidebar
         })
       }}
       className={cn(classes.drawer, {
         [classes.drawerOpen]: !displayMiniSidebar,
-        [classes.drawerClose]: displayMiniSidebar
+        [classes.drawerMini]: displayMiniSidebar,
+        [classes.drawerClose]: !displaySidebar
       })}
     >
       <div className={classes.user}>
