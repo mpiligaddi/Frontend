@@ -13,7 +13,7 @@ export const useDeleteTile = () => {
   const queryClient = useQueryClient();
   const { filters } = useFilters();
 
-  const addToFavorite = async ({ report, tile, reason }: Data) => {
+  const deleteTile = async ({ report, tile, reason }: Data) => {
     await firebase
       .storage()
       .refFromURL(tile.uri)
@@ -39,18 +39,12 @@ export const useDeleteTile = () => {
     return { report, categories };
   };
 
-  return useMutation(addToFavorite, {
+  return useMutation(deleteTile, {
     onSuccess({ report, categories }) {
-      queryClient.setQueryData(
+      queryClient.setQueryData<Report[]>(
         ['reports', +filters?.client?.ID!],
-        (data: Report[] | undefined) => {
-          if (data)
-            return data.map(r =>
-              r.id === report.id ? { ...r, categories } : r
-            );
-
-          return [{ ...report, categories }];
-        }
+        data =>
+          (data || []).map(r => (r.id === report.id ? { ...r, categories } : r))
       );
     }
   });

@@ -1,5 +1,5 @@
 import React, { FC, useState } from 'react';
-import { Route } from './NewSidebar';
+import { Route } from './Sidebar';
 import { useRouter } from 'next/router';
 import cn from 'classnames';
 import { primaryColor, hexToRgb, grayColor } from '@/utils/styles';

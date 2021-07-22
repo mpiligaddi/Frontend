@@ -41,16 +41,10 @@ export const useAddFavorite = () => {
 
   return useMutation(addToFavorite, {
     onSuccess({ report, categories }) {
-      queryClient.setQueryData(
+      queryClient.setQueryData<Report[]>(
         ['reports', +filters?.client?.ID!],
-        (data: Report[] | undefined) => {
-          if (data)
-            return data.map(r =>
-              r.id === report.id ? { ...r, categories } : r
-            );
-
-          return [{ ...report, categories }];
-        }
+        data =>
+          (data || []).map(r => (r.id === report.id ? { ...r, categories } : r))
       );
     }
   });

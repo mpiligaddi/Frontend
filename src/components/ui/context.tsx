@@ -108,6 +108,7 @@ export const UIProvider: FC = props => {
       closeSidebar,
       toggleMiniSidebar
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [state]
   );
 

@@ -74,6 +74,7 @@ const DeleteTile: FC<DeleteTileProps> = ({ isOpen, onClose, onDelete }) => {
           onClick={e => {
             e.stopPropagation();
             onDelete(reason);
+            onClose();
           }}
         >
           Eliminar

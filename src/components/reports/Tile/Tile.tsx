@@ -27,8 +27,8 @@ const Tile: FC<TileProps> = ({
   const classes = useStyles();
   const [favorite, setFavorite] = useState(tile.favorite ?? false);
   const [openModal, setOpenModal] = useState(false);
-  const { mutateAsync: addFavorite } = useAddFavorite();
-  const { mutateAsync: deleteTile } = useDeleteTile();
+  const { mutate: addFavorite } = useAddFavorite();
+  const { mutate: deleteTile } = useDeleteTile();
 
   const { setCarouselInfo } = useCarousel();
 
@@ -38,7 +38,7 @@ const Tile: FC<TileProps> = ({
 
   const handleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    await addFavorite({
+    addFavorite({
       report,
       favorite,
       tile
@@ -46,7 +46,7 @@ const Tile: FC<TileProps> = ({
   };
 
   const onDeleteTile = async (reason: string) => {
-    await deleteTile({
+    deleteTile({
       report,
       tile,
       reason

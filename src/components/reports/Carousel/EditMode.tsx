@@ -11,7 +11,6 @@ import {
 import { Backdrop, CircularProgress } from '@material-ui/core';
 import { makeStyles, styled } from '@material-ui/core/styles';
 import { TextStyle } from '@pixi/text';
-import { useAdminFilters } from '@/api/reports/filters';
 import firebase from 'firebase/app';
 import { PixiViewport } from '@/components/ui/Pixi/ViewBox';
 import { useCarousel } from './CarouselProvider';
@@ -139,8 +138,6 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
   const viewportRef = useRef<any>(null);
   const imageRef = useRef<PixiRef<typeof Sprite>>(null);
 
-  const { setReportsXClient } = useAdminFilters();
-
   const _width = document.body.getBoundingClientRect().width * (9 / 16);
   const _height = document.body.getBoundingClientRect().height - 16 * 17;
   const [rotation, setRotation] = useState(0);
@@ -200,9 +197,9 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
               categories
             });
 
-          setReportsXClient(reports =>
-            reports.map(r => (r.id === report.id ? { ...r, categories } : r))
-          );
+          // setReportsXClient(reports =>
+          //   reports.map(r => (r.id === report.id ? { ...r, categories } : r))
+          // );
 
           setSave(false);
         });

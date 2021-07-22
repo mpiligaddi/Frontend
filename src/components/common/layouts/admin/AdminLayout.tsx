@@ -1,11 +1,10 @@
 import React, { useState, FC } from 'react';
 
 import { AdminNavbar } from '@/components/ui';
-import Sidebar, { Route } from '@/components/ui/Sidebar/NewSidebar';
+import { Sidebar, Route } from '@/components/ui';
 import { FiltersProvider } from '@/api/reports/filters';
 
 import logo from '@/assets/img/CHEK-NEGRO (1).png';
-import { useMe } from '@/api/user';
 import { useStyles } from './styles';
 import {
   Dashboard,

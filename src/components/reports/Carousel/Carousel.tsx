@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import { useEffect, useRef, FC, useMemo } from 'react';
+import { useEffect, useRef, FC, useMemo, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useCarousel } from './CarouselProvider';
 import { useFilters } from '@/api/reports/filters';
@@ -7,10 +7,20 @@ import cn from 'classnames';
 import dynamic from 'next/dynamic';
 import MultiCarousel from 'react-multi-carousel';
 import { getImages } from '@/utils/images';
-import { Close, ArrowForwardIos, ArrowBackIos } from '@material-ui/icons';
+import { useAddFavorite, useDeleteTile } from '@/api/reports';
+import DeleteTile from '../Tile/DeleteTile';
+import {
+  Close,
+  ArrowForwardIos,
+  ArrowBackIos,
+  StarBorderOutlined,
+  Star,
+  Delete
+} from '@material-ui/icons';
 import { IconButton } from '@material-ui/core';
 import dayjs from 'dayjs';
 import { primaryColor } from '@/utils/styles';
+import { Report } from '@/lib/types';
 
 const EditMode = dynamic(() => import('./EditMode'), {
   ssr: false
@@ -70,7 +80,9 @@ const useStyles = makeStyles(theme => ({
     height: '90%',
     display: 'flex',
     position: 'relative',
-    justifyContent: 'center'
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   image: {
     maxWidth: '100%',
@@ -165,11 +177,16 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
   const {
     tileInfo: { tile },
     report,
-    setCarouselInfo
+    setCarouselInfo,
+    disableAction
   } = useCarousel();
+  const [favorite, setFavorite] = useState(tile.favorite || false);
+  const [isOpenDelete, setIsOpenDelete] = useState(false);
   const images = useMemo(() => getImages([report]), [report]);
   const carouselRef = useRef<MultiCarousel>(null);
   const { filters } = useFilters();
+  const addFavorite = useAddFavorite();
+  const deleteTile = useDeleteTile();
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -179,9 +196,13 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
     };
   }, []);
 
-  const changeImage = (image: any) => {
+  useEffect(() => {
+    setFavorite(tile.favorite || false);
+  }, [tile]);
+
+  const changeImage = (image: any, newReport?: Report) => {
     setCarouselInfo({
-      report,
+      report: newReport || report,
       tileInfo: {
         tile: {
           comment: image.label,
@@ -198,17 +219,17 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
     });
   };
 
-  const nextImage = () => {
+  const nextImage = (newReport?: Report) => {
     const index = images.findIndex(image => image.id === tile.name);
 
     if (images.length === index + 1) {
-      changeImage(images[0]);
+      changeImage(images[0], newReport);
       carouselRef.current?.next(1);
 
       return;
     }
 
-    changeImage(images[index + 1]);
+    changeImage(images[index + 1], newReport);
     carouselRef.current?.next(1);
   };
 
@@ -225,8 +246,42 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
     carouselRef.current?.previous(1);
   };
 
+  const handleFavorite = () => {
+    addFavorite.mutate({
+      report,
+      tile,
+      favorite
+    });
+
+    setFavorite(!favorite);
+  };
+
+  const handleDelete = async (reason: string) => {
+    const { categories, report: newReport } = await deleteTile.mutateAsync({
+      reason,
+      report,
+      tile
+    });
+
+    if (images.length > 1) {
+      nextImage({
+        ...newReport,
+        categories
+      });
+
+      return;
+    }
+
+    close();
+  };
+
   return (
     <div className={classes.container}>
+      <DeleteTile
+        isOpen={isOpenDelete}
+        onClose={() => setIsOpenDelete(false)}
+        onDelete={handleDelete}
+      />
       <div className={classes.modal}>
         <IconButton
           aria-label="Cerrar"
@@ -239,21 +294,45 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
         <div className={classes.body}>
           <div className={classes.imageContainer}>
             <img className={classes.image} src={tile.uri} alt={tile.name} />
-            <IconButton
-              onClick={backImage}
-              aria-label="Imagen Anterior"
-              className={classes.back}
-            >
-              <ArrowBackIos />
-            </IconButton>
+            {!disableAction && (
+              <div>
+                <IconButton
+                  aria-label={
+                    favorite
+                      ? 'Desmarcar como Favorito'
+                      : 'Marcar como Favorito'
+                  }
+                  onClick={handleFavorite}
+                >
+                  {favorite ? <Star /> : <StarBorderOutlined />}
+                </IconButton>
+                <IconButton
+                  onClick={() => setIsOpenDelete(true)}
+                  aria-label="Borrar Imagen"
+                >
+                  <Delete />
+                </IconButton>
+              </div>
+            )}
+            {images.length > 1 && (
+              <>
+                <IconButton
+                  onClick={backImage}
+                  aria-label="Imagen Anterior"
+                  className={classes.back}
+                >
+                  <ArrowBackIos />
+                </IconButton>
 
-            <IconButton
-              onClick={nextImage}
-              aria-label="Imagen Siguiente"
-              className={classes.forward}
-            >
-              <ArrowForwardIos />
-            </IconButton>
+                <IconButton
+                  onClick={() => nextImage()}
+                  aria-label="Imagen Siguiente"
+                  className={classes.forward}
+                >
+                  <ArrowForwardIos />
+                </IconButton>
+              </>
+            )}
           </div>
 
           <div className={classes.info}>
