@@ -63,9 +63,7 @@ const chains = [
   { ID: 'VEA', name: 'Vea' },
   { ID: 'VIT', name: 'Vital' },
   { ID: 'WMT', name: 'Walmart' },
-  { ID: 'YGR', name: 'Yaguar' },
+  { ID: 'YGR', name: 'Yaguar' }
 ];
 
-
-
-export default chains
+export default chains;

@@ -24,20 +24,9 @@ const getUser = async (): Promise<User | null> => {
 };
 
 export const useMe = () => {
-  const [initialized, setInitialized] = useState(false);
   const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(() => {
-      setInitialized(true);
-      unsubscribe();
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   return useQuery('me', getUser, {
-    enabled: initialized,
     async onSuccess(user) {
       if (!user) return;
 

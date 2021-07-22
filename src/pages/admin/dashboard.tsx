@@ -4,13 +4,8 @@ import { FilterBar } from '@/components/reports';
 import { GridContainer, GridItem, CardData } from '@/components/ui';
 import { useMe } from '@/api/user';
 import { useFilters, useFilteredData } from '@/api/reports/filters';
-import {
-  ChainsDetail,
-  PhotosDetail,
-  StoresDetail,
-  ComplianceDetail
-} from '@/components/data/details';
-import { useBranches } from '@/api/data';
+import dynamic from 'next/dynamic';
+import { useBranches, useOFC } from '@/api/data';
 
 import shop from '@/assets/img/icon-shop.png';
 import visits from '@/assets/img/icon-visits.png';
@@ -19,16 +14,50 @@ import alert from '@/assets/img/icon-alert.png';
 
 import { Page } from '@/typings';
 
+const dynamicProps = {
+  loading: () => <div>Cargando...</div>
+};
+
+const ChainsDetail = dynamic(
+  import('@/components/data/details/ChainsDetail'),
+  dynamicProps
+);
+
+const PhotosDetail = dynamic(
+  import('@/components/data/details/PhotosDetail'),
+  dynamicProps
+);
+
+const StoresDetail = dynamic(
+  import('@/components/data/details/StoresDetail'),
+  dynamicProps
+);
+
+const ComplianceDetail = dynamic(
+  import('@/components/data/details/ComplianceDetail'),
+  dynamicProps
+);
+
 const AdminDashboard: Page = () => {
   const user = useMe();
   const { filters, filteredReports } = useFilters();
-  const { branches, reports, ofc } = useFilteredData({
+  const { reports, categories } = useFilteredData({
     reported: true,
-    enabled: { chains: false, categories: false }
+    enabled: { chains: false, ofc: false, branches: false }
   });
   const { data: allBranches } = useBranches({
     clientId: +filters?.client?.ID!
   });
+  const branches = useBranches({
+    chain: filters?.chain?.ID,
+    clientId: +filters?.client?.ID!
+  });
+  const ofc = useOFC({
+    categories: categories.data,
+    branches: branches.data,
+    reports: reports.data
+  });
+
   const [OFCPercent, setOFCPercent] = useState(0);
   const [chainsOpen, setChainsOpen] = useState(false);
   const [photosOpen, setPhotosOpen] = useState(false);

@@ -15,33 +15,17 @@ import { useStyles } from './styles';
 
 type AdminNavbarProps = {
   color?: 'primary' | 'info' | 'success' | 'warning' | 'danger';
-  miniActive?: boolean;
-  handleDrawerToggle(): void;
-  sidebarMinimize(): void;
   logo: StaticImageData;
 };
 
-const AdminNavbar: FC<AdminNavbarProps> = props => {
+const AdminNavbar: FC<AdminNavbarProps> = ({ logo }) => {
   const classes = useStyles();
-  const { color, logo } = props;
-  const {
-    toggleSidebar,
-    displayMiniSidebar,
-    toggleMiniSidebar,
-    displaySidebar
-  } = useUI();
+  const { toggleSidebar, displayMiniSidebar, toggleMiniSidebar } = useUI();
 
   const sidebarMinimize = classes.sidebarMinimize + ' ';
 
   return (
-    <AppBar
-      position="sticky"
-      className={cn(classes.appBar, {
-        [classes.appBarWithSidebar]: displaySidebar,
-        [classes.appBarWithSidebarMini]: displaySidebar && displayMiniSidebar,
-        [classes[color!]]: color
-      })}
-    >
+    <AppBar position="sticky" className={classes.appBar}>
       <Toolbar className={classes.container}>
         <Hidden smDown implementation="css">
           <div className={sidebarMinimize}>

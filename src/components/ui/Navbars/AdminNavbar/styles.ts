@@ -25,14 +25,11 @@ export const useStyles = makeStyles(theme => ({
     minHeight: '50px',
     display: 'block',
     marginLeft: 0,
-    ...defaultBoxShadow
+    boxShadow: `
+    0px 7.76336px 32.3056px rgba(0, 0, 0, 0.035), 0px 4.12306px 17.1573px rgba(0, 0, 0, 0.0282725), 0px 1.7157px 7.13952px rgba(0, 0, 0, 0.0196802)
+    `
   },
-  appBarWithSidebar: {
-    width: `calc(100% - ${drawerWidth}px)`
-  },
-  appBarWithSidebarMini: {
-    width: `calc(100% - ${theme.spacing(8) + 1}px)`
-  },
+
   container: {
     ...containerFluid,
     minHeight: '50px'

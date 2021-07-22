@@ -70,23 +70,14 @@ const routes: Route[] = [
 ];
 
 const AdminLayout: FC = ({ children }) => {
-  const user = useMe();
   const classes = useStyles();
-  const [miniActive, setMiniActive] = useState(false);
-
-  if (user.isIdle || user.isLoading) return <p>Loading...</p>;
 
   return (
     <FiltersProvider>
       <div className={classes.root}>
         <Sidebar routes={routes} />
-        <AdminNavbar
-          sidebarMinimize={() => {}}
-          logo={logo}
-          miniActive={miniActive}
-          handleDrawerToggle={() => setMiniActive(!miniActive)}
-        />
         <div id="mainpanel" className={classes.mainPanel}>
+          <AdminNavbar logo={logo} />
           <main className={classes.content}>
             <div className={classes.container}>{children}</div>
           </main>

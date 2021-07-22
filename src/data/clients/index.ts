@@ -1,7 +1,7 @@
 const clients = [
   {
     ID: '9',
-    companyName:'Establecimiento Sas Ignacio S.A.',
+    companyName: 'Establecimiento Sas Ignacio S.A.',
     name: 'San Ignacio',
     adminId: 'FV',
     comercialId: 'LL',

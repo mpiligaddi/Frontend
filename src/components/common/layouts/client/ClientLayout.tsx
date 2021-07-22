@@ -11,14 +11,11 @@ type ClientLayoutProps = {
 };
 
 const ClientLayout: FC<ClientLayoutProps> = ({ children, clean = false }) => {
-  const user = useMe();
   const classes = useStyles();
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
   }, []);
-
-  if (user.isIdle || user.isLoading) return <p>Loading...</p>;
 
   return (
     <FiltersProvider>

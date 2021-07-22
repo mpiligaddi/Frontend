@@ -23,6 +23,7 @@
     "material-table": "^1.69.3",
     "next": "11.0.0",
     "next-transpile-modules": "^8.0.0",
+    "nprogress": "^0.2.0",
     "pixi-viewport": "^4.31.0",
     "pixi.js": "^6.0.4",
     "react": "17.0.2",
@@ -39,6 +40,7 @@
     "yup-phone": "^1.2.19"
   },
   "devDependencies": {
+    "@types/nprogress": "^0.2.0",
     "@types/react": "17.0.11",
     "babel-plugin-transform-imports": "^2.0.0",
     "eslint": "7.28.0",

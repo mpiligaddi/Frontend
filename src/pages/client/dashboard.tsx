@@ -16,7 +16,6 @@ import { LinearProgress } from '@/components/ui';
 
 import shop from '@/assets/img/icon-shop.png';
 import visits from '@/assets/img/icon-visits.png';
-import camera from '@/assets/img/icon-camera.png';
 import alert from '@/assets/img/icon-alert.png';
 
 const useStyles = makeStyles({
@@ -97,7 +96,7 @@ const Dashboard: Page = () => {
       </GridItem>
       <GridItem xs={12} sm={4} md={3} lg={3}>
         <CardData
-          image={camera}
+          image={visits}
           title="Tiendas Reportadas"
           openable={false}
           content={new Set(reports.data?.map(report => report.branchId)).size}
@@ -144,7 +143,6 @@ const Dashboard: Page = () => {
   );
 };
 
-// eslint-disable-next-line react/display-name
-Dashboard.getLayout = page => <ClientLayout>{page}</ClientLayout>;
+Dashboard.Layout = ClientLayout;
 
 export default Dashboard;
