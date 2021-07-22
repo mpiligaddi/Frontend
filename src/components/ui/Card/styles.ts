@@ -21,7 +21,8 @@ export const useStyles = makeStyles({
     color: 'rgba(' + hexToRgb(blackColor) + ', 0.87)',
     background: whiteColor,
     width: '100%',
-    boxShadow: '0 1px 4px 0 rgba(' + hexToRgb(blackColor) + ', 0.14)',
+    boxShadow:
+      '0px -3.79717px 57.967px rgba(0, 0, 0, 0.0357664), 0px -2.12866px 42.1612px rgba(0, 0, 0, 0.03), 0px -1.13052px 29.0437px rgba(0, 0, 0, 0.0242336), 0px -0.470434px 15.5988px rgba(0, 0, 0, 0.0168687);',
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',

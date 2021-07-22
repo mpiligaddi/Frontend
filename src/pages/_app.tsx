@@ -1,6 +1,7 @@
 import '@/assets/scss/trade-app.scss';
 import 'react-perfect-scrollbar/dist/css/styles.css';
 import '@/lib/firebase';
+import 'react-multi-carousel/lib/styles.css';
 
 import { useEffect, FC } from 'react';
 import type { AppProps } from 'next/app';

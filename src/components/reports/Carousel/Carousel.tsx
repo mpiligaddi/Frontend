@@ -1,91 +1,175 @@
-import { useEffect, useRef, useState, FC } from 'react';
-import { styled } from '@material-ui/core/styles';
+/* eslint-disable @next/next/no-img-element */
+import { useEffect, useRef, FC, useMemo } from 'react';
+import { makeStyles } from '@material-ui/core/styles';
 import { useCarousel } from './CarouselProvider';
-import CarouselItem from './CarouselItem';
+import { useFilters } from '@/api/reports/filters';
+import cn from 'classnames';
 import dynamic from 'next/dynamic';
+import MultiCarousel from 'react-multi-carousel';
+import { getImages } from '@/utils/images';
+import { Close, ArrowForwardIos, ArrowBackIos } from '@material-ui/icons';
+import { IconButton } from '@material-ui/core';
+import dayjs from 'dayjs';
+import { primaryColor } from '@/utils/styles';
 
 const EditMode = dynamic(() => import('./EditMode'), {
   ssr: false
 });
 
-const Wrapper = styled('div')({
-  zIndex: 1201,
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  display: 'flex',
-  position: 'fixed',
-  alignItems: 'center',
-  justifyContent: 'center',
-  backgroundColor: 'rgba(0, 0, 0, 0.9)',
-  WebkitTapHighlightColor: 'transparent',
-  width: '100vw',
-  height: '100vh',
-  overflow: 'hidden',
-  color: 'white'
-});
+const useStyles = makeStyles(theme => ({
+  container: {
+    position: 'fixed',
+    left: 0,
+    top: 0,
+    overflow: 'hidden',
+    right: 0,
+    width: '100vw',
+    zIndex: 1000,
+    height: '100vh',
+    bottom: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    '&::before': {
+      zIndex: 900,
+      content: '""',
+      position: 'fixed',
+      width: '100vw',
+      height: '100vh',
+      backgroundColor: '#000',
+      opacity: '0.5'
+    }
+  },
+  modal: {
+    backgroundColor: 'rgb(249, 250, 251)',
+    width: '80%',
+    position: 'relative',
+    zIndex: 2000,
+    height: '85%',
+    boxShadow: `0px 7.76336px 32.3056px rgba(0, 0, 0, 0.035), 0px 4.12306px 17.1573px rgba(0, 0, 0, 0.0282725), 0px 1.7157px 7.13952px rgba(0, 0, 0, 0.0196802)`,
+    [theme.breakpoints.down('md')]: {
+      width: '90%'
+    }
+  },
+  body: {
+    position: 'relative',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '75%'
+  },
+  info: {
+    padding: '10px 15px',
+    height: '90%',
+    width: '30%',
+    borderLeft: '1px solid #ccc'
+  },
+  imageContainer: {
+    padding: '10px',
+    width: '100%',
+    height: '90%',
+    display: 'flex',
+    position: 'relative',
+    justifyContent: 'center'
+  },
+  image: {
+    maxWidth: '100%',
+    height: '100%',
+    boxShadow: `0px 7.76336px 32.3056px rgba(0, 0, 0, 0.035), 0px 4.12306px 17.1573px rgba(0, 0, 0, 0.0282725), 0px 1.7157px 7.13952px rgba(0, 0, 0, 0.0196802)`
+  },
+  footer: {
+    padding: '10px',
+    height: '25%',
+    backgroundColor: 'rgb(229, 231, 235)'
+  },
+  multiCarousel: {
+    height: '100%',
+    width: '100%'
+  },
+  slider: {
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  close: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    zIndex: 3000
+  },
+  itemCarousel: {
+    height: '100%',
+    userSelect: 'none',
+    marginRight: '10px'
+  },
+  imageCarousel: {
+    cursor: 'pointer',
+    width: '100%',
+    boxShadow: `0px 7.76336px 32.3056px rgba(0, 0, 0, 0.035), 0px 4.12306px 17.1573px rgba(199, 22, 22, 0.028), 0px 1.7157px 7.13952px rgba(0, 0, 0, 0.0196802)`,
+    objectFit: 'cover',
+    height: '100%',
 
-const CarouselDiv = styled('div')({
-  display: 'flex',
-  flexWrap: 'nowrap',
-  height: '100%',
-  maxWidth: '100vw',
-  WebkitOverflowScrolling: 'touch',
-  scrollSnapType: 'y mandatory',
-  scrollBehavior: 'smooth',
-  position: 'relative'
-});
-
-const CloseButton = styled('a')({
-  position: 'absolute',
-  zIndex: 20,
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center',
-  justifyContent: 'center',
-  cursor: 'pointer',
-  color: 'white',
-  textDecoration: 'none',
-  opacity: 0.6,
-  fontSize: '20px',
-  top: '10px',
-  right: '10px',
-
-  ':hover': {
-    opacity: 1,
-    color: 'white'
+    userSelect: 'none'
+  },
+  nonSelectedImage: {
+    opacity: 0.5
+  },
+  back: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    margin: 'auto 0',
+    height: '50px'
+  },
+  forward: {
+    position: 'absolute',
+    right: 0,
+    top: 0,
+    bottom: 0,
+    margin: 'auto 0',
+    height: '50px'
+  },
+  data: {
+    color: primaryColor[0]
   }
-});
-
-const SliderButton = styled('a')<unknown, { left?: boolean; right?: boolean }>({
-  position: 'absolute',
-  width: '50px',
-  height: '50px',
-  zIndex: 10,
-  left: props => (props.left ? '50px' : 'unset'),
-  right: props => (props.right ? '50px' : 'unset'),
-  bottom: '50px',
-  cursor: 'pointer',
-  transform: 'translateY(-50%)',
-  opacity: '0.5',
-  transition: 'opacity 0.5s ease',
-  color: 'white !important',
-  fontSize: '50px',
-  '&:hover': {
-    opacity: 1
-  }
-});
+}));
 
 type CarouselProps = {
   close(): void;
 };
 
+const responsive = {
+  superLargeDesktop: {
+    // the naming can be any, depends on you.
+    breakpoint: { max: 4000, min: 3000 },
+    items: 5
+  },
+  desktop: {
+    breakpoint: { max: 3000, min: 1024 },
+    items: 5
+  },
+  tablet: {
+    breakpoint: { max: 1024, min: 464 },
+    items: 3
+  },
+  mobile: {
+    breakpoint: { max: 464, min: 0 },
+    items: 1
+  }
+};
+
 const Carousel: FC<CarouselProps> = ({ close }) => {
-  const carouselRef = useRef<HTMLDivElement>(null);
-  const [isEdit, setEdit] = useState(false);
-  let mainPanel = document.querySelector('#mainpanel');
-  let lastScroll = 0;
+  const classes = useStyles();
+  const {
+    tileInfo: { tile },
+    report,
+    setCarouselInfo
+  } = useCarousel();
+  const images = useMemo(() => getImages([report]), [report]);
+  const carouselRef = useRef<MultiCarousel>(null);
+  const { filters } = useFilters();
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -95,139 +179,144 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
     };
   }, []);
 
-  const {
-    report,
-    tileInfo: { tile, catIndex }
-  } = useCarousel();
-
-  let category = report.categories[catIndex];
-
-  const hotKeys = (e: KeyboardEvent) => {
-    switch (e.key) {
-      case 'Escape':
-        close();
-        break;
-      case 'ArrowLeft':
-        if (!isEdit) lastSlide();
-        break;
-      case 'ArrowRight':
-        if (!isEdit) nextSlide();
-        break;
-      default:
-        break;
-    }
+  const changeImage = (image: any) => {
+    setCarouselInfo({
+      report,
+      tileInfo: {
+        tile: {
+          comment: image.label,
+          name: image.id,
+          type: '',
+          uri: image.url,
+          favorite: image.favorite,
+          isDeleted: image.isDeleted,
+          reason: '',
+          revised: image.revised
+        },
+        catIndex: 0
+      }
+    });
   };
 
-  const scrollBehaviour = (e: any) => {
-    e.preventDefault();
-    e.stopPropagation();
-    e.target.scrollTop = lastScroll;
+  const nextImage = () => {
+    const index = images.findIndex(image => image.id === tile.name);
+
+    if (images.length === index + 1) {
+      changeImage(images[0]);
+      carouselRef.current?.next(1);
+
+      return;
+    }
+
+    changeImage(images[index + 1]);
+    carouselRef.current?.next(1);
   };
 
-  useEffect(() => {
-    if (!mainPanel) return;
-    //Handle events
-    if (tile) {
-      lastScroll = mainPanel.scrollTop;
-      mainPanel.scrollTop = lastScroll;
-      mainPanel.addEventListener('scroll', scrollBehaviour);
-      document.addEventListener('keyup', hotKeys);
+  const backImage = () => {
+    const index = images.findIndex(image => image.id === tile.name);
+
+    if (index === 0) {
+      changeImage(images[images.length - 1]);
+      carouselRef.current?.previous(1);
+      return;
     }
 
-    //Sleep ZZzzzz
-    return () => {
-      document.removeEventListener('keyup', hotKeys);
-      mainPanel?.removeEventListener('scroll', scrollBehaviour);
-    };
-  }, []);
-
-  useEffect(() => {
-    //Handle slide
-    if (tile && !isEdit) {
-      let index = category.images.indexOf(tile);
-      let refElem = carouselRef.current.children[index < 0 ? 0 : index];
-      carouselRef.current.insertBefore(refElem, carouselRef.current.firstChild);
-    }
-  }, [report, isEdit]);
-
-  const toggleEditMode = () => {
-    setEdit(prev => !prev);
-  };
-
-  const nextSlide = () => {
-    if (carouselRef?.current?.children?.length! > 1) {
-      const firtsElement = carouselRef.current!.firstElementChild;
-
-      carouselRef.current!.style.transition = `500ms ease-out all`;
-
-      carouselRef.current!.style.transform = `translateX(-${
-        (firtsElement as any).offsetWidth
-      }px)`;
-
-      const nextTransition = () => {
-        carouselRef.current!.style.transition = 'none';
-        carouselRef.current!.style.transform = `translateX(0)`;
-        carouselRef.current?.appendChild(firtsElement as Node);
-        carouselRef.current?.removeEventListener(
-          'transitionend',
-          nextTransition
-        );
-      };
-
-      carouselRef.current!.addEventListener('transitionend', nextTransition);
-    }
-  };
-
-  const lastSlide = () => {
-    if (carouselRef.current && carouselRef.current.children.length > 1) {
-      const lastChild = carouselRef.current.lastElementChild;
-
-      carouselRef.current.insertBefore(
-        lastChild!,
-        carouselRef.current.firstChild
-      );
-
-      carouselRef.current.style.transition = 'none';
-      carouselRef.current.style.transform = `translateX(-${lastChild.offsetWidth}px)`;
-
-      setTimeout(() => {
-        carouselRef.current!.style.transition = `500ms ease-out all`;
-        carouselRef.current!.style.transform = `translateX(0)`;
-      }, 30);
-    }
+    changeImage(images[index - 1]);
+    carouselRef.current?.previous(1);
   };
 
   return (
-    <Wrapper>
-      <CloseButton onClick={close}>
-        <i className="fas fa-times"></i>
-      </CloseButton>
-      {isEdit ? (
-        <EditMode close={toggleEditMode} />
-      ) : (
-        <>
-          <CarouselDiv ref={carouselRef}>
-            {category.images.map((tile: any, index: number) => (
-              <CarouselItem
-                tile={tile}
-                toggleEdit={toggleEditMode}
-                key={index}
+    <div className={classes.container}>
+      <div className={classes.modal}>
+        <IconButton
+          aria-label="Cerrar"
+          className={classes.close}
+          onClick={close}
+        >
+          <Close />
+        </IconButton>
+
+        <div className={classes.body}>
+          <div className={classes.imageContainer}>
+            <img className={classes.image} src={tile.uri} alt={tile.name} />
+            <IconButton
+              onClick={backImage}
+              aria-label="Imagen Anterior"
+              className={classes.back}
+            >
+              <ArrowBackIos />
+            </IconButton>
+
+            <IconButton
+              onClick={nextImage}
+              aria-label="Imagen Siguiente"
+              className={classes.forward}
+            >
+              <ArrowForwardIos />
+            </IconButton>
+          </div>
+
+          <div className={classes.info}>
+            <p>
+              Fecha:{' '}
+              <span className={classes.data}>
+                {dayjs(report.createdAt.toDate()).format('DD-MM-YYYY')}
+              </span>
+            </p>
+            <p>
+              Cliente:{' '}
+              <span className={classes.data}>{filters?.client?.name}</span>
+            </p>
+            <p>
+              Cadena:{' '}
+              <span className={classes.data}>{filters?.chain?.name}</span>
+            </p>
+            <p>
+              Sucursal:{' '}
+              <span className={classes.data}>{filters?.branch?.name}</span>
+            </p>
+            <p>
+              Categoria:{' '}
+              <span className={classes.data}>
+                {images.find(image => tile.name === image.id)?.categoryName}
+              </span>
+            </p>
+
+            <p>
+              {tile.comment ? `Comentario: ${tile.comment}` : 'Sin Comentario'}
+            </p>
+          </div>
+        </div>
+        <div className={classes.footer}>
+          <MultiCarousel
+            swipeable
+            centerMode
+            autoPlay={false}
+            sliderClass={classes.slider}
+            className={classes.multiCarousel}
+            infinite
+            responsive={responsive}
+            ref={carouselRef}
+            containerClass={classes.multiCarousel}
+            showDots={false}
+            itemClass={classes.itemCarousel}
+          >
+            {images.map(image => (
+              <img
+                key={image.id}
+                onClick={() => changeImage(image)}
+                draggable="false"
+                className={cn(classes.imageCarousel, {
+                  [classes.nonSelectedImage]: tile.name !== image.id
+                })}
+                src={image.url}
+                alt={image.label}
               />
             ))}
-          </CarouselDiv>
-          {category.images.length > 1 && (
-            <>
-              <SliderButton onClick={lastSlide} left>
-                <i className="fas fa-angle-left"></i>
-              </SliderButton>
-              <SliderButton onClick={nextSlide} right>
-                <i className="fas fa-angle-right"></i>
-              </SliderButton>
-            </>
-          )}
-        </>
-      )}
-    </Wrapper>
+          </MultiCarousel>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -81,6 +81,7 @@ export const Avatar = styled('div')<
 
 export const useStyles = makeStyles(theme => ({
   drawer: {
+    zIndex: 10,
     width: drawerWidth,
     flexShrink: 0,
     whiteSpace: 'nowrap',

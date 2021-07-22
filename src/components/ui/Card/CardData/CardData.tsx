@@ -9,11 +9,12 @@ import { useStyles } from './styles';
 type CardDataProps = {
   image: StaticImageData;
   isOpen?: boolean;
+  openable?: boolean;
   title: string;
   content: React.ReactNode;
   sub?: React.ReactNode;
   contentColor?: 'red' | 'normal';
-  onOpen(): void;
+  onOpen?(): void;
 };
 
 const CardData: FC<CardDataProps> = ({
@@ -22,6 +23,7 @@ const CardData: FC<CardDataProps> = ({
   content,
   isOpen,
   sub,
+  openable = true,
   contentColor = 'normal',
   onOpen
 }) => {
@@ -48,18 +50,26 @@ const CardData: FC<CardDataProps> = ({
           </h3>
         </div>
       </CardHeader>
-      <CardFooter stats>
+      <CardFooter stats={openable}>
         <div className={classes.stats}>
-          <Visibility />
-          <Link
-            underline="none"
-            color="textSecondary"
-            align="center"
-            onClick={onOpen}
-            href="#"
-          >
-            {isOpen ? <span>Ocultar detalle</span> : <span>Ver detalle</span>}
-          </Link>
+          {openable && (
+            <>
+              <Visibility />
+              <Link
+                underline="none"
+                color="textSecondary"
+                align="center"
+                onClick={onOpen}
+                href="#"
+              >
+                {isOpen ? (
+                  <span>Ocultar detalle</span>
+                ) : (
+                  <span>Ver detalle</span>
+                )}
+              </Link>
+            </>
+          )}
         </div>
       </CardFooter>
     </Card>

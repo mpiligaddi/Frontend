@@ -20,7 +20,7 @@ export const useStyles = makeStyles(theme => ({
     position: 'absolute',
     width: '100%',
     paddingTop: '0px',
-    zIndex: 1029,
+    zIndex: 500,
     color: grayColor[6],
     minHeight: '50px',
     display: 'block',

@@ -31,6 +31,7 @@
     "react-dom": "17.0.2",
     "react-hook-form": "^7.9.0",
     "react-material-ui-carousel": "^2.2.6",
+    "react-multi-carousel": "^2.6.3",
     "react-perfect-scrollbar": "^1.5.8",
     "react-query": "^3.17.2",
     "sass": "^1.35.1",

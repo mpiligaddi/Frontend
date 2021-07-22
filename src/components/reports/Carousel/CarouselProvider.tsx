@@ -1,13 +1,21 @@
 import { createContext, useContext, useState, FC } from 'react';
 import Carousel from './Carousel';
-import { Report } from '@/lib/types';
+import { Image, Report } from '@/lib/types';
 
-const CarouselContext = createContext({
-  report: {} as Report,
-  tileInfo: {} as any,
-  setCarouselInfo: ({}: { report: Report; tileInfo: any }) => {},
-  disableAction: false
-});
+type State = {
+  report: Report;
+  tileInfo: {
+    tile: Image;
+    catIndex: number;
+  };
+  setCarouselInfo({}: {
+    report: Report;
+    tileInfo: { tile: Image; catIndex: number };
+  }): void;
+  disableAction?: boolean;
+};
+
+const CarouselContext = createContext({} as State);
 
 export const useCarousel = () => useContext(CarouselContext);
 
@@ -18,12 +26,12 @@ const CarouselProvider: FC<{ disableAction?: boolean }> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [carousel, setCarousel] = useState({
     report: {} as Report,
-    tileInfo: {}
+    tileInfo: {} as { tile: Image; catIndex: number }
   });
 
   const close = () => {
     setIsOpen(false);
-    setCarousel({ report: {} as Report, tileInfo: {} });
+    setCarousel({ report: {} as Report, tileInfo: {} as any });
   };
 
   const setCarouselInfo = ({
@@ -31,7 +39,7 @@ const CarouselProvider: FC<{ disableAction?: boolean }> = ({
     tileInfo
   }: {
     report: Report;
-    tileInfo: any;
+    tileInfo: { tile: Image; catIndex: number };
   }) => {
     setCarousel(prev => ({
       report: report ?? prev.report,

@@ -100,7 +100,9 @@ const AdminDashboard: Page = () => {
           image={visits}
           onOpen={() => setStoresOpen(!storesOpen)}
           content={
-            filters?.chain ? filteredReports.length : reports.data?.length
+            filters?.chain
+              ? new Set(filteredReports.map(report => report.branchId)).size
+              : new Set(reports.data?.map(report => report.branchId)).size
           }
           sub={filters?.chain ? branches.data?.length : allBranches?.length}
         />
