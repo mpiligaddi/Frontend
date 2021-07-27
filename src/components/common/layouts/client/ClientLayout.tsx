@@ -1,6 +1,5 @@
 import { FC, useEffect } from 'react';
-import { FiltersProvider } from '@/api/reports/filters';
-import { useMe } from '@/api/user';
+import { FiltersProvider } from '@/context/filters';
 
 import { ClientNavbar } from '@/components/ui';
 import logo from '@/assets/img/CHEK-NEGRO (1).png';

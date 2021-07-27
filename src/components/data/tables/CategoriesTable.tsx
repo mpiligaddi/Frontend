@@ -4,7 +4,7 @@ import {
   useCategories,
   useUpdateCategory,
   useDeleteCategory
-} from '@/api/data';
+} from '@/hooks/api';
 
 const CategoryTable: FC = () => {
   const categories = useCategories({ all: true });

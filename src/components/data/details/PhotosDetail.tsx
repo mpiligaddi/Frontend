@@ -1,5 +1,6 @@
 import { FC } from 'react';
-import { useFilters, useFilteredData } from '@/api/reports/filters';
+import { useFilters } from '@/context/filters';
+import { useFilteredData } from '@/hooks/api';
 import { GridContainer, GridItem, TableOFC } from '@/components/ui';
 import { primaryBackgroundText, primaryColor } from '@/utils/styles';
 import frequency from '@/utils/frequency';

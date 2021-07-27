@@ -9,7 +9,7 @@ import firebase from 'firebase/app';
 import { useUI } from '@/components/ui';
 
 import { useStyles, Avatar } from './styles';
-import { useMe } from '@/api/user';
+import { useMe } from '@/hooks/api';
 
 export interface Route {
   name: string;

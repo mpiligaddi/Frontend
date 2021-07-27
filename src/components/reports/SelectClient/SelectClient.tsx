@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import { LinearProgress, GridContainer, Tabs } from '@/components/ui';
-import { useClients } from '@/api/data';
-import { useFilters } from '@/api/reports/filters';
+import { useClients } from '@/hooks/api';
+import { useFilters } from '@/context/filters';
 import ReportTypeSelector from '../ReportTypeSelector';
 import { ReportType } from '@/lib/types';
 

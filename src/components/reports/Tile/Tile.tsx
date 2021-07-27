@@ -6,7 +6,7 @@ import DeleteTile from './DeleteTile';
 import Image from 'next/image';
 
 import { Image as IImage, Report } from '@/lib/types';
-import { useAddFavorite, useDeleteTile } from '@/api/reports';
+import { useAddFavorite, useDeleteTile } from '@/hooks/api';
 import { useCarousel } from '../Carousel/CarouselProvider';
 
 import { useStyles } from './styles';
@@ -14,16 +14,10 @@ import { useStyles } from './styles';
 type TileProps = {
   tile: IImage;
   report: Report;
-  catIndex: number;
   disableAction?: boolean;
 };
 
-const Tile: FC<TileProps> = ({
-  tile,
-  report,
-  catIndex,
-  disableAction = false
-}) => {
+const Tile: FC<TileProps> = ({ tile, report, disableAction = false }) => {
   const classes = useStyles();
   const [favorite, setFavorite] = useState(tile.favorite ?? false);
   const [openModal, setOpenModal] = useState(false);
@@ -58,7 +52,7 @@ const Tile: FC<TileProps> = ({
   const openTile = () => {
     setCarouselInfo({
       report,
-      tileInfo: { tile, catIndex }
+      tile
     });
   };
 

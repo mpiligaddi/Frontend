@@ -2,17 +2,11 @@ import { useState, useEffect, FC, useCallback } from 'react';
 import { GridContainer, GridItem, TableDashboard } from '@/components/ui';
 import Link from '@material-ui/core/Link';
 import { useRouter } from 'next/router';
-import { useFilters, useFilteredData } from '@/api/reports/filters';
-import { useZones } from '@/api/data';
+import { useFilters } from '@/context/filters';
+import { useZones, useFilteredData } from '@/hooks/api';
 import { primaryBackgroundText } from '@/utils/styles';
 import { useStyles } from './styles';
-
-const frequency = {
-  FV: 'Foto Visita',
-  FS: 'Foto Semanal',
-  FQ: 'Foto Quincenal',
-  FM: 'Foto Mensual'
-};
+import frequency from '@/utils/frequency';
 
 const columnsByChain = [
   {

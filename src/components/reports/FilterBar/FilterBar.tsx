@@ -7,7 +7,8 @@ import {
   GridSize
 } from '@material-ui/core';
 import { GridItem, GridContainer } from '@/components/ui';
-import { useFilters, useFilteredData } from '@/api/reports/filters';
+import { useFilters } from '@/context/filters';
+import { useFilteredData } from '@/hooks/api';
 import type { ChangeEvent } from '@/typings';
 
 import { useStyles } from './styles';

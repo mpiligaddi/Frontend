@@ -1,7 +1,7 @@
 import React, { useState, useEffect, FC, useCallback } from 'react';
 import { GridContainer, GridItem, TableDashboard } from '@/components/ui/';
-import { useFilters, useFilteredData } from '@/api/reports/filters';
-import { useCoverages, useZones } from '@/api/data';
+import { useFilteredData, useCoverages, useZones } from '@/hooks/api';
+import { useFilters } from '@/context/filters';
 import { primaryBackgroundText } from '@/utils/styles';
 
 const columnsByChain = [

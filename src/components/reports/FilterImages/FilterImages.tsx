@@ -2,7 +2,7 @@ import { useState, useEffect, FC } from 'react';
 import { LinearProgress } from '@/components/ui';
 
 import Report from '../Report';
-import { useFilters } from '@/api/reports/filters/';
+import { useFilters } from '@/context/filters';
 import CarouselProvider from '../Carousel/CarouselProvider';
 import { ReportCategory, Report as IReport } from '@/lib/types';
 

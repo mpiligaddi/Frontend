@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import MenuItem from '@material-ui/core/MenuItem';
 import firebase from 'firebase/app';
-import { useLogout } from '@/api/auth';
+import { useLogout } from '@/hooks/api';
 import { useRouter } from 'next/router';
 
 type SignOutButtonProps = {

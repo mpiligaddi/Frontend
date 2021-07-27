@@ -2,7 +2,7 @@ import React, { useState, FC } from 'react';
 
 import { AdminNavbar } from '@/components/ui';
 import { Sidebar, Route } from '@/components/ui';
-import { FiltersProvider } from '@/api/reports/filters';
+import { FiltersProvider } from '@/context/filters';
 
 import logo from '@/assets/img/CHEK-NEGRO (1).png';
 import { useStyles } from './styles';

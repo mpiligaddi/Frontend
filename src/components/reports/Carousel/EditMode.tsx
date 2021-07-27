@@ -131,10 +131,7 @@ const EditMode: FC<EditModeProps> = ({ close }) => {
   const [transform, setTransform] = useState({ width: -1, height: -1 });
   const [isInteractive, setInteractive] = useState(false);
   const [save, setSave] = useState(false);
-  const {
-    report,
-    tileInfo: { tile }
-  } = useCarousel();
+  const { report, tile } = useCarousel();
   const viewportRef = useRef<any>(null);
   const imageRef = useRef<PixiRef<typeof Sprite>>(null);
 

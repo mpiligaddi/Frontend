@@ -1,16 +1,17 @@
 /* eslint-disable react/display-name */
 import { useState, useEffect, FC, useRef, useCallback } from 'react';
 import { TableCrud, SuccessAlert } from '@/components/ui';
-import { useFilters, useFilteredData } from '@/api/reports/filters';
+import { useFilters } from '@/context/filters';
 import {
   useCoverages,
   useChains,
+  useFilteredData,
   useBranches,
   useClients,
   useCreateCoverage,
   useDeleteCoverage,
   useUpdateCoverage
-} from '@/api/data';
+} from '@/hooks/api';
 import frequencyString from '@/utils/frequency';
 import { TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';

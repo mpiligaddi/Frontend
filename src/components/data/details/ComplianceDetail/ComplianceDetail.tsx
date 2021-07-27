@@ -12,8 +12,8 @@ import {
   CardFooter,
   GridContainer
 } from '@/components/ui';
-import { useFilters, useFilteredData } from '@/api/reports/filters';
-import { useZones, useSupervisors } from '@/api/data';
+import { useFilters } from '@/context/filters';
+import { useFilteredData, useZones, useSupervisors } from '@/hooks/api';
 import { primaryBackgroundText, primaryColor } from '@/utils/styles';
 import { useStyles } from './styles';
 

@@ -2,12 +2,12 @@
 import { useEffect, useRef, FC, useMemo, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import { useCarousel } from './CarouselProvider';
-import { useFilters } from '@/api/reports/filters';
+import { useFilters } from '@/context/filters';
 import cn from 'classnames';
 import dynamic from 'next/dynamic';
 import MultiCarousel from 'react-multi-carousel';
 import { getImages } from '@/utils/images';
-import { useAddFavorite, useDeleteTile } from '@/api/reports';
+import { useAddFavorite, useDeleteTile } from '@/hooks/api';
 import DeleteTile from '../Tile/DeleteTile';
 import {
   Close,
@@ -55,7 +55,7 @@ const useStyles = makeStyles(theme => ({
     width: '80%',
     position: 'relative',
     zIndex: 2000,
-    height: '85%',
+    height: '95%',
     boxShadow: `0px 7.76336px 32.3056px rgba(0, 0, 0, 0.035), 0px 4.12306px 17.1573px rgba(0, 0, 0, 0.0282725), 0px 1.7157px 7.13952px rgba(0, 0, 0, 0.0196802)`,
     [theme.breakpoints.down('md')]: {
       width: '90%'
@@ -174,12 +174,7 @@ const responsive = {
 
 const Carousel: FC<CarouselProps> = ({ close }) => {
   const classes = useStyles();
-  const {
-    tileInfo: { tile },
-    report,
-    setCarouselInfo,
-    disableAction
-  } = useCarousel();
+  const { tile, report, setCarouselInfo, disableAction } = useCarousel();
   const [favorite, setFavorite] = useState(tile.favorite || false);
   const [isOpenDelete, setIsOpenDelete] = useState(false);
   const images = useMemo(() => getImages([report]), [report]);
@@ -203,18 +198,15 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
   const changeImage = (image: any, newReport?: Report) => {
     setCarouselInfo({
       report: newReport || report,
-      tileInfo: {
-        tile: {
-          comment: image.label,
-          name: image.id,
-          type: '',
-          uri: image.url,
-          favorite: image.favorite,
-          isDeleted: image.isDeleted,
-          reason: '',
-          revised: image.revised
-        },
-        catIndex: 0
+      tile: {
+        comment: image.label,
+        name: image.id,
+        type: '',
+        uri: image.url,
+        favorite: image.favorite,
+        isDeleted: image.isDeleted,
+        reason: '',
+        revised: image.revised
       }
     });
   };

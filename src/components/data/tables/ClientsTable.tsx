@@ -5,7 +5,7 @@ import {
   useComercials,
   useDeleteClient,
   useUpdateClient
-} from '@/api/data';
+} from '@/hooks/api';
 import { LinearProgress, TableCrud } from '@/components/ui';
 
 const ClientsTable: FC = () => {

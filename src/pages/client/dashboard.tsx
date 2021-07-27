@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useClient, useMe } from '@/api/user';
+import { useClient, useMe } from '@/hooks/api';
 import { Page } from '@/typings/page';
-import { useBranches, useOFC } from '@/api/data';
-import { useFilters, useFilteredData } from '@/api/reports/filters';
+import { useBranches, useOFC, useFilteredData } from '@/hooks/api';
+import { useFilters } from '@/context/filters';
 import { ClientLayout } from '@/components/common/';
 import { makeStyles } from '@material-ui/core/styles';
 import { FavoritesReports } from '@/components/reports';

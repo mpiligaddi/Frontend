@@ -2,7 +2,7 @@
 import { useState, useEffect, FC } from 'react';
 import firebase from 'firebase/app';
 import { TableCrud, SuccessAlert } from '@/components/ui';
-import { useChains, useZones, useUpdateBranch } from '@/api/data';
+import { useChains, useZones, useUpdateBranch } from '@/hooks/api';
 import { Branch, Chain, Zone } from '@/lib/types';
 
 const BranchesTable: FC = () => {

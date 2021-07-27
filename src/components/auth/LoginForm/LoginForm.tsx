@@ -12,7 +12,7 @@ import { useRouter } from 'next/router';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import { GridItem, Button, GridContainer } from '@/components/ui';
-import { useLogin } from '@/api/auth';
+import { useLogin } from '@/hooks/api';
 
 import { useStyles } from './styles';
 

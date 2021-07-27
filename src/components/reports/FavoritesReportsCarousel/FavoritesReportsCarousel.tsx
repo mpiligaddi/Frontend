@@ -2,7 +2,7 @@ import React, { FC, useState, useEffect } from 'react';
 import Carousel from 'react-material-ui-carousel';
 
 import { getImages, FilteredImage } from '@/utils/images';
-import { useFilteredData } from '@/api/reports/filters/use-filtered-data';
+import { useFilteredData } from '@/hooks/api';
 
 import { useStyles } from './styles';
 

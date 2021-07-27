@@ -1,8 +1,8 @@
 import { useState, FC } from 'react';
-import { useFilters } from '@/api/reports/filters';
+import { useFilters } from '@/context/filters';
 import { styled, Theme } from '@material-ui/core/styles';
 import DeleteTile from '../Tile/DeleteTile';
-import { useDeleteTile, useAddFavorite } from '@/api/reports';
+import { useDeleteTile, useAddFavorite } from '@/hooks/api';
 import { useCarousel } from './CarouselProvider';
 
 const CarouselContainer = styled('div')({

@@ -1,9 +1,6 @@
 import { FC } from 'react';
-import { AccordionActions, Typography, Divider } from '@material-ui/core';
-import cn from 'classnames';
-import Pagination from '@material-ui/lab/Pagination';
-import { Card, CardBody, CardHeader } from '@/components/ui';
-import { useFilters } from '@/api/reports/filters';
+import { Divider } from '@material-ui/core';
+import { useFilters } from '@/context/filters';
 import FilterImages from '../FilterImages';
 
 import { useStyles } from './styles';

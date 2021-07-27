@@ -2,10 +2,9 @@ import { useState, useEffect, useCallback } from 'react';
 import { AdminLayout } from '@/components/common';
 import { FilterBar } from '@/components/reports';
 import { GridContainer, GridItem, CardData } from '@/components/ui';
-import { useMe } from '@/api/user';
-import { useFilters, useFilteredData } from '@/api/reports/filters';
+import { useMe, useFilteredData, useBranches, useOFC } from '@/hooks/api';
+import { useFilters } from '@/context/filters';
 import dynamic from 'next/dynamic';
-import { useBranches, useOFC } from '@/api/data';
 
 import shop from '@/assets/img/icon-shop.png';
 import visits from '@/assets/img/icon-visits.png';

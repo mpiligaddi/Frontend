@@ -3,8 +3,8 @@ import { useForm, useFieldArray, Controller } from 'react-hook-form';
 import { useRouter } from 'next/router';
 import { validations } from './validations';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { useCreateClient, CreateClientFields } from '@/api/data';
-import { useAdmins, useComercials } from '@/api/data';
+import { useCreateClient, CreateClientFields } from '@/hooks/api';
+import { useAdmins, useComercials } from '@/hooks/api';
 import {
   FormLabel,
   FormControlLabel,

@@ -4,14 +4,8 @@ import { Image, Report } from '@/lib/types';
 
 type State = {
   report: Report;
-  tileInfo: {
-    tile: Image;
-    catIndex: number;
-  };
-  setCarouselInfo({}: {
-    report: Report;
-    tileInfo: { tile: Image; catIndex: number };
-  }): void;
+  tile: Image;
+  setCarouselInfo({}: { report: Report; tile: Image }): void;
   disableAction?: boolean;
 };
 
@@ -26,24 +20,24 @@ const CarouselProvider: FC<{ disableAction?: boolean }> = ({
   const [isOpen, setIsOpen] = useState(false);
   const [carousel, setCarousel] = useState({
     report: {} as Report,
-    tileInfo: {} as { tile: Image; catIndex: number }
+    tile: {} as Image
   });
 
   const close = () => {
     setIsOpen(false);
-    setCarousel({ report: {} as Report, tileInfo: {} as any });
+    setCarousel({ report: {} as Report, tile: {} as Image });
   };
 
   const setCarouselInfo = ({
     report,
-    tileInfo
+    tile
   }: {
     report: Report;
-    tileInfo: { tile: Image; catIndex: number };
+    tile: Image;
   }) => {
     setCarousel(prev => ({
       report: report ?? prev.report,
-      tileInfo: tileInfo ?? prev.tileInfo
+      tile: tile ?? prev.tile
     }));
     setIsOpen(true);
   };
