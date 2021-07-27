@@ -9,3 +9,4 @@ export * from './supervisors';
 export * from './admin';
 export * from './comercials';
 export * from './use-filtered-data';
+export * from './format';

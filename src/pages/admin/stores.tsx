@@ -1,10 +1,11 @@
-// @material-ui/icons
 import { ListAlt } from '@material-ui/icons';
-// core components
-import { Page } from '@/typings/page.js';
+import { Page } from '@/typings';
 import { GridItem, GridContainer, Tabs } from '@/components/ui';
-// import GetBranches from './GetTables/GetBranches';
-import { ChainsTable, BranchesTable } from '@/components/data/tables';
+import {
+  ChainsTable,
+  BranchesTable,
+  FormatsTable
+} from '@/components/data/tables';
 import { AdminLayout } from '@/components/common';
 
 const Stores: Page = () => {
@@ -15,6 +16,11 @@ const Stores: Page = () => {
           headerColor="primary"
           plainTabs
           tabs={[
+            {
+              tabName: 'Formatos',
+              tabIcon: ListAlt,
+              tabContent: <FormatsTable />
+            },
             {
               tabName: 'Sucursales',
               tabIcon: ListAlt,

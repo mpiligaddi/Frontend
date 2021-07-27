@@ -61,6 +61,12 @@ export interface Zone {
   supervisorId: string;
 }
 
+export interface Format {
+  id: string;
+  name: string;
+  chain: string;
+}
+
 export interface Client {
   id?: string;
   CUIT: string;
