@@ -3,12 +3,14 @@ import {
   useFormats,
   useCreateFormat,
   useDeleteFormat,
-  useUpdateFormat
+  useUpdateFormat,
+  useChains
 } from '@/hooks/api';
 import { TableCrud } from '@/components/ui';
 
 const FormatsTable: FC = () => {
   const { isLoading, data } = useFormats();
+  const chains = useChains({ all: true });
   const createFormat = useCreateFormat();
   const deleteFormat = useDeleteFormat();
   const updateFormat = useUpdateFormat();
@@ -27,7 +29,14 @@ const FormatsTable: FC = () => {
         },
         {
           title: 'Cadena',
-          field: 'chain'
+          field: 'chain',
+          lookup: chains.data?.reduce(
+            (chains, chain) => ({
+              ...chains,
+              [chain.name.toUpperCase()]: chain.name.toUpperCase()
+            }),
+            {}
+          )
         }
       ]}
       data={data || []}
@@ -42,7 +51,7 @@ const FormatsTable: FC = () => {
           await updateFormat.mutateAsync(data);
         }
       }}
-      isLoading={isLoading}
+      isLoading={isLoading || chains.isLoading}
     />
   );
 };
