@@ -1,4 +1,4 @@
-import { FC, useMemo } from 'react';
+import { FC, useState, useEffect } from 'react';
 import {
   Select,
   MenuItem,
@@ -6,10 +6,12 @@ import {
   InputLabel,
   GridSize
 } from '@material-ui/core';
-import { GridItem, GridContainer } from '@/components/ui';
+import { GridItem, GridContainer, Button } from '@/components/ui';
 import { useFilters } from '@/context/filters';
 import { useFilteredData } from '@/hooks/api';
 import type { ChangeEvent } from '@/typings';
+import { CSVLink } from 'react-csv';
+import dayjs from 'dayjs';
 
 import { useStyles } from './styles';
 import { useSelectStyles } from '@/styles/select';
@@ -42,12 +44,36 @@ const FilterBar: FC<FilterBarProps> = ({
   size
 }) => {
   const classes = useStyles();
+  const [data, setData] = useState([] as any[]);
   const selectClasses = useSelectStyles();
-  const { setFilters, filters } = useFilters();
+  const { setFilters, filters, filteredReports } = useFilters();
   const { chains, categories, branches, clients } = useFilteredData({
     reported,
     revised
   });
+
+  useEffect(() => {
+    const reports: any[] = [];
+
+    filteredReports.forEach(report => {
+      report.categories?.forEach(category => {
+        category.images
+          ?.filter(image => !image.isDeleted)
+          ?.forEach(image => {
+            reports.push({
+              date: dayjs(report.createdAt.toDate()).format('DD/MM/YYYY'),
+              category: category.name,
+              image: image.uri,
+              chain: filters?.chain?.name,
+              branch: filters?.branch?.name,
+              comment: image.comment
+            });
+          });
+      });
+    });
+
+    setData(reports);
+  }, [filteredReports, filters]);
 
   const handleSelectClient = (event: ChangeEvent) => {
     setFilters(filters => ({
@@ -309,6 +335,51 @@ const FilterBar: FC<FilterBarProps> = ({
                 </FormControl>
               </GridItem>
             )}
+            <GridItem {...size}>
+              <p></p>
+              <p></p>
+              <Button fullWidth disabled={!filters?.chain || !filters?.branch}>
+                <CSVLink
+                  style={{
+                    color: '#FFF',
+                    width: '100%',
+                    height: '100%',
+                    textDecoration: 'none'
+                  }}
+                  filename={`Reportes-${dayjs().format('DD-MM-YYYY')}.csv`}
+                  headers={[
+                    {
+                      label: 'Fecha',
+                      key: 'date'
+                    },
+                    {
+                      label: 'Cadena',
+                      key: 'chain'
+                    },
+                    {
+                      label: 'Sucursal',
+                      key: 'branch'
+                    },
+                    {
+                      label: 'Categoria',
+                      key: 'category'
+                    },
+                    {
+                      label: 'Imagen',
+                      key: 'image'
+                    },
+                    {
+                      label: 'Comentario',
+                      key: 'comment'
+                    }
+                  ]}
+                  data={data}
+                  target="_blank"
+                >
+                  Exportar
+                </CSVLink>
+              </Button>
+            </GridItem>
           </GridContainer>
         </GridItem>
       </GridContainer>
