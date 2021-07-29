@@ -25,6 +25,7 @@ type FilterBarProps = {
   revised?: boolean;
   allChains?: boolean;
   withSpace?: boolean;
+  exportable?: boolean;
   size?: {
     xs: GridSize;
     sm: GridSize;
@@ -33,6 +34,7 @@ type FilterBarProps = {
 };
 
 const FilterBar: FC<FilterBarProps> = ({
+  exportable = false,
   client = false,
   chain = true,
   branch = true,
@@ -53,6 +55,8 @@ const FilterBar: FC<FilterBarProps> = ({
   });
 
   useEffect(() => {
+    if (!exportable) return;
+
     const reports: any[] = [];
 
     filteredReports.forEach(report => {
@@ -73,7 +77,7 @@ const FilterBar: FC<FilterBarProps> = ({
     });
 
     setData(reports);
-  }, [filteredReports, filters]);
+  }, [filteredReports, filters, exportable]);
 
   const handleSelectClient = (event: ChangeEvent) => {
     setFilters(filters => ({
@@ -335,51 +339,56 @@ const FilterBar: FC<FilterBarProps> = ({
                 </FormControl>
               </GridItem>
             )}
-            <GridItem {...size}>
-              <p></p>
-              <p></p>
-              <Button fullWidth disabled={!filters?.chain || !filters?.branch}>
-                <CSVLink
-                  style={{
-                    color: '#FFF',
-                    width: '100%',
-                    height: '100%',
-                    textDecoration: 'none'
-                  }}
-                  filename={`Reportes-${dayjs().format('DD-MM-YYYY')}.csv`}
-                  headers={[
-                    {
-                      label: 'Fecha',
-                      key: 'date'
-                    },
-                    {
-                      label: 'Cadena',
-                      key: 'chain'
-                    },
-                    {
-                      label: 'Sucursal',
-                      key: 'branch'
-                    },
-                    {
-                      label: 'Categoria',
-                      key: 'category'
-                    },
-                    {
-                      label: 'Imagen',
-                      key: 'image'
-                    },
-                    {
-                      label: 'Comentario',
-                      key: 'comment'
-                    }
-                  ]}
-                  data={data}
-                  target="_blank"
+            {exportable && (
+              <GridItem {...size}>
+                <p></p>
+                <p></p>
+                <Button
+                  fullWidth
+                  disabled={!filters?.chain || !filters?.branch}
                 >
-                  Exportar
-                </CSVLink>
-              </Button>
-            </GridItem>
+                  <CSVLink
+                    style={{
+                      color: '#FFF',
+                      width: '100%',
+                      height: '100%',
+                      textDecoration: 'none'
+                    }}
+                    filename={`Reportes-${dayjs().format('DD-MM-YYYY')}.csv`}
+                    headers={[
+                      {
+                        label: 'Fecha',
+                        key: 'date'
+                      },
+                      {
+                        label: 'Cadena',
+                        key: 'chain'
+                      },
+                      {
+                        label: 'Sucursal',
+                        key: 'branch'
+                      },
+                      {
+                        label: 'Categoria',
+                        key: 'category'
+                      },
+                      {
+                        label: 'Imagen',
+                        key: 'image'
+                      },
+                      {
+                        label: 'Comentario',
+                        key: 'comment'
+                      }
+                    ]}
+                    data={data}
+                    target="_blank"
+                  >
+                    Exportar
+                  </CSVLink>
+                </Button>
+              </GridItem>
+            )}
           </GridContainer>
         </GridItem>
       </GridContainer>

@@ -14,7 +14,7 @@ import { useClient } from '@/hooks/api';
 import { UseQueryResult } from 'react-query';
 import { Branch, Category, Chain, Report, Client } from '@/lib/types';
 
-interface Filters {
+export interface Filters {
   client?: Client;
   branch?: Branch;
   chain?: Chain;

@@ -3,7 +3,7 @@ import MaterialTable, {
   Column,
   Components
 } from 'material-table';
-import { format } from 'date-fns';
+import dayjs from 'dayjs';
 
 type TableCrudProps<T extends object = any> = {
   data: T[];
@@ -28,7 +28,7 @@ const TableCrud = <T extends object = any>(props: TableCrudProps<T>) => {
         components={components}
         options={{
           exportButton: true,
-          exportFileName: `${title}_${format(new Date(), 'dd-mm-yyyy')}`,
+          exportFileName: `${title}_${dayjs().format('DD-MM-YYYY')}`,
           addRowPosition: 'first',
           exportAllData: true,
           actionsColumnIndex: -1,

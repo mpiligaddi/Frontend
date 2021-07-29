@@ -1,6 +1,6 @@
 import { FC } from 'react';
 import MaterialTable, { Column } from 'material-table';
-import { format } from 'date-fns';
+import dayjs from 'dayjs';
 
 type TableDashboardProps = {
   columns: Column<any>[];
@@ -17,7 +17,7 @@ const TableDashboard: FC<TableDashboardProps> = ({ columns, data, title }) => {
         columns={columns}
         options={{
           exportButton: true,
-          exportFileName: `${title}_${format(new Date(), 'dd-mm-yyyy')}`,
+          exportFileName: `${title}_${dayjs().format('DD-MM-YYYY')}`,
           exportAllData: true,
           actionsColumnIndex: -1,
           filtering: true,

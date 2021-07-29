@@ -2,7 +2,8 @@ import { GridContainer, GridItem, Tabs, ComingSoon } from '@/components/ui';
 import { Page } from '@/typings';
 import { ListAlt } from '@material-ui/icons';
 import { AdminLayout } from '@/components/common';
-import { CategoriesTable } from '@/components/data/tables';
+
+import { CategoriesTable, ProductsTable } from '@/components/data/tables';
 
 const Content = ({ type }: { type: string }) => (
   <ComingSoon
@@ -26,7 +27,7 @@ const Products: Page = () => {
             {
               tabName: 'SKU',
               tabIcon: ListAlt,
-              tabContent: <Content type="los productos" />
+              tabContent: <ProductsTable />
             },
             {
               tabName: 'Quiebre',

@@ -1,7 +1,7 @@
 /*eslint-disable*/
-import React, {useState} from "react";
+import React, { useState } from 'react';
 
-import defaultImage from "../../assets/img/default-avatar.png";
+import defaultImage from '../../assets/img/default-avatar.png';
 
 export default function PictureUpload() {
   const [file, setFile] = useState(null);

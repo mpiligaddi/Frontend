@@ -61,6 +61,13 @@ export interface Zone {
   supervisorId: string;
 }
 
+export interface Product {
+  id: number;
+  chain: string;
+  category: string;
+  description: string;
+}
+
 export interface Format {
   id: string;
   name: string;

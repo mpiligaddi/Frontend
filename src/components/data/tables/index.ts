@@ -4,3 +4,4 @@ export { default as BranchesTable } from './BranchesTable';
 export { default as CoveragesTable } from './CoveragesTable';
 export { default as CategoriesTable } from './CategoriesTable';
 export { default as FormatsTable } from './FormatsTable';
+export { default as ProductsTable } from './ProductsTable';

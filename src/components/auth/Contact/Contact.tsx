@@ -2,7 +2,7 @@ import { useState, FC } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import 'yup-phone';
+import 'yup-phone-lite';
 import { useContact } from '@/hooks/api';
 
 import { Dialog, DialogContent, DialogTitle } from '@material-ui/core';
@@ -43,7 +43,7 @@ const Contact: FC<ContactProps> = ({ close, isOpen = false }) => {
         phone: yup
           .string()
           .required('Campo obligatorio')
-          .phone('Numero invalido.'),
+          .phone(undefined, 'Numero invalido'),
         message: yup.string()
       })
     ),

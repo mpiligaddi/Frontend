@@ -19,6 +19,7 @@ const Revision: Page = () => {
 
       {filtersVisible && (
         <FilterBar
+          exportable
           size={{
             xs: 12,
             sm: 6,

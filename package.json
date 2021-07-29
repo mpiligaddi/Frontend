@@ -17,7 +17,6 @@
     "@material-ui/lab": "^4.0.0-alpha.58",
     "chart.js": "^3.4.1",
     "classnames": "^2.3.1",
-    "date-fns": "^2.22.1",
     "dayjs": "^1.10.6",
     "firebase": "^8.6.8",
     "material-table": "^1.69.3",
@@ -35,11 +34,10 @@
     "react-hook-form": "^7.9.0",
     "react-material-ui-carousel": "^2.2.6",
     "react-multi-carousel": "^2.6.3",
-    "react-perfect-scrollbar": "^1.5.8",
     "react-query": "^3.17.2",
     "sass": "^1.35.1",
     "yup": "^0.32.9",
-    "yup-phone": "^1.2.19"
+    "yup-phone-lite": "^1.0.4"
   },
   "devDependencies": {
     "@next/bundle-analyzer": "^11.0.1",
