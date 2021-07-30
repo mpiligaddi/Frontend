@@ -23,7 +23,14 @@ const ProductsTable: FC = () => {
       columns={[
         {
           title: 'Cadena',
-          field: 'chain'
+          field: 'chain',
+          lookup: chains.data?.reduce(
+            (chains, chain) => ({
+              ...chains,
+              [chain.name.toUpperCase()]: chain.name
+            }),
+            {}
+          )
         },
         {
           title: 'Categoria',
@@ -31,18 +38,7 @@ const ProductsTable: FC = () => {
           lookup: categories.data?.reduce(
             (categories, category) => ({
               ...categories,
-              [category.name.toUpperCase()]: category.name.toUpperCase()
-            }),
-            {}
-          )
-        },
-        {
-          title: 'Cadena',
-          field: 'chain',
-          lookup: chains.data?.reduce(
-            (chains, chain) => ({
-              ...chains,
-              [chain.name.toUpperCase()]: chain.name.toUpperCase()
+              [category.name.toUpperCase()]: category.name
             }),
             {}
           )

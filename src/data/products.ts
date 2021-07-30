@@ -253,6 +253,4 @@ const products = [
   }
 ];
 
-console.log(products.map((product, id) => ({ ...product, id })));
-
 export default products;
