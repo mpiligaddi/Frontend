@@ -1,7 +1,17 @@
 import { useQuery } from 'react-query';
-import admins from '@/data/admins';
-import { Admin } from '@/lib/types';
+import { client } from '@/lib/axios';
+import { User } from '@/lib/types';
+
+const getAdmins = async () => {
+  const res = await client.get<{ user: User[] }>('/api/users', {
+    params: {
+      role: 'backoffice'
+    }
+  });
+
+  return res.data.user;
+};
 
 export const useAdmins = () => {
-  return useQuery('admins', () => admins as Admin[]);
+  return useQuery('admins', getAdmins);
 };

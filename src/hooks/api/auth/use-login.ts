@@ -1,7 +1,7 @@
 import { useMutation } from 'react-query';
-import firebase from 'firebase/app';
 import { User } from '@/lib/types';
 import { useQueryClient } from 'react-query';
+import { client } from '@/lib/axios';
 
 type Data = {
   email: string;
@@ -17,26 +17,21 @@ export const useLogin = () => {
     remember,
     password
   }: Data): Promise<User | null> => {
-    const persistence = remember
-      ? firebase.auth.Auth.Persistence.LOCAL
-      : firebase.auth.Auth.Persistence.SESSION;
+    const { data } = await client.post<{ user: User }>(
+      '/auth/login',
+      {
+        email,
+        password,
+        remember: true
+      },
+      {
+        withCredentials: true
+      }
+    );
 
-    await firebase.auth().setPersistence(persistence);
+    console.log(data);
 
-    const { user } = await firebase
-      .auth()
-      .signInWithEmailAndPassword(email, password);
-
-    const userDoc = await firebase
-      .firestore()
-      .collection('users')
-      .doc(user!.uid)
-      .get();
-
-    if (!userDoc.exists) return null;
-    const userData = userDoc.data() as User;
-
-    return userData;
+    return data.user;
   };
 
   return useMutation(login, {

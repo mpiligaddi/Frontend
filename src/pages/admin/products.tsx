@@ -4,6 +4,7 @@ import { ListAlt } from '@material-ui/icons';
 import { AdminLayout } from '@/components/common';
 
 import { CategoriesTable, ProductsTable } from '@/components/data/tables';
+import { ensureAuth } from '@/lib/auth';
 
 const Content = ({ type }: { type: string }) => (
   <ComingSoon
@@ -47,5 +48,7 @@ const Products: Page = () => {
 };
 
 Products.Layout = AdminLayout;
+
+export const getServerSideProps = ensureAuth('backoffice');
 
 export default Products;

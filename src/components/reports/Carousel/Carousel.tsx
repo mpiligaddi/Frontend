@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { useCarousel } from './CarouselProvider';
 import { useFilters } from '@/context/filters';
 import cn from 'classnames';
-import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import MultiCarousel from 'react-multi-carousel';
 import { getImages } from '@/utils/images';
 import { useAddFavorite, useDeleteTile } from '@/hooks/api';
@@ -21,10 +21,6 @@ import { IconButton } from '@material-ui/core';
 import dayjs from 'dayjs';
 import { primaryColor } from '@/utils/styles';
 import { Report } from '@/lib/types';
-
-const EditMode = dynamic(() => import('./EditMode'), {
-  ssr: false
-});
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -75,19 +71,34 @@ const useStyles = makeStyles(theme => ({
     borderLeft: '1px solid #ccc'
   },
   imageContainer: {
+    position: 'relative',
     padding: '10px',
     width: '100%',
     height: '90%',
     display: 'flex',
-    position: 'relative',
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center'
   },
   image: {
-    maxWidth: '100%',
+    inset: 0,
+    margin: '10px',
+    maxWidth: '100% * 3/4',
     height: '100%',
-    boxShadow: `0px 7.76336px 32.3056px rgba(0, 0, 0, 0.035), 0px 4.12306px 17.1573px rgba(0, 0, 0, 0.0282725), 0px 1.7157px 7.13952px rgba(0, 0, 0, 0.0196802)`
+    boxShadow: `0px 7.76336px 32.3056px rgba(0, 0, 0, 0.035), 0px 4.12306px 17.1573px rgba(0, 0, 0, 0.0282725), 0px 1.7157px 7.13952px rgba(0, 0, 0, 0.0196802)`,
+
+    '& div': {
+      position: 'static !important',
+      height: '100% !important',
+      maxWidth: '100% * 3/4 !important',
+
+      '& img': {
+        width: '100% !important',
+        position: 'static !important',
+        height: '100% !important',
+        maxWidth: '100% !important'
+      }
+    }
   },
   footer: {
     padding: '10px',
@@ -200,19 +211,21 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
       report: newReport || report,
       tile: {
         comment: image.label,
-        name: image.id,
+        name: image.url,
         type: '',
         uri: image.url,
         favorite: image.favorite,
-        isDeleted: image.isDeleted,
-        reason: '',
-        revised: image.revised
+        delete: image.delete,
+        deleteReason: '',
+        revised: image.revised,
+        id: image.id,
+        photoReportId: ''
       }
     });
   };
 
   const nextImage = (newReport?: Report) => {
-    const index = images.findIndex(image => image.id === tile.name);
+    const index = images.findIndex(image => image.id === tile.id);
 
     if (images.length === index + 1) {
       changeImage(images[0], newReport);
@@ -226,7 +239,7 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
   };
 
   const backImage = () => {
-    const index = images.findIndex(image => image.id === tile.name);
+    const index = images.findIndex(image => image.id === tile.id);
 
     if (index === 0) {
       changeImage(images[images.length - 1]);
@@ -238,31 +251,20 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
     carouselRef.current?.previous(1);
   };
 
-  const handleFavorite = () => {
-    addFavorite.mutate({
-      report,
-      tile,
-      favorite
+  const handleFavorite = async () => {
+    await addFavorite.mutateAsync({
+      imageId: tile.id,
+      favorite: !favorite
     });
 
     setFavorite(!favorite);
   };
 
   const handleDelete = async (reason: string) => {
-    const { categories, report: newReport } = await deleteTile.mutateAsync({
+    await deleteTile.mutateAsync({
       reason,
-      report,
-      tile
+      imageId: tile.id
     });
-
-    if (images.length > 1) {
-      nextImage({
-        ...newReport,
-        categories
-      });
-
-      return;
-    }
 
     close();
   };
@@ -285,7 +287,18 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
 
         <div className={classes.body}>
           <div className={classes.imageContainer}>
-            <img className={classes.image} src={tile.uri} alt={tile.name} />
+            {/* <img
+              src={`http://e.undervolt.io:3000/assets/${report.creatorId}/${report.id}/${tile.name}`}
+              alt={tile.name}
+              className={classes.image}
+            /> */}
+            <div className={classes.image}>
+              <Image
+                layout="fill"
+                src={`http://e.undervolt.io:3000/assets/${report.creatorId}/${report.id}/${tile.name}`}
+                alt={tile.name}
+              />
+            </div>
             {!disableAction && (
               <div>
                 <IconButton
@@ -331,7 +344,7 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
             <p>
               Fecha:{' '}
               <span className={classes.data}>
-                {dayjs(report.createdAt.toDate()).format('DD-MM-YYYY')}
+                {dayjs(report.createdAt).format('DD-MM-YYYY')}
               </span>
             </p>
             <p>
@@ -349,7 +362,7 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
             <p>
               Categoria:{' '}
               <span className={classes.data}>
-                {images.find(image => tile.name === image.id)?.categoryName}
+                {images.find(image => tile.id === image.id)?.categoryName}
               </span>
             </p>
 
@@ -373,16 +386,21 @@ const Carousel: FC<CarouselProps> = ({ close }) => {
             itemClass={classes.itemCarousel}
           >
             {images.map(image => (
-              <img
+              <div
                 key={image.id}
-                onClick={() => changeImage(image)}
-                draggable="false"
                 className={cn(classes.imageCarousel, {
-                  [classes.nonSelectedImage]: tile.name !== image.id
+                  [classes.nonSelectedImage]: tile.id !== image.id
                 })}
-                src={image.url}
-                alt={image.label}
-              />
+              >
+                <Image
+                  onClick={() => changeImage(image)}
+                  draggable="false"
+                  objectFit="cover"
+                  src={`http://e.undervolt.io:3000/assets/${report.creatorId}/${report.id}/${image.url}`}
+                  layout="fill"
+                  alt={image.label}
+                />
+              </div>
             ))}
           </MultiCarousel>
         </div>

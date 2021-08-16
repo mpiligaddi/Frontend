@@ -1,5 +1,4 @@
 import { useMutation } from 'react-query';
-import firebase from 'firebase/app';
 
 type Data = {
   email: string;
@@ -9,7 +8,5 @@ type Data = {
 };
 
 export const useContact = () => {
-  return useMutation((data: Data) =>
-    firebase.firestore().collection('contact').add(data)
-  );
+  return useMutation(async (data: Data) => {});
 };

@@ -4,6 +4,7 @@ import { AdminLayout } from '@/components/common';
 import { GridContainer, GridItem, Tabs } from '@/components/ui';
 import { Page } from '@/typings';
 import { ListAlt, AddCircle } from '@material-ui/icons';
+import { ensureAuth } from '@/lib/auth';
 
 const Clients: Page = () => {
   return (
@@ -31,5 +32,7 @@ const Clients: Page = () => {
 };
 
 Clients.Layout = AdminLayout;
+
+export const getServerSideProps = ensureAuth('backoffice');
 
 export default Clients;

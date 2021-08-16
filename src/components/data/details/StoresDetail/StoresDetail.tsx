@@ -1,95 +1,153 @@
-import { useState, useEffect, FC, useCallback } from 'react';
+import { useState, useEffect, FC, useCallback, useMemo } from 'react';
 import { GridContainer, GridItem, TableDashboard } from '@/components/ui';
 import Link from '@material-ui/core/Link';
 import { useRouter } from 'next/router';
 import { useFilters } from '@/context/filters';
-import { useZones, useFilteredData } from '@/hooks/api';
+import { useZones, useFilteredData, useChains } from '@/hooks/api';
 import { primaryBackgroundText } from '@/utils/styles';
+import dayjs from 'dayjs';
 import { useStyles } from './styles';
-import frequency from '@/utils/frequency';
-
-const columnsByChain = [
-  {
-    title: 'Sucursal',
-    field: 'branch'
-  },
-  {
-    title: 'Fecha de último reporte',
-    field: 'lastReport'
-  },
-  {
-    title: 'Zona',
-    field: 'zone'
-  },
-  {
-    title: 'Reporte Completo',
-    field: 'isComplete'
-  }
-];
-
-const columnsByClient = [
-  {
-    title: 'Cadena',
-    field: 'chain'
-  },
-  ...columnsByChain
-];
+import { Report } from '@/lib/types';
 
 const StoresDetail: FC = () => {
   const router = useRouter();
   const { filters, filteredReports } = useFilters();
   const classes = useStyles();
-  const { branches, reports, chains } = useFilteredData();
+  const chains = useChains({ all: true });
+  const { branches, reports } = useFilteredData();
 
   const [data, setData] = useState([]);
   const { data: zones } = useZones();
 
   const getData = useCallback(() => {
     if (filters?.chain) {
-      const data = filteredReports.map(r => {
+      const data = filteredReports.reduce((reports: any[], r: Report) => {
+        const existReport = reports.find(
+          report => report.branchId === r.branchId
+        ) as Report;
+
+        if (existReport && dayjs(existReport.createdAt).isBefore(r.createdAt)) {
+          const index = reports.indexOf(existReport);
+          reports[index] = {
+            branchId: r.branchId,
+            createdAt: dayjs(r.createdAt).format('DD/MM/YYYY HH:mm A'),
+            zone: zones?.filter(
+              z =>
+                z.id ==
+                branches.data?.filter(b => b.id == r.branchId)[0]?.zoneId
+            )[0]?.name,
+            isComplete: r.isComplete ? 'SI' : 'NO'
+          };
+
+          return reports;
+        }
+
         const report = {
-          branch: branches.data?.filter(b => b.ID == r.branchId)[0]?.name,
-          lastReport: r.createdAt.toDate().toLocaleString(),
+          chainId: r.chainId,
+          branchId: r.branchId,
+          createdAt: dayjs(r.createdAt).format('DD/MM/YYYY HH:mm A'),
           zone: zones?.filter(
             z =>
-              z.ID == branches.data?.filter(b => b.ID == r.branchId)[0]?.zoneId
+              z.id == branches.data?.filter(b => b.id == r.branchId)[0]?.zoneId
           )[0]?.name,
           isComplete: r.isComplete ? 'SI' : 'NO'
         };
 
-        return report;
-      });
+        return [...reports, report];
+      }, []);
 
       setData(data as any);
       return;
     }
 
-    const data = reports.data?.map(report => ({
-      chain: chains.data?.filter(c => c.ID == report.branchId.substr(0, 3))[0]
-        ?.name,
-      branch: branches.data?.filter(b => b.ID == report.branchId)[0]?.name,
-      lastReport: report.createdAt.toDate().toLocaleString(),
-      zone: zones?.filter(
-        z =>
-          z.ID == branches.data?.filter(b => b.ID == report.branchId)[0]?.zoneId
-      )[0]?.name,
+    const data = reports.data?.reduce((reports: any[], r: Report) => {
+      const existReport = reports.find(
+        report => report.branchId === r.branchId
+      ) as Report;
 
-      isComplete: report.isComplete ? 'SI' : 'NO'
-    }));
+      if (existReport) {
+        if (dayjs(existReport.createdAt).isBefore(r.createdAt)) {
+          const index = reports.indexOf(existReport);
+          reports[index] = {
+            chainId: r.chainId,
+            branchId: r.branchId,
+            createdAt: dayjs(r.createdAt).format('DD/MM/YYYY HH:mm A'),
+            zone: zones?.filter(
+              z =>
+                z.id ==
+                branches.data?.filter(b => b.id == r.branchId)[0]?.zoneId
+            )[0]?.name,
+            isComplete: r.isComplete ? 'SI' : 'NO'
+          };
+
+          return reports;
+        }
+
+        return reports;
+      }
+
+      const report = {
+        chainId: r.chainId,
+        branchId: r.branchId,
+        createdAt: dayjs(r.createdAt).format('DD/MM/YYYY HH:mm A'),
+        zone: zones?.filter(
+          z => z.id == branches.data?.filter(b => b.id == r.branchId)[0]?.zoneId
+        )[0]?.name,
+        isComplete: r.isComplete ? 'SI' : 'NO'
+      };
+
+      return [...reports, report];
+    }, []);
 
     setData(data as any);
-  }, [
-    branches.data,
-    filters,
-    chains.data,
-    filteredReports,
-    zones,
-    reports.data
-  ]);
+  }, [branches.data, filters, filteredReports, zones, reports.data]);
 
   useEffect(() => {
     getData();
   }, [filters, getData]);
+
+  const columnsByChain = useMemo(
+    () => [
+      {
+        title: 'Sucursal',
+        field: 'branchId',
+        lookup: branches.data?.reduce(
+          (branches, branch) => ({
+            ...branches,
+            [branch.id]: branch.name
+          }),
+          {}
+        )
+      },
+      {
+        title: 'Fecha de último reporte',
+        field: 'createdAt'
+      },
+      {
+        title: 'Zona',
+        field: 'zone'
+      }
+    ],
+    [branches.data]
+  );
+
+  const columnsByClient = useMemo(
+    () => [
+      {
+        title: 'Cadena',
+        field: 'chainId',
+        lookup: chains.data?.reduce(
+          (chains, chain) => ({
+            ...chains,
+            [chain.id]: chain.name
+          }),
+          {}
+        )
+      },
+      ...columnsByChain
+    ],
+    [columnsByChain, chains.data]
+  );
 
   return (
     <>
@@ -106,7 +164,11 @@ const StoresDetail: FC = () => {
             <p>
               Período de reporte fotográfico acordado:{' '}
               <span style={primaryBackgroundText}>
-                {frequency[filters?.client?.periodReportId!]}
+                {
+                  filters?.client?.periods?.find(
+                    ({ period }) => period.type.alias === 'F'
+                  )?.period.alias
+                }
               </span>
             </p>
           </div>
@@ -117,8 +179,13 @@ const StoresDetail: FC = () => {
               {'  '}
               <span style={primaryBackgroundText}>
                 {filters?.chain
-                  ? `${filteredReports.length} (de ${branches.data?.length} totales)`
-                  : `${reports.data?.length} (de ${branches.data?.length} totales)`}
+                  ? `${
+                      new Set(filteredReports.map(report => report.branchId))
+                        .size
+                    } (de ${branches.data?.length} totales)`
+                  : `${
+                      new Set(reports.data?.map(report => report.branchId)).size
+                    } (de ${branches.data?.length} totales)`}
               </span>
             </p>
           </div>

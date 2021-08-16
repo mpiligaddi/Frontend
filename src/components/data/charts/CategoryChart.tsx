@@ -34,7 +34,6 @@ const CategoryChart: FC<CategoryChartProps> = ({ labels, values, title }) => {
         data={data}
         width={50}
         height={75}
-        title={title}
         options={{
           responsive: true,
           layout: {

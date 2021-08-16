@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import { useState, useEffect, FC, useMemo } from 'react';
 import { TableCrud, SuccessAlert } from '@/components/ui';
 import { Filters } from '@/context/filters';
@@ -10,7 +9,6 @@ import {
   useCreateCoverage,
   useDeleteCoverage
 } from '@/hooks/api';
-import frequencyString from '@/utils/frequency';
 import { TextField } from '@material-ui/core';
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import { Branch, Chain, Client } from '@/lib/types';
@@ -32,11 +30,11 @@ const CoveragesTable: FC = () => {
   const [branch, setBranch] = useState<Branch | null>(null);
   const [filters, setFilters] = useState<Filters>({});
   const chains = useChains({
-    clientId: client?.ID
+    clientId: client?.id
   });
   const branches = useBranches({
-    chain: chain?.ID,
-    clientId: +client?.ID!
+    chain: chain?.id,
+    clientId: client?.id!
   });
   const allChains = useChains({ all: true });
   const allBranches = useBranches({ all: true });
@@ -51,20 +49,18 @@ const CoveragesTable: FC = () => {
     try {
       setLoading(true);
       const data = coverages.data?.map(coverage => {
-        const client = allClients.data?.find(c => +c.ID === coverage.clientId);
+        const client = allClients.data?.find(c => c.id === coverage.clientId);
 
-        const periodReport = client?.periodReportId
-          ? frequencyString[client?.periodReportId]
-          : 'No Definido';
+        const periodReport =
+          client?.periods?.find(({ period }) => period.type.alias === 'F')
+            ?.period.name || 'No definido';
 
         return {
           client,
-          chain: allChains.data?.find(
-            ch => ch.ID == coverage.branchId.substr(0, 3)
-          ),
-          branch: allBranches.data?.find(b => b.ID == coverage.branchId),
+          chain: coverage.branch.chain,
+          branch: allBranches.data?.find(b => b.id == coverage.branchId),
           intensity: coverage.intensity,
-          frequency: coverage.frequency,
+          frequency: coverage.frecuency,
           periodReport,
           id: coverage.id
         };
@@ -254,41 +250,16 @@ const CoveragesTable: FC = () => {
             ]}
             isLoading={loading}
             editable={{
-              async onRowAdd(data: any) {
-                createCoverage.mutate({
-                  branchId: data.branch.ID,
-                  clientId: data.client.ID,
+              async onRowAdd(data) {
+                await createCoverage.mutateAsync({
+                  branchId: data.branch?.id!,
+                  clientId: data.client?.id!,
                   frequency: data.frequency,
                   intensity: data.intensity
                 });
               },
-              // async onRowUpdate(data) {
-              //   console.log(data);
-              // },
-              // onRowUpdate: (newData, oldData) =>
-              //   new Promise((resolve) => {
-              //       firebase.db
-              //         .collection('coverages')
-              //         .doc(`${oldData.id}`)
-              //         .set({
-              //           clientId: newData.client,
-              //           chainId: newData.chain,
-              //           branchId: newData.branch,
-              //           frequency: newData.frequency,
-              //           intensity: newData.intensity,
-              //           periodReport: newData.periodReport,
-              //         })
-              //         .then(function () {
-              //           console.log('Document successfully written!');
-              //           refreshCoverages();
-              //         })
-              //         .catch(function (error) {
-              //           console.error('Error writing document: ', error);
-              //         });
-              //       resolve();
-              //   }),
               async onRowDelete({ id }) {
-                deleteCoverage.mutate(id);
+                await deleteCoverage.mutateAsync(id);
               }
             }}
           />

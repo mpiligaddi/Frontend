@@ -1,83 +1,84 @@
 import { useMemo } from 'react';
 import { useQuery, UseQueryOptions } from 'react-query';
-import { Branch, Report } from '@/lib/types';
-import { useCoverages } from '..';
-import branchesJson from '@/data/branches';
+import { Branch } from '@/lib/types';
+import { client } from '@/lib/axios';
 
 interface Config {
   chain?: string;
   reported?: boolean;
   revised?: boolean;
-  reports?: Report[];
   all?: boolean;
-  clientId?: number;
+  clientId?: string;
   options?: UseQueryOptions<Branch[]>;
 }
 
-export const useBranches = ({
+const getBranches = async ({
+  all,
   chain,
-  reported,
-  revised,
-  reports,
   clientId,
-  options,
-  all
-}: Config) => {
-  const coverages = useCoverages();
-  const key = useMemo(
-    () =>
-      all
-        ? { all }
-        : { chain, reported, clientId, reports: reports?.length, revised },
-    [all, reported, clientId, chain, reports, revised]
-  );
-
-  const getBranches = async (): Promise<Branch[]> => {
-    if (all) {
-      return branchesJson;
-    }
-
-    const clientCoverages = coverages.data?.filter(
-      coverage => coverage.clientId === clientId
-    );
-    const branchesIds = clientCoverages?.map(c => c.branchId);
-
-    let branches: Branch[] = [];
-
-    branchesJson.forEach(b => {
-      if (branchesIds?.includes(b.ID)) {
-        branches.push(b);
+  reported,
+  revised
+}: Config): Promise<Branch[]> => {
+  if (all) {
+    const res = await client.get<{ branches: Branch[] }>('/api/branches', {
+      params: {
+        reports: reported ? (revised ? 'revised' : 'only') : undefined
       }
     });
 
-    if (!chain) return branches;
+    return res.data.branches;
+  }
 
-    if (chain) {
-      branches = branches.filter(branch => branch.chainId === chain);
+  if (!chain && clientId) {
+    const res = await client.get<{ branches: Branch[] }>('/api/branches', {
+      params: {
+        clientId,
+        reports: reported ? (revised ? 'revised' : 'only') : undefined
+      }
+    });
+
+    return res.data.branches;
+  }
+
+  if (chain && clientId) {
+    const res = await client.get<{ branches: Branch[] }>(`/api/branches`, {
+      params: {
+        bychain: chain,
+        clientId,
+        reports: reported ? (revised ? 'revised' : 'only') : undefined
+      }
+    });
+
+    if (reported) {
+      return res.data.branches.filter(branch => branch.reports.length > 1);
     }
 
-    if (!reported) return branches;
+    return res.data.branches;
+  }
 
-    let reportsBranchsIds: string[];
+  return [];
+};
 
-    if (revised) {
-      reportsBranchsIds = reports!
-        .filter(report => report.revised)
-        .map(report => report.branchId);
-    } else {
-      reportsBranchsIds = reports!.map(report => report.branchId);
+export const useBranches = ({
+  clientId,
+  reported = false,
+  revised = false,
+  chain,
+  all,
+  options
+}: Config) => {
+  const key = useMemo(
+    () => (all ? { all } : { clientId, reported, revised, chain }),
+    [clientId, reported, revised, chain, all]
+  );
+
+  return useQuery(
+    ['branches', key],
+    () => getBranches({ clientId, reported, revised, chain, all }),
+    {
+      enabled: all || !!clientId || (!!chain && !!clientId),
+      keepPreviousData: true,
+      ...options
     }
-
-    const onlyWithReports = branches.filter(branch =>
-      reportsBranchsIds.includes(branch.ID)
-    );
-
-    return onlyWithReports;
-  };
-
-  return useQuery(['branches', key], getBranches, {
-    enabled: all ? true : false || !coverages.isLoading,
-    keepPreviousData: true,
-    ...options
-  });
+  );
 };

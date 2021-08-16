@@ -1,47 +1,34 @@
 import { Coverage } from '@/lib/types';
-import firebase from 'firebase';
+import { client } from '@/lib/axios';
 import { useQueryClient, useMutation } from 'react-query';
 
 type Data = {
-  clientId: number;
+  clientId: string;
   branchId: string;
   intensity: number;
   frequency: number;
 };
 
+const createCoverage = async ({
+  clientId,
+  branchId,
+  intensity,
+  frequency
+}: Data) => {
+  await client.post('/api/coverages', {
+    client: clientId,
+    branch: branchId,
+    frecuency: frequency,
+    intensity
+  });
+};
+
 export const useCreateCoverage = () => {
   const queryClient = useQueryClient();
 
-  const createCoverage = async ({
-    clientId,
-    branchId,
-    intensity,
-    frequency
-  }: Data) => {
-    const coverage: Omit<Coverage, 'id'> = {
-      clientId,
-      branchId,
-      intensity,
-      frequency
-    };
-
-    const ref = await firebase
-      .firestore()
-      .collection('coverages')
-      .add(coverage);
-
-    return {
-      ...coverage,
-      id: ref.id
-    };
-  };
-
   return useMutation(createCoverage, {
-    onSuccess(coverage) {
-      queryClient.setQueryData<Coverage[]>('coverages', data => [
-        ...(data || []),
-        coverage
-      ]);
+    async onSuccess(coverage) {
+      await queryClient.refetchQueries('coverages');
     }
   });
 };

@@ -27,7 +27,10 @@ const TableCrud = <T extends object = any>(props: TableCrudProps<T>) => {
         editable={editable}
         components={components}
         options={{
-          exportButton: true,
+          exportButton: {
+            csv: true,
+            pdf: false
+          },
           exportFileName: `${title}_${dayjs().format('DD-MM-YYYY')}`,
           addRowPosition: 'first',
           exportAllData: true,

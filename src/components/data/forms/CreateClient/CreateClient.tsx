@@ -31,7 +31,6 @@ const CreateClient: FC = () => {
   const { data: comercials } = useComercials();
 
   const {
-    watch,
     formState: { errors },
     register,
     setValue,
@@ -47,8 +46,8 @@ const CreateClient: FC = () => {
   });
 
   useEffect(() => {
-    register('adminId');
-    register('comercialId');
+    register('admin');
+    register('comercial');
   }, [register]);
 
   return (
@@ -76,7 +75,7 @@ const CreateClient: FC = () => {
                       required
                       errors={errors}
                       fullWidth
-                      {...register('companyName')}
+                      {...register('displayname')}
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={4}>
@@ -86,43 +85,6 @@ const CreateClient: FC = () => {
                       errors={errors}
                       fullWidth
                       {...register('name')}
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={2}>
-                    <Input
-                      labelText="Identificador"
-                      required
-                      {...register('ID')}
-                      fullWidth
-                      errors={errors}
-                    />
-                  </GridItem>
-                </GridContainer>
-
-                <GridContainer>
-                  <GridItem xs={12} sm={12} md={6}>
-                    <Input
-                      labelText="Email"
-                      errors={errors}
-                      fullWidth
-                      {...register('email')}
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
-                    <Input
-                      labelText="Teléfono"
-                      {...register('phone')}
-                      fullWidth
-                      errors={errors}
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={3}>
-                    <Input
-                      labelText="CUIT"
-                      required
-                      fullWidth
-                      errors={errors}
-                      {...register('CUIT')}
                     />
                   </GridItem>
                 </GridContainer>
@@ -136,18 +98,10 @@ const CreateClient: FC = () => {
                     />
                   </GridItem>
                   <GridItem xs={12} sm={12} md={6}>
-                    <Input
-                      labelText="Nombre de contacto"
-                      fullWidth
-                      {...register('contactName')}
-                      errors={errors}
-                    />
-                  </GridItem>
-                  <GridItem xs={12} sm={12} md={6}>
                     <Autocomplete
                       //disabled
                       size="small"
-                      id="adminId"
+                      id="admin"
                       getOptionSelected={(option, value) =>
                         option.name === value.name
                       }
@@ -155,14 +109,14 @@ const CreateClient: FC = () => {
                       //defaultValue={admins.filter(adm => adm.ID === adminID)[0]}
                       options={admins!}
                       openOnFocus
-                      onChange={(e, value) => setValue('adminId', value?.ID)}
+                      onChange={(e, value) => setValue('admin', value?.id)}
                       renderInput={params => (
                         <TextField
                           {...params}
                           label="Back Office"
                           margin="normal"
-                          helperText={errors?.adminId?.message}
-                          error={Boolean(errors?.adminId)}
+                          helperText={errors?.admin?.message}
+                          error={Boolean(errors?.admin)}
                         />
                       )}
                     />
@@ -170,79 +124,23 @@ const CreateClient: FC = () => {
                   <GridItem xs={12} sm={12} md={6}>
                     <Autocomplete
                       size="small"
-                      id="comercialId"
+                      id="comercial"
                       options={comercials!}
                       getOptionSelected={(option, value) =>
                         option.name === value.name
                       }
                       getOptionLabel={option => option.name}
-                      onChange={(e, value) =>
-                        setValue('comercialId', value?.ID)
-                      }
+                      onChange={(e, value) => setValue('comercial', value?.id)}
                       renderInput={params => (
                         <TextField
                           {...params}
                           label="Comercial"
                           margin="normal"
-                          helperText={errors?.comercialId?.message}
-                          error={Boolean(errors?.comercialId)}
+                          helperText={errors?.comercial?.message}
+                          error={Boolean(errors?.comercial)}
                         />
                       )}
                     />
-                  </GridItem>
-                </GridContainer>
-
-                <GridContainer>
-                  <GridContainer>
-                    <GridItem xs={12} sm={12} md={12}>
-                      <GridItem xs={12} sm={12} md={12}>
-                        <Input
-                          labelText="Descripción"
-                          required
-                          {...register('description')}
-                          fullWidth
-                          errors={errors}
-                          placeholder="Agregue información adicional que considere relevante sobre el cliente (no obligatorio)"
-                          multiline
-                          rows={3}
-                        />
-                      </GridItem>
-                    </GridItem>
-                  </GridContainer>
-                  <GridItem xs={12} sm={12} md={12}>
-                    <br />
-                    <FormControlLabel
-                      control={
-                        <Controller
-                          name="control"
-                          render={({ field }) => (
-                            <Switch
-                              color="primary"
-                              {...field}
-                              classes={{
-                                switchBase: classes.switchBase,
-                                checked: classes.switchChecked,
-                                thumb: classes.switchIcon,
-                                track: classes.switchBar
-                              }}
-                            />
-                          )}
-                          control={control}
-                          defaultValue={false}
-                        />
-                      }
-                      classes={{
-                        label: classes.label
-                      }}
-                      label="Requiere control de reportes fotográficos"
-                    />
-                    {watch('control', false) && (
-                      <h6>
-                        El cliente no podrá ver las fotografías tomadas en los
-                        puntos de venta hasta que el analista de cuentas a cargo
-                        las apruebe.
-                      </h6>
-                    )}
                   </GridItem>
                 </GridContainer>
               </GridItem>

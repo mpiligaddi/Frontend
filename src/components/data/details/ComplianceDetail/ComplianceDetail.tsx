@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, FC } from 'react';
+import { useState, useEffect, useCallback, FC, useMemo } from 'react';
 import { AccessTime } from '@material-ui/icons';
 import { LinearProgress } from '@material-ui/core';
 import ChartCate from '../../charts/CategoryChart';
@@ -17,33 +17,10 @@ import { useFilteredData, useZones, useSupervisors } from '@/hooks/api';
 import { primaryBackgroundText, primaryColor } from '@/utils/styles';
 import { useStyles } from './styles';
 
-const columns = [
-  {
-    title: 'Zona',
-    field: 'zone'
-  },
-  {
-    title: 'Cadena',
-    field: 'chain'
-  },
-  {
-    title: 'Punto de venta',
-    field: 'branch'
-  },
-  {
-    title: 'Último registro',
-    field: 'lastReport'
-  },
-  {
-    title: 'Supervisor',
-    field: 'supervisor'
-  }
-];
-
 export const ComplianceDetail: FC = () => {
   const { filters, filteredReports } = useFilters();
   const classes = useStyles();
-  const { branches, reports, categories, ofc } = useFilteredData();
+  const { branches, reports, categories, ofc, chains } = useFilteredData();
   const { data: zones } = useZones();
   const [dataSupervisors, setDataSupervisors] = useState<number[]>([]);
   const [dataCategories, setDataCategories] = useState<number[]>([]);
@@ -59,12 +36,42 @@ export const ComplianceDetail: FC = () => {
   const [OFCPorcIncump, setOFCPorcIncump] = useState(0);
   const { data: supervisors } = useSupervisors();
 
+  const columns = useMemo(
+    () => [
+      {
+        title: 'Zona',
+        field: 'zone'
+      },
+      {
+        title: 'Cadena',
+        field: 'chain',
+        lookup: chains.data?.reduce(
+          (chains, chain) => ({ ...chains, [chain.id]: chain.name }),
+          {}
+        )
+      },
+      {
+        title: 'Punto de venta',
+        field: 'branch'
+      },
+      {
+        title: 'Último registro',
+        field: 'lastReport'
+      },
+      {
+        title: 'Supervisor',
+        field: 'supervisor'
+      }
+    ],
+    [chains.data]
+  );
+
   const getPendings = useCallback(() => {
     let pendings = 0;
     pendings =
       filters?.client && filters?.chain
         ? branches.data?.length! - filteredReports.length
-        : !filters?.chain?.ID
+        : !filters?.chain?.id
         ? branches?.data?.length! - reports.data?.length!
         : 0;
     return pendings;
@@ -94,20 +101,27 @@ export const ComplianceDetail: FC = () => {
 
   const getDataXChain = useCallback(() => {
     try {
-      const dataXChain = branches.data?.map(comp => ({
-        chain: comp.chainName,
-        branch: branches.data?.find(b => b.ID == comp.ID)?.name,
-        supervisor: supervisors?.find(
-          s => s.ID == zones?.find(z => z.ID == comp.zoneId)?.supervisorId
-        )?.name,
-        zone: zones?.find(z => z.ID == comp.zoneId)?.name,
-        lastReport:
-          reports.data
-            ?.filter(report => report.branchId === comp.ID)
-            [reports.data?.length - 1]?.createdAt.toDate()
-            .toLocaleString() || 'Sin registros'
-        //lastReport: await getReportDate(comp.ID),
-      }));
+      const dataXChain = branches.data?.map(comp => {
+        const reportsInBranch = (reports.data || []).filter(
+          report => report.branchId === comp.id
+        );
+
+        console.log(reportsInBranch);
+
+        return {
+          chain: comp.chainId,
+          branch: branches.data?.find(b => b.id == comp.id)?.name,
+          supervisor: supervisors?.find(
+            s => s.id == zones?.find(z => z.id == comp.zoneId)?.supervisorId
+          )?.name,
+          zone: zones?.find(z => z.id == comp.zoneId)?.name,
+          lastReport:
+            reportsInBranch[
+              reportsInBranch.length - 1
+            ]?.createdAt.toLocaleString() || 'Sin registros'
+          //lastReport: await getReportDate(comp.ID),
+        };
+      });
 
       return dataXChain?.filter(c => c.lastReport == 'Sin registros' || true);
     } catch (error) {
@@ -117,23 +131,26 @@ export const ComplianceDetail: FC = () => {
 
   const getDataXClient = useCallback(() => {
     try {
-      const dataXClient = branches.data?.map(comp => ({
-        chain: comp.chainName,
-        branch: branches.data?.filter(b => b.ID == comp.ID)[0]?.name,
-        supervisor: supervisors?.filter(
-          s => s.ID == zones?.filter(z => z.ID == comp.zoneId)[0]?.supervisorId
-        )[0]?.name,
-        zone: zones?.filter(z => z.ID == comp.zoneId)[0]?.name,
-        lastReport:
-          reports.data
-            ?.filter(report => report.branchId === comp.ID)
-            [reports.data?.length - 1]?.createdAt.toDate()
-            .toLocaleString() || 'Sin registros'
-      }));
+      const dataXClient = branches.data?.map(comp => {
+        const reportsInBranch = (reports.data || []).filter(
+          report => report.branchId === comp.id
+        );
 
-      return dataXClient?.filter(
-        c => c.lastReport === 'Sin registros' || false
-      );
+        const lastReport =
+          reportsInBranch[0]?.createdAt.toLocaleString() || 'Sin registros';
+
+        return {
+          chain: comp.chainId,
+          branch: branches.data?.find(b => b.id == comp.id)?.name,
+          supervisor: supervisors?.find(
+            s => s.id == zones?.find(z => z.id == comp.zoneId)?.supervisorId
+          )?.name,
+          zone: zones?.find(z => z.id == comp.zoneId)?.name,
+          lastReport
+        };
+      });
+
+      return dataXClient?.filter(c => c.lastReport === 'Sin registros');
     } catch (error) {
       console.error(`getDataXClient. Ocurrió el error: ${error}`);
     }
@@ -157,7 +174,7 @@ export const ComplianceDetail: FC = () => {
 
     branchIds?.forEach(br => {
       branches.data?.map(branch => {
-        if (br == branch.ID) {
+        if (br == branch.id) {
           zoneIds.push(branch.zoneId);
         }
       });
@@ -166,14 +183,17 @@ export const ComplianceDetail: FC = () => {
     //console.log(zoneIds)
 
     zoneIds.forEach(z => {
-      const supId = zones?.filter(zo => zo.ID == z)[0]?.supervisorId;
-      sups.push(supId!);
+      const supId = zones?.find(zo => zo.id == z)?.supervisorId;
+      const sup = supervisors?.find(
+        supervisor => supervisor.id === supId
+      )?.name;
+      sups.push(sup!);
     });
 
     const counts = getCount(sups);
     setLabelsSupervisors(Object.keys(counts));
     setDataSupervisors(Object.values(counts));
-  }, [zones, branches.data, getOFCPending]);
+  }, [zones, branches.data, getOFCPending, supervisors]);
 
   const getDataCategories = useCallback(() => {
     const param = getOFCPending()?.map(pending => pending.categoryId);
@@ -182,7 +202,7 @@ export const ComplianceDetail: FC = () => {
     const cats: string[] = [];
 
     categories.data?.forEach(c => {
-      if (Object.keys(counts).includes(c.ID)) {
+      if (Object.keys(counts).includes(c.id)) {
         cats.push(c.name);
       }
     });
@@ -191,14 +211,14 @@ export const ComplianceDetail: FC = () => {
   }, [categories.data, getOFCPending]);
 
   const getDataChainsChart = useCallback(() => {
-    const param = getOFCPending()?.map(pending =>
-      pending.branchId.substr(0, 3)
+    const param = getOFCPending()?.map(
+      pending => chains.data?.find(chain => chain.id === pending.chainId)?.name
     );
     if (!param) return;
     const counts = getCount(param);
     setLabelsChainsChart(Object.keys(counts));
     setDataChainsChart(Object.values(counts));
-  }, [getOFCPending]);
+  }, [getOFCPending, chains.data]);
 
   const getCompliances = useCallback(() => {
     setLoading(true);

@@ -3,6 +3,7 @@ import { AdminLayout } from '@/components/common';
 import { Page } from '@/typings/page';
 import { SelectClient, FilterBar, Accordion } from '@/components/reports';
 import { ReportType } from '@/lib/types';
+import { ensureAuth } from '@/lib/auth';
 
 const Revision: Page = () => {
   const [type, setType] = useState<ReportType>('all');
@@ -35,5 +36,7 @@ const Revision: Page = () => {
 };
 
 Revision.Layout = AdminLayout;
+
+export const getServerSideProps = ensureAuth('backoffice');
 
 export default Revision;

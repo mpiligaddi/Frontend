@@ -22,17 +22,17 @@ const SelectClient: FC<SelectClientProps> = ({ type, showFilters }) => {
           <Tabs
             headerColor="primary"
             plainTabs
-            tabs={data?.map(c => ({
+            tabs={data?.map(client => ({
               onClick: () => {
-                if (c.ID === filters?.client?.ID) return;
+                if (client.id === filters?.client?.id) return;
                 setFilters({
                   category: undefined,
                   branch: undefined,
                   chain: undefined,
-                  client: data?.find(client => client.ID === c.ID)
+                  client
                 });
               },
-              tabName: c.name,
+              tabName: client.name,
               tabContent: (
                 <ReportTypeSelector showFilters={showFilters} type={type} />
               )

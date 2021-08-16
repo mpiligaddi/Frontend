@@ -1,25 +1,29 @@
-import { useMutation } from 'react-query';
-import firebase from 'firebase/app';
+import { useMutation, useQueryClient } from 'react-query';
+import { client } from '@/lib/axios';
 
 interface Data {
-  id: string;
-  chainId: string;
-  chainName: string;
-  name: string;
-  ID: string;
+  zone: string;
+  chain: string;
   address: string;
-  zoneId: string;
+  locality: string;
+  id: string;
+  name: string;
+  displayName: string;
 }
 
+const updateBranch = async ({ id, ...data }: Data) => {
+  await client.put(`/api/branches/${id}`, {
+    ...data,
+    displayname: data.displayName
+  });
+};
+
 export const useUpdateBranch = () => {
-  const updateBranch = async ({ id, ...data }: Data) => {
-    await firebase.firestore().collection('branches').doc(id).update(data);
+  const queryClient = useQueryClient();
 
-    return {
-      id,
-      ...data
-    };
-  };
-
-  return useMutation(updateBranch);
+  return useMutation(updateBranch, {
+    async onSuccess() {
+      await queryClient.refetchQueries('branches');
+    }
+  });
 };

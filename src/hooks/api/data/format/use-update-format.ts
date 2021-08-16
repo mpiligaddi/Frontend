@@ -1,14 +1,21 @@
 import { Format } from '@/lib/types';
 import { useMutation, useQueryClient } from 'react-query';
+import { client } from '@/lib/axios';
+
+type Data = {
+  formatId: string;
+  chainId: string;
+  oldChain: string;
+};
+
+const updateChainOfFormat = async ({ formatId, chainId, oldChain }: Data) => {
+  const res = await client.put(`/formats/${formatId}/${oldChain}`, {
+    chainId
+  });
+
+  console.log(res.data);
+};
 
 export const useUpdateFormat = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation(async (data: Format) => data, {
-    onSuccess(format) {
-      queryClient.setQueryData<Format[]>('formats', data =>
-        (data || []).map(f => (f.id === format.id ? { ...f, ...format } : f))
-      );
-    }
-  });
+  return useMutation(updateChainOfFormat);
 };

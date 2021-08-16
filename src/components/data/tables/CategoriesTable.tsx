@@ -3,12 +3,14 @@ import { TableCrud } from '@/components/ui';
 import {
   useCategories,
   useUpdateCategory,
-  useDeleteCategory
+  useDeleteCategory,
+  useCreateCategory
 } from '@/hooks/api';
 
 const CategoryTable: FC = () => {
   const categories = useCategories({ all: true });
   const updateCategory = useUpdateCategory();
+  const createCategory = useCreateCategory();
   const deleteCategory = useDeleteCategory();
 
   return (
@@ -18,20 +20,19 @@ const CategoryTable: FC = () => {
       data={categories.data || []}
       columns={[
         {
-          field: 'ID',
-          title: 'Identificador'
-        },
-        {
           field: 'name',
           title: 'Nombre'
         }
       ]}
       editable={{
+        async onRowAdd(data) {
+          await createCategory.mutateAsync(data.name);
+        },
         async onRowUpdate(data) {
-          updateCategory.mutate(data);
+          await updateCategory.mutateAsync(data);
         },
         async onRowDelete(data) {
-          deleteCategory.mutate(data.id);
+          await deleteCategory.mutateAsync(data.id);
         }
       }}
     />

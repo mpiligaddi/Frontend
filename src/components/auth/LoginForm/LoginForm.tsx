@@ -22,14 +22,18 @@ type FormValues = {
   remember: boolean;
 };
 
+const roleRoute: Record<string, string> = {
+  backoffice: 'admin',
+  client: 'client'
+};
+
 const LoginForm: FC = () => {
   const classes = useStyles();
-  const [error, setError] = useState('');
   const [forgotOpen, setForgotOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
   const router = useRouter();
   const { register, handleSubmit, control } = useForm<FormValues>();
-  const login = useLogin();
+  const { mutateAsync, isLoading, error } = useLogin();
 
   const handleClose = () => {
     setForgotOpen(false);
@@ -41,28 +45,11 @@ const LoginForm: FC = () => {
 
   // Submit function (Login user)
   const onSubmit: SubmitHandler<FormValues> = async values => {
-    setError('');
+    const user = await mutateAsync(values);
+    if (!user?.role) return;
 
-    try {
-      const user = await login.mutateAsync(values);
-      if (!user?.role) return;
-
-      await router.push(`/${user.role}/dashboard`);
-    } catch (err) {
-      if (err.code == 'auth/invalid-email') {
-        setError('Formato de correo electrónico inválido');
-      } else if (
-        err.code == 'auth/wrong-password' ||
-        err.code == 'auth/user-not-found'
-      ) {
-        setError('Usuario y/o contraseña inválido');
-      } else if (err.code == 'auth/too-many-request') {
-        setError(
-          'Demasiados intentos. Intente más tarde o solicite el restablecimiento de su contraseña.'
-        );
-      } else if (err) {
-        setError(err.message);
-      }
+    if (roleRoute[user.role]) {
+      await router.push(`/${roleRoute[user.role]}/dashboard`);
     }
   };
 
@@ -78,7 +65,7 @@ const LoginForm: FC = () => {
           <br />
           <Alert severity="error">
             <AlertTitle>Error</AlertTitle>
-            {error}
+            {(error as any).response.data.message}
           </Alert>
         </GridItem>
       )}

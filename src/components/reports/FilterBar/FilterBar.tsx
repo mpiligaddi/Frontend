@@ -61,12 +61,12 @@ const FilterBar: FC<FilterBarProps> = ({
 
     filteredReports.forEach(report => {
       report.categories?.forEach(category => {
-        category.images
-          ?.filter(image => !image.isDeleted)
+        category.photos
+          ?.filter(image => !image.delete)
           ?.forEach(image => {
             reports.push({
-              date: dayjs(report.createdAt.toDate()).format('DD/MM/YYYY'),
-              category: category.name,
+              date: dayjs(report.createdAt).format('DD/MM/YYYY'),
+              category: category.category.name,
               image: image.uri,
               chain: filters?.chain?.name,
               branch: filters?.branch?.name,
@@ -86,7 +86,7 @@ const FilterBar: FC<FilterBarProps> = ({
       branch: undefined
     }));
     const client = clients.data?.find(
-      client => client.ID === event.target.value
+      client => client.id === event.target.value
     );
     setFilters(filters => ({
       ...filters,
@@ -99,7 +99,7 @@ const FilterBar: FC<FilterBarProps> = ({
       ...filters,
       branch: undefined
     }));
-    const chain = chains.data?.find(chain => chain.ID === event.target.value);
+    const chain = chains.data?.find(chain => chain.id === event.target.value);
     setFilters(filters => ({
       ...filters,
       chain
@@ -107,7 +107,7 @@ const FilterBar: FC<FilterBarProps> = ({
   };
 
   const handleSelectBranch = (event: ChangeEvent) => {
-    const branch = branches.data?.find(b => b.ID === event.target.value);
+    const branch = branches.data?.find(b => b.id === event.target.value);
 
     setFilters(filters => ({
       ...filters,
@@ -117,7 +117,7 @@ const FilterBar: FC<FilterBarProps> = ({
 
   const handleSelectCategory = (event: ChangeEvent) => {
     const category = categories.data?.find(
-      category => category.ID === event.target.value
+      category => category.id === event.target.value
     );
     setFilters(filters => ({
       ...filters,
@@ -152,7 +152,7 @@ const FilterBar: FC<FilterBarProps> = ({
                     classes={{
                       select: selectClasses.select
                     }}
-                    value={filters?.client?.ID || ''}
+                    value={filters?.client?.id || ''}
                     onChange={handleSelectClient}
                     inputProps={{
                       name: 'selectClient',
@@ -165,12 +165,12 @@ const FilterBar: FC<FilterBarProps> = ({
 
                     {clients.data?.map(client => (
                       <MenuItem
-                        key={client.ID}
+                        key={client.id}
                         classes={{
                           root: selectClasses.selectMenuItem,
                           selected: selectClasses.selectMenuItemSelected
                         }}
-                        value={client.ID}
+                        value={client.id}
                       >
                         {client.name}
                       </MenuItem>
@@ -200,7 +200,7 @@ const FilterBar: FC<FilterBarProps> = ({
                     classes={{
                       select: selectClasses.select
                     }}
-                    value={filters?.chain?.ID || ''}
+                    value={filters?.chain?.id || ''}
                     onChange={handleSelectChain}
                     inputProps={{
                       name: 'selectChain',
@@ -218,22 +218,23 @@ const FilterBar: FC<FilterBarProps> = ({
                         }}
                         value={''}
                       >
-                        Todas
+                        {chains.isLoading ? 'Cargando...' : 'Todas'}
                       </MenuItem>
                     )}
 
-                    {chains.data?.map(chain => (
-                      <MenuItem
-                        key={chain.ID}
-                        classes={{
-                          root: selectClasses.selectMenuItem,
-                          selected: selectClasses.selectMenuItemSelected
-                        }}
-                        value={chain.ID}
-                      >
-                        {chain.name}
-                      </MenuItem>
-                    ))}
+                    {!chains.isLoading &&
+                      chains.data?.map(chain => (
+                        <MenuItem
+                          key={chain.id}
+                          classes={{
+                            root: selectClasses.selectMenuItem,
+                            selected: selectClasses.selectMenuItemSelected
+                          }}
+                          value={chain.id}
+                        >
+                          {chain.name}
+                        </MenuItem>
+                      ))}
                   </Select>
                 </FormControl>
               </GridItem>
@@ -260,7 +261,7 @@ const FilterBar: FC<FilterBarProps> = ({
                     classes={{
                       select: selectClasses.select
                     }}
-                    value={filters?.branch?.ID || ''}
+                    value={filters?.branch?.id || ''}
                     onChange={handleSelectBranch}
                     inputProps={{
                       name: 'selectBranch',
@@ -272,12 +273,12 @@ const FilterBar: FC<FilterBarProps> = ({
                     </MenuItem>
                     {branches.data?.map(branch => (
                       <MenuItem
-                        key={branch.ID}
+                        key={branch.id}
                         classes={{
                           root: selectClasses.selectMenuItem,
                           selected: selectClasses.selectMenuItemSelected
                         }}
-                        value={branch.ID}
+                        value={branch.id}
                       >
                         {branch.name}
                       </MenuItem>
@@ -307,7 +308,7 @@ const FilterBar: FC<FilterBarProps> = ({
                     classes={{
                       select: selectClasses.select
                     }}
-                    value={filters?.category?.ID || ''}
+                    value={filters?.category?.id || ''}
                     onChange={handleSelectCategory}
                     inputProps={{
                       name: 'selectCategory',
@@ -325,12 +326,12 @@ const FilterBar: FC<FilterBarProps> = ({
                     </MenuItem>
                     {categories.data?.map(category => (
                       <MenuItem
-                        key={category.ID}
+                        key={category.id}
                         classes={{
                           root: selectClasses.selectMenuItem,
                           selected: selectClasses.selectMenuItemSelected
                         }}
-                        value={category.ID}
+                        value={category.id}
                       >
                         {category.name}
                       </MenuItem>

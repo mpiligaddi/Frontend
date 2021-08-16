@@ -1,13 +1,9 @@
-import firebase from 'firebase';
 import { useMutation } from 'react-query';
+import { client } from '@/lib/axios';
 
 export const useDeleteCategory = () => {
   const deleteCategory = async (id: string) => {
-    await firebase.firestore().collection('categories').doc(id).delete();
-
-    return {
-      id
-    };
+    await client.delete(`/api/categories/${id}`);
   };
 
   return useMutation(deleteCategory);

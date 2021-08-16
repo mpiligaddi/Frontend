@@ -1,12 +1,12 @@
 import { useMutation } from 'react-query';
-import firebase from 'firebase/app';
+import { client } from '@/lib/axios';
 import { useQueryClient } from 'react-query';
 
 export const useLogout = () => {
   const queryClient = useQueryClient();
 
   const logout = async () => {
-    await firebase.auth().signOut();
+    await client.delete('/auth');
   };
 
   return useMutation(logout, {

@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "build:analyze": "ANALYZE=true yarn build",
     "prepare": "husky install"
   },
   "dependencies": {
@@ -15,10 +16,10 @@
     "@material-ui/core": "^4.11.4",
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.58",
+    "axios": "^0.21.1",
     "chart.js": "^3.4.1",
     "classnames": "^2.3.1",
     "dayjs": "^1.10.6",
-    "firebase": "^8.6.8",
     "material-table": "^1.69.3",
     "next": "11.0.0",
     "next-compose-plugins": "^2.2.1",
@@ -49,6 +50,7 @@
     "eslint-config-next": "11.0.0",
     "husky": ">=6",
     "lint-staged": ">=10",
+    "null-loader": "^4.0.1",
     "prettier": "^2.3.2",
     "typescript": "4.3.4"
   },

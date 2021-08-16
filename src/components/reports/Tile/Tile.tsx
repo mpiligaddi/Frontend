@@ -33,16 +33,16 @@ const Tile: FC<TileProps> = ({ tile, report, disableAction = false }) => {
   const handleFavorite = async (e: React.MouseEvent) => {
     e.stopPropagation();
     addFavorite({
-      report,
-      favorite,
-      tile
+      imageId: tile.id,
+      favorite: !favorite
     });
+
+    setFavorite(!favorite);
   };
 
   const onDeleteTile = async (reason: string) => {
     deleteTile({
-      report,
-      tile,
+      imageId: tile.id,
       reason
     });
 
@@ -65,7 +65,7 @@ const Tile: FC<TileProps> = ({ tile, report, disableAction = false }) => {
       />
       <div className={classes.photo}>
         <Image
-          src={tile.uri}
+          src={`http://e.undervolt.io:3000/assets/${report.creatorId}/${report.id}/${tile.name}`}
           width="200"
           height="300"
           objectFit="cover"

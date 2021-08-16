@@ -3,7 +3,6 @@ import { useFilters } from '@/context/filters';
 import { useFilteredData } from '@/hooks/api';
 import { GridContainer, GridItem, TableOFC } from '@/components/ui';
 import { primaryBackgroundText, primaryColor } from '@/utils/styles';
-import frequency from '@/utils/frequency';
 
 export const PhotosDetail: FC = () => {
   const { filters } = useFilters();
@@ -24,7 +23,11 @@ export const PhotosDetail: FC = () => {
             <p>
               Período de reporte fotográfico acordado: {'  '}
               <span style={primaryBackgroundText}>
-                {frequency[filters?.client?.periodReportId!]}
+                {
+                  filters?.client?.periods?.find(
+                    ({ period }) => period.type.alias === 'F'
+                  )?.period.alias
+                }
               </span>
             </p>
           </div>

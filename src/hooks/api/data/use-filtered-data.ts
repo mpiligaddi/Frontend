@@ -32,17 +32,17 @@ export const useFilteredData = ({
   const { filters } = useFilters();
 
   const categories = useCategories({
-    clientId: +filters?.client?.ID!,
+    clientId: filters?.client?.id,
     options: {
       enabled: enabled?.categories
     }
   });
-  const reports = useReports(+filters?.client?.ID!, {
+  const reports = useReports(filters?.client?.id!, {
     enabled: enabled?.reports
   });
 
   const chains = useChains({
-    clientId: filters?.client?.ID,
+    clientId: filters?.client?.id,
     revised,
     reported,
     reports: reports.data,
@@ -52,11 +52,10 @@ export const useFilteredData = ({
   });
 
   const branches = useBranches({
-    chain: filters?.chain?.ID,
+    chain: filters?.chain?.id,
     revised,
     reported,
-    reports: reports.data,
-    clientId: +filters?.client?.ID!,
+    clientId: filters?.client?.id!,
     options: {
       enabled: enabled?.branches
     }

@@ -1,4 +1,4 @@
-import { useState, useEffect, FC } from 'react';
+import { FC } from 'react';
 import {
   useClients,
   useAdmins,
@@ -6,94 +6,69 @@ import {
   useDeleteClient,
   useUpdateClient
 } from '@/hooks/api';
-import { LinearProgress, TableCrud } from '@/components/ui';
+import { TableCrud } from '@/components/ui';
 
 const ClientsTable: FC = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const clients = useClients();
   const admins = useAdmins();
   const comercials = useComercials();
   const updateClient = useUpdateClient();
   const deleteClient = useDeleteClient();
-  const [data, setData] = useState<any>([]);
-
-  useEffect(() => {
-    if (!clients.data || !admins.data || !comercials.data) return;
-
-    setIsLoading(true);
-
-    const data = clients.data.map(client => ({
-      ID: client.ID,
-      id: client.id,
-      companyName: client.companyName,
-      name: client.name,
-      contact: client.contactName,
-      admin: admins.data.find(adm => adm.ID == client.adminId)?.ID,
-      comercial: comercials.data.find(com => com.ID == client.comercialId)?.ID
-    }));
-
-    setData(data);
-    setIsLoading(false);
-  }, [clients.data, admins.data, comercials.data]);
-
-  if (clients.isLoading || admins.isLoading || comercials.isLoading)
-    return <LinearProgress />;
 
   return (
-    <>
-      {data && (
-        <div>
-          <TableCrud
-            title="Clientes"
-            data={data}
-            columns={[
-              { title: 'Identificador', field: 'ID', editable: 'never' },
-              { title: 'Empresa', field: 'companyName' },
-              { title: 'Nombre', field: 'name' },
-              { title: 'Contacto', field: 'contact' },
-              {
-                title: 'Back Office',
-                field: 'admin',
-                lookup: admins.data?.reduce(
-                  (admins, admin) => ({
-                    ...admins,
-                    [admin.ID]: admin.name
-                  }),
-                  {}
-                )
-              },
-              {
-                title: 'Comercial',
-                field: 'comercial',
-                lookup: comercials.data?.reduce(
-                  (object, comercial) => ({
-                    ...object,
-                    [comercial.ID]: comercial.name
-                  }),
-                  {}
-                )
-              }
-            ]}
-            editable={{
-              async onRowUpdate(data) {
-                updateClient.mutate({
-                  id: (data as any).id,
-                  adminId: data.admin,
-                  comercialId: data.comercial,
-                  companyName: data.companyName,
-                  contactName: data.contact,
-                  name: data.name
-                });
-              },
-              async onRowDelete(data: any) {
-                deleteClient.mutate(data.id);
-              }
-            }}
-            isLoading={isLoading}
-          />
-        </div>
-      )}
-    </>
+    <div>
+      <TableCrud
+        title="Clientes"
+        data={clients.data || []}
+        columns={[
+          { title: 'Empresa', field: 'displayName' },
+          { title: 'Nombre', field: 'name' },
+          { title: 'CUIT', field: 'cuit' },
+          { title: 'Direccion', field: 'address' },
+          {
+            title: 'Back Office',
+            field: 'adminId',
+            lookup: admins.data?.reduce(
+              (admins, admin) => ({
+                ...admins,
+                [admin.id]: admin.name
+              }),
+              {}
+            )
+          },
+          {
+            title: 'Comercial',
+            field: 'comercialId',
+            lookup: comercials.data?.reduce(
+              (object, comercial) => ({
+                ...object,
+                [comercial.id]: comercial.name
+              }),
+              {}
+            )
+          }
+        ]}
+        editable={{
+          async onRowUpdate(data) {
+            await updateClient.mutateAsync({
+              id: data.id,
+              adminId: data.adminId,
+              comercialId: data.comercialId,
+              displayName: data.displayName,
+              cuit: data.cuit,
+              address: data.address,
+              name: data.name
+            });
+          },
+          async onRowDelete(data) {
+            deleteClient.mutate(data.id);
+          }
+        }}
+        isLoading={
+          clients.isLoading || admins.isLoading || comercials.isLoading
+        }
+      />
+    </div>
   );
 };
 

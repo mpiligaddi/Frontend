@@ -7,6 +7,7 @@ import {
   FormatsTable
 } from '@/components/data/tables';
 import { AdminLayout } from '@/components/common';
+import { ensureAuth } from '@/lib/auth';
 
 const Stores: Page = () => {
   return (
@@ -39,5 +40,7 @@ const Stores: Page = () => {
 };
 
 Stores.Layout = AdminLayout;
+
+export const getServerSideProps = ensureAuth('backoffice');
 
 export default Stores;

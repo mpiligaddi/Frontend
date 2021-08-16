@@ -1,6 +1,7 @@
 import { AdminLayout } from '@/components/common';
 import { CoveragesTable } from '@/components/data/tables';
 import { GridContainer, GridItem, Tabs } from '@/components/ui';
+import { ensureAuth } from '@/lib/auth';
 import { Page } from '@/typings';
 import { ListAlt } from '@material-ui/icons';
 
@@ -25,5 +26,7 @@ const Coverages: Page = () => {
 };
 
 Coverages.Layout = AdminLayout;
+
+export const getServerSideProps = ensureAuth('backoffice');
 
 export default Coverages;

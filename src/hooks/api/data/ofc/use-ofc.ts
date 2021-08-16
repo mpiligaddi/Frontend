@@ -14,7 +14,7 @@ export const useOFC = ({ branches, reports, categories, options }: Data) => {
 
     branches?.forEach(bxc => {
       const filteredReports = reports?.filter(
-        report => report.branchId === bxc.ID
+        report => report.branchId === bxc.id
       );
 
       categories?.forEach(cat => {
@@ -23,7 +23,7 @@ export const useOFC = ({ branches, reports, categories, options }: Data) => {
           filteredReports.forEach(report => {
             const category = report.categories.find(
               category =>
-                category.ID === cat.ID && Array.isArray(category.images)
+                category.id === cat.id && Array.isArray(category.photos)
             );
             if (category) {
               done = true;
@@ -32,8 +32,9 @@ export const useOFC = ({ branches, reports, categories, options }: Data) => {
         } else done = false;
 
         ofcs.push({
-          categoryId: cat.ID,
-          branchId: bxc.ID,
+          categoryId: cat.id,
+          branchId: bxc.id,
+          chainId: bxc.chainId,
           done
         });
       });

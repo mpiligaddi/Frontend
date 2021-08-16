@@ -1,42 +1,52 @@
-import firebase from 'firebase/app';
-
 type User = {
-  role: 'sadmin' | 'admin' | 'client' | 'merchandiser';
-  ID: string;
-  displayName: string;
+  role: 'backoffice' | 'client' | 'merchandiser';
+  id: string;
+  name: string;
   email: string;
   key: string;
+  client?: {
+    id: string;
+  };
+  picture: null;
+  supervisorId?: string;
 };
 
 export type ReportType = 'revised' | 'all' | 'pendings' | 'favorites' | '';
 
 export interface Chain {
-  ID: string;
+  id: string;
   name: string;
+  formatId: null;
+  products: any[];
+  reports?: { id: string; revised: boolean }[];
 }
 
 export interface Comercial {
-  ID: string;
+  id: string;
   name: string;
   email: string;
 }
 
 export interface OFC {
   categoryId: string;
+  chainId: string;
   branchId: string;
   done: boolean;
 }
 
 export interface Coverage {
   id: string;
-  clientId: number;
+  clientId: string;
   branchId: string;
-  frequency: number;
+  branch: {
+    chain: Chain;
+  };
+  frecuency: number;
   intensity: number;
 }
 
 export interface Supervisor {
-  ID: string;
+  id: string;
   name: string;
   email: string;
   coordinatorId: string;
@@ -48,51 +58,78 @@ export interface Admin {
   email: string;
 }
 export interface Category {
-  clientId: string;
   name: string;
   id: string;
-  ID: string;
+}
+
+export interface Period {
+  id: string;
+  name: string;
+  alias: string;
+  type: {
+    id: string;
+    name: string;
+    alias: string;
+  };
+  id: string;
+}
+
+export interface ProductChain {
+  id: string;
+  chainId: string;
+  productId: string;
+  product: {
+    name: string;
+    category: {
+      id: string;
+    };
+  };
 }
 
 export interface Zone {
-  ID: string;
+  id: string;
   name: string;
   region: string;
   supervisorId: string;
 }
 
 export interface Product {
-  id: number;
-  chain: string;
-  category: string;
-  description: string;
+  id: string;
+  name: string;
+  type: string;
+  sku: string;
+  chains?: {
+    chain: Chain;
+  }[];
+  category?: Category;
 }
 
 export interface Format {
   id: string;
   name: string;
-  chain: string;
+  chains: Chain[];
 }
 
 export interface Client {
-  id?: string;
-  CUIT: string;
-  ID: string;
-  address: string;
-  adminId: string;
-  comercialId: string;
-  companyName: string;
-  contactName: string;
-  control: string;
+  id: string;
+  displayName: string;
   name: string;
-  periodReportId: 'FS' | 'FQ' | 'FM' | 'FV' | 'IN';
+  address: string;
+  cuit: string;
+  adminId: string;
+  periods: {
+    period: Period;
+  }[];
+  comercialId: string;
 }
 
 export interface Image {
+  id: string;
   revised?: boolean;
-  isDeleted?: boolean;
+  delete: boolean;
   comment: string;
-  reason?: string;
+  deleteReason?: string;
+  photoReportId: string;
   favorite?: boolean;
   name: string;
   type: string;
@@ -100,13 +137,12 @@ export interface Image {
 }
 
 export interface ReportCategory {
-  ID: string;
-  name: string;
-  withoutStock: boolean;
-  badCategory: boolean;
-  clientId: number;
   id: string;
-  images: Image[];
+  reportId: string;
+  categoryId: string;
+  category: Category;
+  withoutStock: boolean;
+  photos: Image[];
 }
 
 export interface Report {
@@ -114,8 +150,8 @@ export interface Report {
   branchId: string;
   chainId: string;
   clientId: string;
-  createdAt: firebase.firestore.Timestamp;
-  createdBy: string;
+  createdAt: string;
+  creatorId: string;
   isComplete: boolean;
   revised: boolean;
   categories: ReportCategory[];
@@ -127,12 +163,12 @@ export interface Report {
 }
 
 export interface Branch {
-  ID: string;
+  id: string;
   address: string;
+  displayName: string;
   chainId: string;
-  chainName: string;
   locality: string;
   name: string;
-  region: string;
+  reports: [];
   zoneId: string;
 }

@@ -1,21 +1,21 @@
 import { Client } from '@/lib/types';
-import firebase from 'firebase';
+import { client } from '@/lib/axios';
 import { useQueryClient, useMutation } from 'react-query';
+
+const deleteClient = async (id: string) => {
+  await client.delete(`/api/clients/${id}`);
+
+  return {
+    id
+  };
+};
 
 export const useDeleteClient = () => {
   const queryClient = useQueryClient();
 
-  const deleteClient = async (id: string) => {
-    await firebase.firestore().collection('clients').doc(id).delete();
-
-    return {
-      id
-    };
-  };
-
   return useMutation(deleteClient, {
     onSuccess({ id }) {
-      queryClient.setQueryData<Client[]>(['clients', null], data =>
+      queryClient.setQueriesData<Client[]>('clients', data =>
         (data || []).filter(client => client.id !== id)
       );
     }

@@ -36,34 +36,34 @@ export const FiltersProvider: FC = ({ children }) => {
   const [filteredReports, setFilteredReports] = useState<Report[]>([]);
 
   const clients = useClients();
-  const reports = useReports(+filters?.client?.ID!);
+  const reports = useReports(filters?.client?.id);
 
   const getReports = useCallback(() => {
     if (!reports.data || !filters) return;
 
-    if (!filters.chain?.ID) return;
+    if (!filters.chain?.id) return;
 
     let filteredReports = reports.data.filter(report => {
       if (
-        filters.chain?.ID &&
-        !filters.branch?.ID &&
-        report.chainId === filters.chain.ID
+        filters.chain?.id &&
+        !filters.branch?.id &&
+        report.chainId === filters.chain.id
       )
         return true;
       else if (
-        filters.chain?.ID &&
-        filters.branch?.ID &&
-        report.chainId === filters.chain?.ID &&
-        report.branchId === filters.branch?.ID
+        filters.chain?.id &&
+        filters.branch?.id &&
+        report.chainId === filters.chain?.id &&
+        report.branchId === filters.branch?.id
       )
         return true;
       else return false;
     });
 
-    if (filters?.category?.ID) {
+    if (filters?.category?.id) {
       filteredReports = filteredReports?.map(report => {
         const categories = report.categories.filter(
-          c => c.ID === filters?.category?.ID
+          c => c.category.id === filters?.category?.id
         );
 
         return {

@@ -1,7 +1,7 @@
 import { useState, FC } from 'react';
 import { GridContainer } from '@/components/ui';
 import { GridListTile, IconButton, Icon, GridList } from '@material-ui/core';
-import firebase from 'firebase/app';
+import { useReviewReport } from '@/hooks/api';
 
 import dayjs from 'dayjs';
 import { Report as IReport, Category } from '@/lib/types';
@@ -27,11 +27,10 @@ const Report: FC<ReportProps> = ({
 }) => {
   const classes = useStyles();
   const [revised, setRevised] = useState(report.revised ?? false);
+  const reviewReport = useReviewReport();
 
-  const handleRevised = async () => {
-    await firebase.firestore().collection('reports').doc(report.id).update({
-      revised: !revised
-    });
+  const handleRevised = () => {
+    reviewReport.mutate({ reportId: report.id, revised: !revised });
 
     setRevised(!revised);
   };
@@ -40,7 +39,7 @@ const Report: FC<ReportProps> = ({
     <div>
       <div>
         <p className={classes.date}>
-          {dayjs(report.createdAt.toDate()).format('DD/MM/YYYY')}
+          {dayjs(report.createdAt).format('DD/MM/YYYY')}
         </p>
         {revisable && (
           <span style={{ display: 'flex' }}>
@@ -66,11 +65,11 @@ const Report: FC<ReportProps> = ({
         <GridContainer key={cat.id} className={classes.report}>
           {!category && (
             <div className={classes.reportDate}>
-              <p>{cat.name}</p>
+              <p>{cat.category.name}</p>
             </div>
           )}
           <GridList className={classes.gridList2} cols={4}>
-            {cat.images.map(tile => (
+            {cat.photos?.map(tile => (
               <GridListTile key={tile.name}>
                 <Tile
                   report={report}

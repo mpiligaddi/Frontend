@@ -16,7 +16,10 @@ const TableDashboard: FC<TableDashboardProps> = ({ columns, data, title }) => {
         data={data}
         columns={columns}
         options={{
-          exportButton: true,
+          exportButton: {
+            csv: true,
+            pdf: false
+          },
           exportFileName: `${title}_${dayjs().format('DD-MM-YYYY')}`,
           exportAllData: true,
           actionsColumnIndex: -1,

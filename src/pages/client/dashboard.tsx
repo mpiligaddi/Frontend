@@ -17,6 +17,7 @@ import { LinearProgress } from '@/components/ui';
 import shop from '@/assets/img/icon-shop.png';
 import visits from '@/assets/img/icon-visits.png';
 import alert from '@/assets/img/icon-alert.png';
+import { ensureAuth } from '@/lib/auth';
 
 const useStyles = makeStyles({
   container: {
@@ -50,7 +51,7 @@ const Dashboard: Page = () => {
   const { filters, reports } = useFilters();
   const [OFCPercent, setOFCPercent] = useState(0);
   const branches = useBranches({
-    clientId: +filters?.client?.ID!
+    clientId: filters?.client?.id!
   });
   const { chains, categories } = useFilteredData({
     reported: true,
@@ -79,7 +80,7 @@ const Dashboard: Page = () => {
     <GridContainer className={classes.cards}>
       <GridItem className={classes.title} xs={12} sm={12} md={12} lg={12}>
         <h3>
-          <span className={classes.titleName}>{client.data?.name} </span>
+          <span className={classes.titleName}>{user.data?.name} </span>
           <span className={classes.message}>
             Bienvenido a sus reportes fotográficos
           </span>
@@ -144,5 +145,7 @@ const Dashboard: Page = () => {
 };
 
 Dashboard.Layout = ClientLayout;
+
+export const getServerSideProps = ensureAuth('client');
 
 export default Dashboard;

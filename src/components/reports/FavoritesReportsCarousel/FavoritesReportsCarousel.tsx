@@ -3,6 +3,7 @@ import Carousel from 'react-material-ui-carousel';
 
 import { getImages, FilteredImage } from '@/utils/images';
 import { useFilteredData } from '@/hooks/api';
+import Image from 'next/image';
 
 import { useStyles } from './styles';
 
@@ -32,13 +33,14 @@ const FavoritesReportsCarousel: FC = () => {
       className={classes.carousel}
     >
       {images.map(image => (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          className={classes.carouselImage}
-          alt={image.id}
-          key={image.id}
-          src={image.url}
-        />
+        <div className={classes.carouselImage} key={image.id}>
+          <Image
+            objectFit="cover"
+            alt={image.id}
+            layout="fill"
+            src={`http://e.undervolt.io:3000/assets/${image.report.creatorId}/${image.report.id}/${image.url}`}
+          />
+        </div>
       ))}
     </Carousel>
   );

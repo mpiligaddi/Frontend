@@ -46,22 +46,21 @@ const ChainsCardDetail: FC = () => {
 
   const getData = useCallback(() => {
     const coveragesByClient = coverages?.filter(
-      c => c.clientId === +filters?.client?.ID!
+      c => c.clientId === filters?.client?.id!
     );
 
     if (filters?.chain) {
       const coveragesByChain = coveragesByClient?.filter(
-        cxcli => cxcli.branchId.substr(0, 3) == filters?.chain?.ID
+        cxcli => cxcli.branch.chain.id === filters?.chain?.id
       );
       const dataChain = coveragesByChain?.map(c => {
         const coverage = {
-          branch: branches.data?.filter(b => b.ID == c.branchId)[0]?.name,
+          branch: branches.data?.find(b => b.id == c.branchId)?.name,
           intensity: c.intensity,
-          frequency: c.frequency,
-          zone: zones?.filter(
-            z =>
-              z.ID == branches.data?.filter(b => b.ID == c.branchId)[0]?.zoneId
-          )[0]?.name
+          frequency: c.frecuency,
+          zone: zones?.find(
+            z => z.id == branches.data?.find(b => b.id == c.branchId)?.zoneId
+          )?.name
         };
         return coverage;
       });
@@ -72,15 +71,13 @@ const ChainsCardDetail: FC = () => {
 
     const dataClient = coveragesByClient?.map(c => {
       const coverage = {
-        chain: chains.data?.filter(
-          chain => chain.ID == c.branchId.substr(0, 3)
-        )[0]?.name,
-        branch: branches.data?.filter(b => b.ID == c.branchId)[0]?.name,
+        chain: chains.data?.find(chain => chain.id == c.branch.chain.id)?.name,
+        branch: branches.data?.find(b => b.id == c.branchId)?.name,
         intensity: c.intensity,
-        frequency: c.frequency,
-        zone: zones?.filter(
-          z => z.ID == branches.data?.filter(b => b.ID == c.branchId)[0]?.zoneId
-        )[0]?.name
+        frequency: c.frecuency,
+        zone: zones?.find(
+          z => z.id == branches.data?.find(b => b.id == c.branchId)?.zoneId
+        )?.name
       };
       return coverage;
     });

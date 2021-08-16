@@ -12,6 +12,7 @@ import camera from '@/assets/img/icon-camera.png';
 import alert from '@/assets/img/icon-alert.png';
 
 import { Page } from '@/typings';
+import { ensureAuth } from '@/lib/auth';
 
 const dynamicProps = {
   loading: () => <div>Cargando...</div>
@@ -41,15 +42,15 @@ const AdminDashboard: Page = () => {
   const user = useMe();
   const { filters, filteredReports } = useFilters();
   const { reports, categories } = useFilteredData({
-    reported: true,
+    reported: false,
     enabled: { chains: false, ofc: false, branches: false }
   });
   const { data: allBranches } = useBranches({
-    clientId: +filters?.client?.ID!
+    clientId: filters?.client?.id
   });
   const branches = useBranches({
-    chain: filters?.chain?.ID,
-    clientId: +filters?.client?.ID!
+    chain: filters?.chain?.id,
+    clientId: filters?.client?.id
   });
   const ofc = useOFC({
     categories: categories.data,
@@ -84,7 +85,7 @@ const AdminDashboard: Page = () => {
   return (
     <GridContainer>
       <GridItem xs={12} sm={6} md={6}>
-        <h3>{`¡Hola ${user.data?.displayName}!`}</h3>
+        <h3>{`¡Hola ${user.data?.name}!`}</h3>
         <h5>Filtrá las opciones para conocer el estado de tus cuentas:</h5>
       </GridItem>
       <GridItem xs={12} sm={6} md={6}>
@@ -155,5 +156,7 @@ const AdminDashboard: Page = () => {
 };
 
 AdminDashboard.Layout = AdminLayout;
+
+export const getServerSideProps = ensureAuth('backoffice');
 
 export default AdminDashboard;

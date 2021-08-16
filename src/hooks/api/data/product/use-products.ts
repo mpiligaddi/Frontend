@@ -1,7 +1,18 @@
 import { useQuery } from 'react-query';
-import products from '@/data/products';
+import { client } from '@/lib/axios';
 import { Product } from '@/lib/types';
 
+const getProducts = async () => {
+  const res = await client.get<{ products: Product[] }>('/api/products', {
+    params: {
+      category: true,
+      chains: true
+    }
+  });
+
+  return res.data.products;
+};
+
 export const useProducts = () => {
-  return useQuery('products', () => products as Product[]);
+  return useQuery('products', getProducts);
 };

@@ -1,5 +1,4 @@
-import { Client } from '@/lib/types';
-import firebase from 'firebase';
+import { client } from '@/lib/axios';
 import { useQueryClient, useMutation } from 'react-query';
 
 interface UpdateData {
@@ -7,29 +6,28 @@ interface UpdateData {
   adminId: string;
   comercialId: string;
   name: string;
-  companyName: string;
-  contactName: string;
+  address: string;
+  displayName: string;
+  cuit: string;
 }
+
+const updateClient = async ({ id, ...data }: UpdateData) => {
+  await client.put(`/api/clients/${id}`, {
+    cuit: data.cuit,
+    name: data.name,
+    address: data.address,
+    displayname: data.displayName,
+    comercial: data.comercialId,
+    admin: data.adminId
+  });
+};
 
 export const useUpdateClient = () => {
   const queryClient = useQueryClient();
 
-  const updateClient = async ({ id, ...data }: UpdateData) => {
-    await firebase.firestore().collection('clients').doc(id).update(data);
-
-    return {
-      id,
-      ...data
-    };
-  };
-
   return useMutation(updateClient, {
-    onSuccess(newClient) {
-      queryClient.setQueryData<Client[]>(['clients', null], data =>
-        (data || []).map(client =>
-          client.id === newClient.id ? { ...client, ...newClient } : client
-        )
-      );
+    async onSuccess() {
+      await queryClient.refetchQueries('clients');
     }
   });
 };

@@ -1,34 +1,38 @@
+import { useMemo } from 'react';
 import { useQuery, UseQueryOptions } from 'react-query';
-import firebase from 'firebase/app';
+import { client } from '@/lib/axios';
 import { Category } from '@/lib/types';
 
 type Config = {
-  clientId?: number;
+  clientId?: string;
   all?: boolean;
   options?: UseQueryOptions<Category[]>;
 };
 
-export const useCategories = ({ clientId, options, all }: Config) => {
-  const getCategories = async () => {
-    const ref = firebase.firestore().collection('categories');
+const getCategories = async ({ all, clientId }: Omit<Config, 'options'>) => {
+  if (all) {
+    const res = await client.get<{ categories: Category[] }>('/api/categories');
 
-    if (all) {
-      const { docs } = await ref.get();
+    return res.data.categories;
+  }
 
-      return docs.map(doc => ({ ...doc.data(), id: doc.id })) as Category[];
+  if (!clientId) return [];
+
+  const res = await client.get<{ categories: Category[] }>(`/api/categories`, {
+    params: {
+      byclient: clientId
     }
+  });
 
-    const result = await ref.where('clientId', '==', clientId).get();
+  return res.data.categories;
+};
 
-    const categories = result.docs.map(c => {
-      return { ...c.data(), id: c.id };
-    }) as Category[];
+export const useCategories = ({ clientId, options, all }: Config) => {
+  const key = useMemo(() => (all ? { all } : { clientId }), [all, clientId]);
 
-    return categories;
-  };
-
-  return useQuery(['categories', { clientId, all }], getCategories, {
+  return useQuery(['categories', key], () => getCategories({ clientId, all }), {
     enabled: all || !!clientId,
+    keepPreviousData: true,
     ...options
   });
 };

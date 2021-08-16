@@ -1,21 +1,24 @@
-import { FC } from 'react';
+import { FC, useEffect, useState } from 'react';
 import {
   useProducts,
   useCreateProduct,
   useDeleteProduct,
-  useUpdateProduct,
+  useProductsChains,
+  useDeleteProductsChains,
+  useUpdateProductsChains,
   useChains,
   useCategories
 } from '@/hooks/api';
 import { TableCrud } from '@/components/ui';
 
 const ProductsTable: FC = () => {
-  const { isLoading, data } = useProducts();
+  const products = useProducts();
   const chains = useChains({ all: true });
   const categories = useCategories({ all: true });
   const createProduct = useCreateProduct();
-  const deleteProduct = useDeleteProduct();
-  const updateProduct = useUpdateProduct();
+  const productsChains = useProductsChains();
+  const updateProductsChains = useUpdateProductsChains();
+  const deleteProductsChains = useDeleteProductsChains();
 
   return (
     <TableCrud
@@ -23,44 +26,53 @@ const ProductsTable: FC = () => {
       columns={[
         {
           title: 'Cadena',
-          field: 'chain',
+          field: 'chainId',
           lookup: chains.data?.reduce(
             (chains, chain) => ({
               ...chains,
-              [chain.name.toUpperCase()]: chain.name
+              [chain.id]: chain.name
             }),
             {}
           )
         },
         {
           title: 'Categoria',
-          field: 'category',
+          field: 'product.category.id',
           lookup: categories.data?.reduce(
             (categories, category) => ({
               ...categories,
-              [category.name.toUpperCase()]: category.name
+              [category.id]: category.name
             }),
             {}
           )
         },
         {
-          title: 'Descripcion',
-          field: 'description'
+          title: 'Nombre',
+          field: 'product.name'
         }
       ]}
-      data={data || []}
+      data={productsChains.data || []}
       editable={{
         async onRowAdd(data) {
-          await createProduct.mutateAsync(data);
+          await createProduct.mutateAsync({
+            categoryId: data.product.category.id,
+            chainId: data.chainId,
+            name: data.product.name
+          });
         },
         async onRowDelete(data) {
-          await deleteProduct.mutateAsync(data.id);
+          await deleteProductsChains.mutateAsync(data.id);
         },
-        async onRowUpdate(data) {
-          await updateProduct.mutateAsync(data);
+        async onRowUpdate({ chainId, productId, id, product }) {
+          await updateProductsChains.mutateAsync({
+            chainId,
+            id,
+            name: product.name,
+            categoryId: product.category.id
+          });
         }
       }}
-      isLoading={isLoading || chains.isLoading}
+      isLoading={products.isLoading || chains.isLoading}
     />
   );
 };

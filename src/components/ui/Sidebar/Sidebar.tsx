@@ -5,7 +5,6 @@ import { Drawer, List, Divider } from '@material-ui/core';
 import avatar from '@/assets/img/placeholder.jpg';
 
 import SidebarItem from './SidebarItem';
-import firebase from 'firebase/app';
 import { useUI } from '@/components/ui';
 
 import { useStyles, Avatar } from './styles';
@@ -45,11 +44,8 @@ const Sidebar: FC<SidebarProps> = ({ routes }) => {
       })}
     >
       <div className={classes.user}>
-        <Avatar
-          src={firebase.auth().currentUser?.photoURL}
-          default={avatar.src}
-        />
-        {!displayMiniSidebar && <p>{user.data?.displayName}</p>}
+        <Avatar src={user.data?.picture} default={avatar.src} />
+        {!displayMiniSidebar && <p>{user.data?.name}</p>}
       </div>
       <Divider className={classes.divider} />
       <List component="nav" className={classes.listRoot}>

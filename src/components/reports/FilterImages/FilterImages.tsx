@@ -31,9 +31,9 @@ const FilterImages: FC<FilterImagesProps> = ({
 
       const categories = report.categories.reduce(
         (categories: ReportCategory[], category) => {
-          if (!category.images) return categories;
+          if (!category.photos) return categories;
 
-          const baseImages = category.images.filter(image => !image.isDeleted);
+          const baseImages = category.photos.filter(image => !image.delete);
 
           const images = baseImages.filter(image => {
             if (type === 'favorites' && image.favorite) return true;

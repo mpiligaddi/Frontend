@@ -1,25 +1,21 @@
 import { useQuery, UseQueryOptions } from 'react-query';
-import firebase from 'firebase/app';
 import { Report } from '@/lib/types';
+import { client } from '@/lib/axios';
 
 export const useReports = (
-  clientId?: number,
+  clientId?: string,
   options?: UseQueryOptions<Report[]>
 ) => {
   const getReports = async () => {
-    const result = await firebase
-      .firestore()
-      .collection('reports')
-      .where('clientId', '==', `${clientId}`)
-      .orderBy('createdAt', 'desc')
-      .get();
+    const res = await client.get('/api/reports', {
+      params: {
+        byclient: clientId,
+        type: 'photographic',
+        categories: true
+      }
+    });
 
-    const reports = result.docs.map(report => ({
-      ...report.data(),
-      id: report.id
-    })) as Report[];
-
-    return reports;
+    return res.data.reports;
   };
 
   return useQuery(['reports', clientId], getReports, {

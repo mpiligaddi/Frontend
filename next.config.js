@@ -8,8 +8,26 @@ const withBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 module.exports = withPlugins([[withBundleAnalyzer], [withTM]], {
+  async rewrites() {
+    return {
+      fallback: [
+        {
+          source: '/api/:path*',
+          destination: `${process.env.NEXT_PUBLIC_API_URL}/:path*`
+        }
+      ]
+    };
+  },
   transpileModules: ['@material-ui/core', '@material-ui/icons'],
   images: {
-    domains: ['firebasestorage.googleapis.com']
+    domains: ['firebasestorage.googleapis.com', 'localhost', 'e.undervolt.io']
+  },
+  webpack(config) {
+    config.module.rules.push({
+      test: /jspdf/,
+      use: 'null-loader'
+    });
+
+    return config;
   }
 });

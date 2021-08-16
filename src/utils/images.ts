@@ -14,24 +14,24 @@ export interface FilteredImage {
 export const getImages = (reports: Report[]) => {
   const images = reports.reduce((acc: FilteredImage[], report) => {
     const cats = report.categories.filter(category =>
-      Array.isArray(category.images)
+      Array.isArray(category.photos)
     );
 
     const images = cats.reduce((acc: FilteredImage[], cat) => {
-      const images = cat.images.reduce((images: FilteredImage[], image) => {
-        if (image.isDeleted) return images;
+      const images = cat.photos.reduce((images: FilteredImage[], image) => {
+        if (image.delete) return images;
 
         return [
           ...images,
           {
-            id: image.name,
+            id: image.id,
             revised: image.revised ?? false,
-            url: image.uri,
+            url: image.name,
             favorite: image.favorite ?? false,
             report,
-            isDeleted: image.isDeleted ?? false,
+            isDeleted: image.delete ?? false,
             label: image.comment,
-            categoryName: cat.name
+            categoryName: cat.category.name
           }
         ];
       }, []);

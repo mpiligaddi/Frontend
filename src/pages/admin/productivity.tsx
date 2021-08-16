@@ -2,6 +2,7 @@ import React, { FC } from 'react';
 import { ComingSoon, GridContainer, GridItem, Tabs } from '@/components/ui';
 import { AdminLayout } from '@/components/common';
 import { Page } from '@/typings';
+import { ensureAuth } from '@/lib/auth';
 
 const Content: FC = () => (
   <ComingSoon message="Podrás ver analíticas de tu productividad y su evolución en el tiempo" />
@@ -88,5 +89,7 @@ const Productivity: Page = () => {
 };
 
 Productivity.Layout = AdminLayout;
+
+export const getServerSideProps = ensureAuth('backoffice');
 
 export default Productivity;

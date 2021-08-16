@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { useQuery, UseQueryOptions } from 'react-query';
-import firebase from 'firebase/app';
 import { Chain, Report } from '@/lib/types';
-import chainsJson from '@/data/chains';
+import { client } from '@/lib/axios';
 
 interface Data {
   clientId?: string;
@@ -17,80 +16,47 @@ export const useChains = ({
   clientId,
   reported,
   revised,
-  reports,
   options,
   all
 }: Data) => {
   const key = useMemo(
-    () =>
-      all ? { all } : { reported, clientId, reports: reports?.length, revised },
-    [all, reported, clientId, reports, revised]
+    () => (all ? { all } : { reported, clientId, revised }),
+    [all, reported, clientId, revised]
   );
 
   const getChains = async () => {
     if (all) {
-      return chainsJson;
+      const res = await client.get<{ chains: Chain[] }>('/api/chains');
+
+      return res.data.chains;
     }
 
-    const result = await firebase
-      .firestore()
-      .collection('chainsxclient')
-      .where('clientId', '==', clientId)
-      .get();
-
-    //setchainsXClient(result.docs);
-
-    const chainsXClient = result.docs.map(chain => ({
-      ...(chain.data() as { chainId: string; clientId: string }),
-      id: chain.id
-    }));
-
-    const chainsId = chainsXClient.map(obj => obj.chainId);
-
-    const { docs: chainDocs } = await firebase
-      .firestore()
-      .collection('chains')
-      .orderBy('name', 'asc')
-      .get();
-
-    const chains = chainDocs.map(doc => doc.data()) as Chain[];
-
-    console.log(reports);
-
-    const chainsData: Chain[] = [];
-
-    chains.forEach(chain => {
-      if (chainsId.includes(chain.ID)) {
-        chainsData.push(chain);
+    const res = await client.get<{ chains: Chain[] }>('/api/chains', {
+      params: {
+        byclient: clientId,
+        reports: reported
       }
     });
 
-    if (!reported) return chainsData;
+    if (!reported) return res.data.chains;
 
-    let reportsChainIds: string[];
+    const onlyWithReports = res.data.chains.filter(chain => {
+      if (revised) {
+        const onlyRevised = chain.reports?.filter(report => report.revised);
 
-    if (revised) {
-      reportsChainIds = reports!
-        .filter(report => report.revised)
-        .map(report => report.chainId);
-    } else {
-      reportsChainIds = reports!.map(report => report.chainId);
-    }
+        return onlyRevised && onlyRevised.length > 0;
+      }
 
-    const onlyWithReports = chainsData.filter(chain =>
-      reportsChainIds.includes(chain.ID)
-    );
+      return chain.reports && chain.reports.length > 0;
+    });
 
     return onlyWithReports;
   };
 
   return useQuery(['chains', key], getChains, {
-    enabled: all
-      ? true
-      : false || reported
-      ? !!clientId && !!reports
-      : !!clientId,
+    enabled: all ? true : false || !!clientId,
     keepPreviousData: true,
-    ...options
+    ...options,
+    onError() {}
   });
 };
