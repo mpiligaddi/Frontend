@@ -45,9 +45,7 @@ const Sidebar: FC<SidebarProps> = ({ routes }) => {
     >
       <div className={classes.user}>
         <Avatar src={user.data?.picture} default={avatar.src} />
-        {!displayMiniSidebar && (
-          <p className={classes.userName}>{user.data?.name}</p>
-        )}
+        {!displayMiniSidebar && <p>{user.data?.name}</p>}
       </div>
       <Divider className={classes.divider} />
       <List component="nav" className={classes.listRoot}>
