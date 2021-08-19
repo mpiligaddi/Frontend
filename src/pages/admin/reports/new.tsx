@@ -27,7 +27,6 @@ type ReportCategory = Category & {
 const NewReport: Page = () => {
   const [selectedCategories, setCategories] = useState<ReportCategory[]>([]);
   const { filters, setBranch, setChain, setClient } = useFilters();
-  const [locationError, setLocationError] = useState(false);
   const { clients, chains, branches, categories } = useFilteredData();
   const { mutateAsync } = useAddPhotoReport();
   const router = useRouter();
@@ -42,11 +41,26 @@ const NewReport: Page = () => {
   }, [categories.data]);
 
   const sendReport = async () => {
+    if (!filters?.client) {
+      toast.error('Es necesario elegir un cliente');
+      return;
+    }
+
+    if (!filters?.chain) {
+      toast.error('Es necesario elegir una cadena');
+      return;
+    }
+
+    if (!filters?.branch) {
+      toast.error('Es necesario elegir una sucursal');
+      return;
+    }
+
     const formData = new FormData();
     const position = await getPosition();
 
     if (!position) {
-      setLocationError(true);
+      toast.error('Es necesario activar la ubicacion para enviar el reporte');
       return;
     }
 
@@ -84,23 +98,24 @@ const NewReport: Page = () => {
     });
 
     try {
-      const { message } = await mutateAsync(formData);
-
-      toast.success(message);
+      await toast.promise(mutateAsync(formData), {
+        success: ({ message }) => message,
+        error: err => err.response.data.message,
+        loading: 'Subiendo Reporte...'
+      });
 
       router.push('/admin/revision');
     } catch (err) {
-      if (err.response.data) {
-        toast.error(err.response.data.message);
-      }
-
-      toast.error('Sucedio un error al enviar el reporte, vuelve a intentar');
+      // if (err.response.data) {
+      //   toast.error(err.response.data.message);
+      // }
+      // toast.error('Sucedio un error al enviar el reporte, vuelve a intentar');
     }
   };
 
   return (
     <GridContainer justify="center" style={{ padding: 10 }}>
-      <Toaster />
+      <Toaster position="top-right" />
       <GridItem xs={10} sm={10} md={10}>
         <br />
         <GridContainer>
@@ -175,10 +190,6 @@ const NewReport: Page = () => {
               </GridContainer>
             </GridItem>
           </GridContainer>
-        )}
-        {/* <PictureUpload /> */}
-        {locationError && (
-          <p>Es necesario activar la ubicacion para enviar un reporte</p>
         )}
         <Button onClick={sendReport}>Subir</Button>
       </GridItem>

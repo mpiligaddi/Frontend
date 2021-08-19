@@ -102,7 +102,13 @@ const ImageUpload: FC<ImageUploadProps> = ({
 
   return (
     <div className={classes.root}>
-      <input type="file" hidden onChange={handleImageChange} ref={fileInput} />
+      <input
+        accept="image/png, image/jpeg"
+        type="file"
+        hidden
+        onChange={handleImageChange}
+        ref={fileInput}
+      />
       <Button style={{ padding: 0 }} onClick={handleClick}>
         <div>
           <Avatar

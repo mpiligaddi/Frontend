@@ -21,7 +21,7 @@ export const Avatar = styled('div')<
   overflow: 'hidden',
   float: 'left',
   zIndex: 5,
-  margin: '0 11px 0 11px',
+  margin: '0 0 0 11px',
   borderRadius: '50%',
   boxShadow: `0 10px 20px -12px rgba(0, 0, 0, 0.32),
     0 4px 15px 0px rgba(0, 0, 0, 0.1), 0 8px 5px -5px rgba(0, 0, 0, 0.2)`,
@@ -131,7 +131,8 @@ export const useStyles = makeStyles(theme => ({
     color: '#fff',
     padding: '10px 0px',
     '& p': {
-      margin: 0
+      margin: 0,
+      marginLeft: '10px'
     }
   }
 }));

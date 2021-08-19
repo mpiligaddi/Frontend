@@ -49,16 +49,12 @@ const ComplianceDetail = dynamic(
 
 const AdminDashboard: Page = () => {
   const user = useMe();
-  const { filters, filteredReports } = useFilters();
-  const { reports, categories } = useFilteredData({
+  const { filters } = useFilters();
+  const { reports, categories, branches } = useFilteredData({
     reported: false,
-    enabled: { chains: false, ofc: false, branches: false }
+    enabled: { chains: false, ofc: false }
   });
   const { data: allBranches } = useBranches({
-    clientId: filters?.client?.id
-  });
-  const branches = useBranches({
-    chain: filters?.chain?.id,
     clientId: filters?.client?.id
   });
   const ofc = useOFC({
@@ -172,7 +168,11 @@ const AdminDashboard: Page = () => {
           onOpen={() => setStoresOpen(!storesOpen)}
           content={
             filters?.chain
-              ? new Set(filteredReports.map(report => report.branchId)).size
+              ? new Set(
+                  reports.data
+                    ?.filter(report => report.chainId === filters?.chain?.id)
+                    .map(report => report.branchId)
+                ).size
               : new Set(reports.data?.map(report => report.branchId)).size
           }
           sub={filters?.chain ? branches.data?.length : allBranches?.length}
