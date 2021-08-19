@@ -8,7 +8,6 @@ import illustration from '@/assets/img/LANDINGILUSTRACION.png';
 
 import { Link, Checkbox, TextField, FormControlLabel } from '@material-ui/core';
 import { Alert, AlertTitle } from '@material-ui/lab';
-import { useRouter } from 'next/router';
 import { useForm, SubmitHandler, Controller } from 'react-hook-form';
 
 import { GridItem, Button, GridContainer } from '@/components/ui';
@@ -22,18 +21,12 @@ type FormValues = {
   remember: boolean;
 };
 
-const roleRoute: Record<string, string> = {
-  backoffice: 'admin',
-  client: 'client'
-};
-
 const LoginForm: FC = () => {
   const classes = useStyles();
   const [forgotOpen, setForgotOpen] = useState(false);
   const [contactOpen, setContactOpen] = useState(false);
-  const router = useRouter();
   const { register, handleSubmit, control } = useForm<FormValues>();
-  const { mutateAsync, isLoading, error } = useLogin();
+  const { mutate, isLoading, error } = useLogin();
 
   const handleClose = () => {
     setForgotOpen(false);
@@ -43,14 +36,8 @@ const LoginForm: FC = () => {
     setContactOpen(false);
   };
 
-  // Submit function (Login user)
   const onSubmit: SubmitHandler<FormValues> = async values => {
-    const user = await mutateAsync(values);
-    if (!user?.role) return;
-
-    if (roleRoute[user.role]) {
-      await router.push(`/${roleRoute[user.role]}/dashboard`);
-    }
+    mutate(values);
   };
 
   return (

@@ -34,6 +34,11 @@ export interface OFC {
   done: boolean;
 }
 
+export interface OQC {
+  branchId: string;
+  done: boolean;
+}
+
 export interface Coverage {
   id: string;
   clientId: string;

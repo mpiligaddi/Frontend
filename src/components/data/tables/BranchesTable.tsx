@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { TableCrud, SuccessAlert } from '@/components/ui';
+import { TableCrud } from '@/components/ui';
 import {
   useChains,
   useZones,
@@ -17,9 +17,6 @@ const BranchesTable: FC = () => {
 
   return (
     <>
-      {/* {create && (
-        <SuccessAlert msg="Sucursal creada con éxito" onConfirm={updateBranches.} />
-      )} */}
       <>
         <div>
           <TableCrud

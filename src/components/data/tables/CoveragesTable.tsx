@@ -1,5 +1,5 @@
 import { useState, useEffect, FC, useMemo } from 'react';
-import { TableCrud, SuccessAlert } from '@/components/ui';
+import { TableCrud } from '@/components/ui';
 import { Filters } from '@/context/filters';
 import {
   useCoverages,
@@ -75,9 +75,6 @@ const CoveragesTable: FC = () => {
 
   return (
     <>
-      {createCoverage.isSuccess && (
-        <SuccessAlert msg="Anexo agregado con éxito" onConfirm={() => {}} />
-      )}
       {data && (
         <div>
           <TableCrud

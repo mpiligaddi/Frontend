@@ -34,11 +34,14 @@ export const useChains = ({
     const res = await client.get<{ chains: Chain[] }>('/api/chains', {
       params: {
         byclient: clientId,
-        reports: reported
+        reports: reported,
+        reporttype: 'photographic'
       }
     });
 
     if (!reported) return res.data.chains;
+
+    console.log(res.data);
 
     const onlyWithReports = res.data.chains.filter(chain => {
       if (revised) {

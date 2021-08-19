@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import MaterialCarousel from 'react-material-ui-carousel';
+import { Carousel as MCarousel } from 'react-responsive-carousel';
 import Image from 'next/image';
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -60,11 +60,14 @@ const Carousel: FC = () => {
   const classes = useStyles();
 
   return (
-    <MaterialCarousel
-      timeout={1000}
-      indicators={false}
-      stopAutoPlayOnHover={false}
-      navButtonsAlwaysInvisible
+    <MCarousel
+      autoPlay
+      transitionTime={1000}
+      infiniteLoop
+      showIndicators={false}
+      showStatus={false}
+      showThumbs={false}
+      showArrows={false}
     >
       {items.map((item, i) => (
         <div key={i} className={classes.item}>
@@ -79,7 +82,7 @@ const Carousel: FC = () => {
           <p className={classes.content}>{item.content}</p>
         </div>
       ))}
-    </MaterialCarousel>
+    </MCarousel>
   );
 };
 

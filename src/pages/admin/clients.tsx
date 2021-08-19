@@ -1,4 +1,9 @@
-import { ClientsTable } from '@/components/data/tables';
+import {
+  ClientsTable,
+  CoveragesTable,
+  CategoriesTable,
+  ProductsTable
+} from '@/components/data/tables';
 import { CreateClient } from '@/components/data/forms';
 import { AdminLayout } from '@/components/common';
 import { GridContainer, GridItem, Tabs } from '@/components/ui';
@@ -18,6 +23,21 @@ const Clients: Page = () => {
               tabName: 'Clientes',
               tabIcon: ListAlt,
               tabContent: <ClientsTable />
+            },
+            {
+              tabName: 'Anexos',
+              tabIcon: ListAlt,
+              tabContent: <CoveragesTable />
+            },
+            {
+              tabName: 'Categorías',
+              tabIcon: ListAlt,
+              tabContent: <CategoriesTable />
+            },
+            {
+              tabName: 'Productos',
+              tabIcon: ListAlt,
+              tabContent: <ProductsTable />
             },
             {
               tabName: 'Nuevo Cliente',

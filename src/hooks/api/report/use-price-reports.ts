@@ -6,7 +6,7 @@ const getReports = async (clientId?: string) => {
   const res = await client.get('/api/reports', {
     params: {
       byclient: clientId,
-      type: 'photographic',
+      type: 'pricing',
       categories: true
     }
   });
@@ -14,11 +14,11 @@ const getReports = async (clientId?: string) => {
   return res.data.reports;
 };
 
-export const useReports = (
+export const usePriceReports = (
   clientId?: string,
   options?: UseQueryOptions<Report[]>
 ) => {
-  return useQuery(['reports', clientId], () => getReports(clientId), {
+  return useQuery(['priceReports', clientId], () => getReports(clientId), {
     enabled: !!clientId,
     keepPreviousData: true,
     ...options

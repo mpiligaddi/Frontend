@@ -6,3 +6,4 @@ export { default as FilterImages } from './FilterImages';
 export { default as FavoritesReports } from './FavoritesReportsCarousel';
 export { default as SelectClient } from './SelectClient';
 export { default as ReportTypeSelector } from './ReportTypeSelector';
+export { default as CategoryReport } from './CategoryReport';

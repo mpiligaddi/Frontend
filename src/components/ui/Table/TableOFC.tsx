@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { makeStyles, withStyles } from '@material-ui/core/styles';
+import { withStyles } from '@material-ui/core/styles';
 import {
   Table,
   TableBody,
@@ -22,12 +22,6 @@ const StyledTableCell = withStyles({
   }
 })(TableCell);
 
-const useStyles = makeStyles({
-  table: {
-    //minWidth: 700,
-  }
-});
-
 function createData(pra: string, renov: string, when: string) {
   return { pra, renov, when };
 }
@@ -40,11 +34,9 @@ const rows = [
 ];
 
 const TableOFC: FC = () => {
-  const classes = useStyles();
-
   return (
     <TableContainer component={Paper}>
-      <Table className={classes.table} size="small" aria-label="a dense table">
+      <Table size="small" aria-label="a dense table">
         <TableHead>
           <TableRow>
             <StyledTableCell align="center">PRA</StyledTableCell>

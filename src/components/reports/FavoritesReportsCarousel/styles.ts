@@ -13,7 +13,10 @@ export const useStyles = makeStyles(theme => ({
     height: '100%',
     width: '100%',
     justifyContent: 'space-around',
-    borderRadius: '23px'
+    borderRadius: '23px',
+    '& div': {
+      borderRadius: '23px'
+    }
   },
   carouselImage: {
     height: '500px',

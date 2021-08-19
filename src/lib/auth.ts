@@ -20,7 +20,16 @@ const roles: Record<string, string> = {
 
 export const ensureAuth =
   (role?: string, gssr?: CustomGSSR): GetServerSideProps =>
-  async ({ req, ...ctx }) => {
+  async ({ req }) => {
+    if (!req.cookies.token) {
+      return {
+        props: {},
+        redirect: {
+          destination: '/auth/login'
+        }
+      };
+    }
+
     const queryClient = new QueryClient();
 
     try {
@@ -67,7 +76,13 @@ export const ensureAuth =
 
 export const redirectIfAuth =
   (): GetServerSideProps =>
-  async ({ req, ...ctx }) => {
+  async ({ req }) => {
+    if (!req.cookies.token) {
+      return {
+        props: {}
+      };
+    }
+
     const queryClient = new QueryClient();
 
     try {

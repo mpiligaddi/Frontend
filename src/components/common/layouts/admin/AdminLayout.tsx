@@ -47,19 +47,9 @@ const routes: Route[] = [
     icon: <Person />
   },
   {
-    name: 'Anexos',
-    path: '/admin/coverages',
-    icon: <List />
-  },
-  {
-    name: 'Tiendas',
+    name: 'Cobertura',
     path: '/admin/stores',
     icon: <Store />
-  },
-  {
-    name: 'Productos',
-    path: '/admin/products',
-    icon: <ShoppingCart />
   },
   {
     name: 'Mi Productividad',

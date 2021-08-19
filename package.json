@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "find:unused": "next-unused",
     "build:analyze": "ANALYZE=true yarn build",
     "prepare": "husky install"
   },
@@ -21,9 +22,8 @@
     "classnames": "^2.3.1",
     "dayjs": "^1.10.6",
     "material-table": "^1.69.3",
-    "next": "11.0.0",
+    "next": "^11.1.0",
     "next-compose-plugins": "^2.2.1",
-    "next-transpile-modules": "^8.0.0",
     "nprogress": "^0.2.0",
     "pixi-viewport": "^4.31.0",
     "pixi.js": "^6.0.4",
@@ -33,10 +33,11 @@
     "react-csv": "^2.0.3",
     "react-dom": "17.0.2",
     "react-hook-form": "^7.9.0",
-    "react-material-ui-carousel": "^2.2.6",
+    "react-hot-toast": "^2.1.0",
     "react-multi-carousel": "^2.6.3",
     "react-query": "^3.17.2",
-    "sass": "^1.35.1",
+    "react-responsive-carousel": "^3.2.20",
+    "uuid": "^8.3.2",
     "yup": "^0.32.9",
     "yup-phone-lite": "^1.0.4"
   },
@@ -45,11 +46,13 @@
     "@types/nprogress": "^0.2.0",
     "@types/react": "17.0.11",
     "@types/react-csv": "^1.1.2",
+    "@types/uuid": "^8.3.1",
     "babel-plugin-transform-imports": "^2.0.0",
     "eslint": "7.28.0",
     "eslint-config-next": "11.0.0",
     "husky": ">=6",
     "lint-staged": ">=10",
+    "next-unused": "^0.0.6",
     "null-loader": "^4.0.1",
     "prettier": "^2.3.2",
     "typescript": "4.3.4"
@@ -57,5 +60,23 @@
   "lint-staged": {
     "*.{js,ts,tsx}": "eslint --cache --fix",
     "*.{js,ts,tsx,scss,md,json}": "prettier --write"
+  },
+  "next-unused": {
+    "debug": true,
+    "alias": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "include": [
+      "src/lib",
+      "src/hooks",
+      "src/pages",
+      "src/utils",
+      "src/components"
+    ],
+    "entrypoints": [
+      "src/pages"
+    ]
   }
 }

@@ -23,14 +23,14 @@ const Stores: Page = () => {
               tabContent: <FormatsTable />
             },
             {
-              tabName: 'Sucursales',
-              tabIcon: ListAlt,
-              tabContent: <BranchesTable />
-            },
-            {
               tabName: 'Cadenas',
               tabIcon: ListAlt,
               tabContent: <ChainsTable />
+            },
+            {
+              tabName: 'Sucursales',
+              tabIcon: ListAlt,
+              tabContent: <BranchesTable />
             }
           ]}
         />

@@ -25,6 +25,9 @@ interface State {
   reports: UseQueryResult<Report[]>;
   filteredReports: Report[];
   filters?: Filters;
+  setClient(client?: Client): void;
+  setChain(chain?: Chain): void;
+  setBranch(branch?: Branch): void;
   setFilters: Dispatch<SetStateAction<Filters | undefined>>;
 }
 
@@ -76,6 +79,31 @@ export const FiltersProvider: FC = ({ children }) => {
     setFilteredReports(filteredReports);
   }, [reports.data, filters]);
 
+  const setClient = (client?: Client) => {
+    setFilters(filters => ({
+      ...filters,
+      client,
+      chain: undefined,
+      branch: undefined,
+      category: undefined
+    }));
+  };
+
+  const setChain = (chain?: Chain) => {
+    setFilters(filters => ({
+      ...filters,
+      chain,
+      branch: undefined
+    }));
+  };
+
+  const setBranch = (branch?: Branch) => {
+    setFilters(filters => ({
+      ...filters,
+      branch
+    }));
+  };
+
   useEffect(() => {
     getReports();
   }, [filters, reports.data, getReports]);
@@ -101,7 +129,10 @@ export const FiltersProvider: FC = ({ children }) => {
       filteredReports,
       reports,
       filters,
-      setFilters
+      setFilters,
+      setBranch,
+      setChain,
+      setClient
     }),
     [filteredReports, reports, filters]
   );

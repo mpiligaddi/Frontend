@@ -1,5 +1,5 @@
 import React, { FC, useState, useEffect } from 'react';
-import Carousel from 'react-material-ui-carousel';
+import { Carousel } from 'react-responsive-carousel';
 
 import { getImages, FilteredImage } from '@/utils/images';
 import { useFilteredData } from '@/hooks/api';
@@ -27,9 +27,11 @@ const FavoritesReportsCarousel: FC = () => {
 
   return (
     <Carousel
-      stopAutoPlayOnHover
-      animation="fade"
-      indicators={false}
+      autoPlay
+      infiniteLoop
+      showThumbs={false}
+      showStatus={false}
+      showIndicators={false}
       className={classes.carousel}
     >
       {images.map(image => (

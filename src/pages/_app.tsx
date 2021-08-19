@@ -1,4 +1,5 @@
-import '@/assets/scss/trade-app.scss';
+import '@/assets/css/style.css';
+import 'react-responsive-carousel/lib/styles/carousel.min.css';
 import 'react-multi-carousel/lib/styles.css';
 import '@/assets/css/nprogress.css';
 
@@ -38,7 +39,6 @@ NProgress.configure({
 
 const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
   const Layout = Component.Layout || Noop;
-  const getLayout = Component.getLayout;
   const router = useRouter();
   const [queryClient] = useState(
     () =>
@@ -84,19 +84,10 @@ const MyApp: FC<MyAppProps> = ({ Component, pageProps }) => {
             <Head>
               <title>Chek</title>
             </Head>
-            {getLayout ? (
-              getLayout(
-                <>
-                  <Component {...pageProps} />
-                  <ReactQueryDevtools />
-                </>
-              )
-            ) : (
-              <Layout>
-                <Component {...pageProps} />
-                <ReactQueryDevtools />
-              </Layout>
-            )}
+            <Layout>
+              <Component {...pageProps} />
+              <ReactQueryDevtools />
+            </Layout>
           </UIProvider>
         </ThemeProvider>
       </Hydrate>
